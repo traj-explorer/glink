@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.github.stc.glink.wordcount.util;
+package com.github.tm.glink.examples.flink.wordcount.util;
 
 /**
  * Provides the default data sets used for the WordCount example program.

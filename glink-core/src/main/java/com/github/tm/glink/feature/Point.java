@@ -1,4 +1,8 @@
-package com.github.stc.glink.feature;
+package com.github.tm.glink.feature;
+
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 
 /**
  * @author Yu Liebing
@@ -6,13 +10,18 @@ package com.github.stc.glink.feature;
 public class Point extends GeoObject {
 
   private String id;
-  private float lat;
-  private float lng;
+  private double lat;
+  private double lng;
   private long timestamp;
 
   public Point() { }
 
-  public Point(String id, float lat, float lng, long timestamp) {
+  public Point(double lat, double lng) {
+    this.lat = lat;
+    this.lng = lng;
+  }
+
+  public Point(String id, double lat, double lng, long timestamp) {
     this.id = id;
     this.lat = lat;
     this.lng = lng;
@@ -27,19 +36,19 @@ public class Point extends GeoObject {
     this.id = id;
   }
 
-  public float getLat() {
+  public double getLat() {
     return lat;
   }
 
-  public void setLat(float lat) {
+  public void setLat(double lat) {
     this.lat = lat;
   }
 
-  public float getLng() {
+  public double getLng() {
     return lng;
   }
 
-  public void setLng(float lng) {
+  public void setLng(double lng) {
     this.lng = lng;
   }
 
@@ -54,5 +63,10 @@ public class Point extends GeoObject {
   @Override
   public String toString() {
     return id + ", " + lat + ", " + lng + ", " + timestamp;
+  }
+
+  @Override
+  public Geometry getGeometry(GeometryFactory factory) {
+    return factory.createPoint(new Coordinate(lat, lng));
   }
 }

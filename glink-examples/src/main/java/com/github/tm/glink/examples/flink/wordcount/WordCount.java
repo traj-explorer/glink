@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.github.stc.glink.wordcount;
+package com.github.tm.glink.examples.flink.wordcount;
 
-import com.github.stc.glink.wordcount.util.WordCountData;
+import com.github.tm.glink.examples.flink.wordcount.util.WordCountData;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.MultipleParameterTool;

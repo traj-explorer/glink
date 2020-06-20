@@ -1,4 +1,4 @@
-package com.github.stc.glink.partition;
+package com.github.tm.glink.partition;
 
 import org.apache.flink.api.common.functions.Partitioner;
 

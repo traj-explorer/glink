@@ -1,6 +1,6 @@
-package com.github.stc.glink.source;
+package com.github.tm.glink.source;
 
-import com.github.stc.glink.feature.Point;
+import com.github.tm.glink.feature.Point;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
@@ -9,7 +9,6 @@ import java.io.FileReader;
 
 /**
  * @author Yu Liebing
- * Create on 2020-05-16.
  */
 public class CSVPointSource extends RichSourceFunction<Point> {
 
