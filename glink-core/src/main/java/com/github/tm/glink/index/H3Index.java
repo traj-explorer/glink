@@ -24,6 +24,11 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public int getRes() {
+    return res;
+  }
+
+  @Override
   public long getIndex(double lat, double lng) {
     return h3Core.geoToH3(lat, lng, res);
   }
@@ -34,12 +39,27 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public long getParent(long index, int res) {
+    return h3Core.h3ToParent(index, res);
+  }
+
+  @Override
   public List<Long> getChildren(long index) {
+    return h3Core.h3ToChildren(index, res);
+  }
+
+  @Override
+  public List<Long> getChildren(long index, int res) {
     return h3Core.h3ToChildren(index, res);
   }
 
   @Override
   public List<Long> getContainGrids(Geometry geometry) {
     return null;
+  }
+
+  @Override
+  public List<Long> kRing(long index, int k) {
+    return h3Core.kRing(index, k);
   }
 }

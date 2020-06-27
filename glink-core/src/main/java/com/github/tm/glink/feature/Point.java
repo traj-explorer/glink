@@ -9,23 +9,31 @@ import org.locationtech.jts.geom.GeometryFactory;
  */
 public class Point extends GeoObject {
 
+  // attributes of point
   private String id;
   private double lat;
   private double lng;
   private long timestamp;
 
+  // index attributes
+  private long index;
+
   public Point() { }
 
   public Point(double lat, double lng) {
-    this.lat = lat;
-    this.lng = lng;
+    this(null, lat, lng, 0L, 0L);
   }
 
   public Point(String id, double lat, double lng, long timestamp) {
+    this(id, lat, lng, timestamp, 0L);
+  }
+
+  public Point(String id, double lat, double lng, long timestamp, long index) {
     this.id = id;
     this.lat = lat;
     this.lng = lng;
     this.timestamp = timestamp;
+    this.index = index;
   }
 
   public String getId() {
@@ -60,9 +68,17 @@ public class Point extends GeoObject {
     this.timestamp = timestamp;
   }
 
+  public long getIndex() {
+    return index;
+  }
+
+  public void setIndex(long index) {
+    this.index = index;
+  }
+
   @Override
   public String toString() {
-    return id + ", " + lat + ", " + lng + ", " + timestamp;
+    return id + ", " + lat + ", " + lng + ", " + timestamp + ", " + index;
   }
 
   @Override
