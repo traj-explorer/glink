@@ -1,5 +1,6 @@
 package com.github.tm.glink.index;
 
+import com.github.tm.glink.feature.ClassfiedGrids;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -22,7 +23,7 @@ public abstract class GridIndex implements Serializable {
 
   public abstract List<Long> getChildren(long index, int res);
 
-  public abstract List<Long> getContainGrids(Geometry geometry);
+  public abstract ClassfiedGrids getContainGrids(Geometry geometry);
 
   public abstract List<Long> kRing(long index, int k);
 }
