@@ -20,4 +20,7 @@ public class CSVDiDiGPSPointSource extends CSVGeoObjectSource<Point> {
             Double.parseDouble(items[3]),
             Long.parseLong(items[2]) * 1000);
   }
+
+
+
 }

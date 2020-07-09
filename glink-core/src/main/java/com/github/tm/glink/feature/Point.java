@@ -4,10 +4,12 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 
+import java.io.Serializable;
+
 /**
  * @author Yu Liebing
  */
-public class Point extends GeoObject {
+public class Point extends GeoObject implements Comparable<Point>, Serializable {
 
   // attributes of point
   private String id;
@@ -75,14 +77,28 @@ public class Point extends GeoObject {
   public void setIndex(long index) {
     this.index = index;
   }
-
   @Override
   public String toString() {
     return id + ", " + lat + ", " + lng + ", " + timestamp + ", " + index;
   }
-
   @Override
   public Geometry getGeometry(GeometryFactory factory) {
     return factory.createPoint(new Coordinate(lat, lng));
+  }
+
+  public static Point fromString(String line) {
+    String[] tokens = line.split(",");
+    if (tokens.length == 4) {
+      return new Point(tokens[0], Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]), Long.parseLong(tokens[3]));
+    } else if (tokens.length == 5) {
+      return new Point(tokens[0], Double.parseDouble(tokens[1]), Double.parseDouble(tokens[2]), Long.parseLong(tokens[3]), Long.parseLong(tokens[4]));
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public int compareTo(Point o) {
+    return 0;
   }
 }

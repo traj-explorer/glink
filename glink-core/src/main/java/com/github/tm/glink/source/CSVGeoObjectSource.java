@@ -24,7 +24,7 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
   }
 
   @Override
-  public final void run(SourceContext<T> sourceContext) throws Exception {
+  public void run(SourceContext<T> sourceContext) throws Exception {
     String line;
     while ((line = bufferedReader.readLine()) != null) {
       T geoObject = parseLine(line);

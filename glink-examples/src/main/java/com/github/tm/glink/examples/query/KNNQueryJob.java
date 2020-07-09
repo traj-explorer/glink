@@ -24,7 +24,7 @@ public class KNNQueryJob {
     int k = 10;
     QueryPoint queryPoint = new QueryPoint(30.66, 104.05);
 
-    String path = KNNQueryJob.class.getResource("/gps_20161101_0710").getPath();
+    String path = KNNQueryJob.class.getResource("/src/main/gps_20161101_0710").getPath();
     DataStream<Point> pointDataStream = env.addSource(new CSVDiDiGPSPointSource(path))
             .assignTimestampsAndWatermarks(new EventTimeAssigner(5000));
 
