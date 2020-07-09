@@ -33,7 +33,7 @@ public class DidiGPSPointSource extends CSVGeoObjectSource<Point> {
     long dataEventTime;
     String line;
     // buffer存储使最大时间戳发生变化两条记录的中间的记录。
-    // 线程等待只会在当最大时间戳发生变化,且变化量大于100ms时发生。
+    // 线程等待只会在当最大时间戳发生变化,且变化量大于10ms时发生。
     LinkedList<String> buffer = new LinkedList<>();
     while (bufferedReader.ready() && (line = bufferedReader.readLine()) != null) {
       String[] tokens = line.split(",");

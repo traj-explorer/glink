@@ -1,7 +1,9 @@
 package com.github.tm.glink.examples.source;
 
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer011;
@@ -29,7 +31,9 @@ public class DiDiGPSPointToKafka {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     // start the data generator
-    DataStream<Point> rides = env.addSource(new DidiGPSPointSource(FILE_PATH, servingSpeedFactor, 1477955400L));
+    KeyedStream<Point, String> rides = env.addSource(new DidiGPSPointSource(FILE_PATH, servingSpeedFactor, 1477955400L))
+        .keyBy(Point::getId);
+
     rides.addSink(new FlinkKafkaProducer011<Point>(DIDI_GPS_POINTS_TOPIC, new PointSchema(), props, java.util.Optional.of(new DidiGPSPointPartitionar())));
     rides.print();
     env.execute("DidiGPSPointToKafka");
