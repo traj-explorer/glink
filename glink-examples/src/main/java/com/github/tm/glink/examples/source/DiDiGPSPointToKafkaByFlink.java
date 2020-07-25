@@ -16,7 +16,7 @@ import com.github.tm.glink.util.PointSchema;
 import java.util.Properties;
 
 
-public class DiDiGPSPointToKafka {
+public class DiDiGPSPointToKafkaByFlink {
 
   private static final String LOCAL_KAFKA_BROKER = "localhost:9092";
   public static final String DIDI_GPS_POINTS_TOPIC = "DiDiGPSPoints01";
