@@ -15,7 +15,7 @@ public class Point extends GeoObject {
   private double lng;
   private long timestamp;
 
-  // index attributes
+  // index
   private long index;
 
   public Point() { }
@@ -78,7 +78,7 @@ public class Point extends GeoObject {
 
   @Override
   public String toString() {
-    return id + ", " + lat + ", " + lng + ", " + timestamp + ", " + index;
+    return String.format("Point{id=%s, lat=%f, lng=%f, timestamp=%d, index=%d}", id, lat, lng, timestamp, index);
   }
 
   @Override

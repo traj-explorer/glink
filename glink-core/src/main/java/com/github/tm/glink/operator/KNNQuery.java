@@ -1,7 +1,7 @@
 package com.github.tm.glink.operator;
 
 import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
+import com.github.tm.glink.feature.Coordinate;
 import com.github.tm.glink.operator.judgement.IndexKNNJudgement;
 import com.github.tm.glink.operator.judgement.NativeKNNJudgement;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -15,7 +15,7 @@ public class KNNQuery {
 
   public static DataStream<Point> pointKNNQuery(
           DataStream<Point> geoDataStream,
-          QueryPoint queryPoint,
+          Coordinate queryPoint,
           int k,
           int windowSize,
           boolean useIndex,

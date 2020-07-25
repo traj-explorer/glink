@@ -15,6 +15,8 @@ public abstract class GridIndex implements Serializable {
 
   public abstract long getIndex(double lat, double lng);
 
+  public abstract void getGeoBoundary(long index);
+
   public abstract long getParent(long index);
 
   public abstract long getParent(long index, int res);

@@ -24,7 +24,7 @@ public class H3RangeQuery {
         } else if (index.equals("polygon")) {
             return geoDataStream.map(new IndexAssigner(res))
                     .keyBy(r -> Math.abs(r.getId().hashCode() % partitionNum))
-                    .filter(new H3RangeJudgement<>(queryGeometry,res));
+                    .filter(new H3RangeJudgement<>(queryGeometry, res));
         } else {
             throw new IllegalArgumentException("Unsupported `rangeIndex`, should be one of the `null`, `polygon`, `all`");
         }
@@ -37,6 +37,6 @@ public class H3RangeQuery {
             int res) {
         return geoDataStream.map(new IndexAssigner(res))
                 .keyBy(r -> Math.abs(r.getId().hashCode() % partitionNum))
-                .filter(new H3RangeJudgement<>(queryWindow,res));
+                .filter(new H3RangeJudgement<>(queryWindow, res));
     }
 }

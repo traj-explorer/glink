@@ -1,7 +1,7 @@
 package com.github.tm.glink.operator.judgement;
 
 import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
+import com.github.tm.glink.feature.Coordinate;
 import com.github.tm.glink.util.GeoDistanceComparator;
 import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
@@ -16,7 +16,7 @@ import java.util.PriorityQueue;
 public class NativeKNNJudgement {
 
   public static void windowApply(
-          QueryPoint queryPoint,
+          Coordinate queryPoint,
           int k,
           Integer windowKey,
           TimeWindow timeWindow,
@@ -44,10 +44,10 @@ public class NativeKNNJudgement {
 
   public static class NativeKeyedKNNJudgement implements WindowFunction<Point, Point, Integer, TimeWindow> {
 
-    private QueryPoint queryPoint;
+    private Coordinate queryPoint;
     private int k;
 
-    public NativeKeyedKNNJudgement(QueryPoint queryPoint, int k) {
+    public NativeKeyedKNNJudgement(Coordinate queryPoint, int k) {
       this.queryPoint = queryPoint;
       this.k = k;
     }
@@ -61,10 +61,10 @@ public class NativeKNNJudgement {
 
   public static class NativeAllKNNJudgement implements AllWindowFunction<Point, Point, TimeWindow> {
 
-    private QueryPoint queryPoint;
+    private Coordinate queryPoint;
     private int k;
 
-    public NativeAllKNNJudgement(QueryPoint queryPoint, int k) {
+    public NativeAllKNNJudgement(Coordinate queryPoint, int k) {
       this.queryPoint = queryPoint;
       this.k = k;
     }

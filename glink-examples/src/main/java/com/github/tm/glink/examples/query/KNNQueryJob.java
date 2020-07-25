@@ -2,7 +2,7 @@ package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
 import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
+import com.github.tm.glink.feature.Coordinate;
 import com.github.tm.glink.operator.KNNQuery;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -22,7 +22,7 @@ public class KNNQueryJob {
     env.getConfig().setAutoWatermarkInterval(1000L);
 
     int k = 10;
-    QueryPoint queryPoint = new QueryPoint(30.66, 104.05);
+    Coordinate queryPoint = new Coordinate(30.66, 104.05);
 
     String path = KNNQueryJob.class.getResource("/gps_20161101_0710").getPath();
     DataStream<Point> pointDataStream = env.addSource(new CSVDiDiGPSPointSource(path))

@@ -5,12 +5,12 @@ import java.io.Serializable;
 /**
  * @author Yu Liebing
  */
-public class QueryPoint implements Serializable {
+public class Coordinate implements Serializable {
 
   private double lat;
   private double lng;
 
-  public QueryPoint(double lat, double lng) {
+  public Coordinate(double lat, double lng) {
     this.lat = lat;
     this.lng = lng;
   }

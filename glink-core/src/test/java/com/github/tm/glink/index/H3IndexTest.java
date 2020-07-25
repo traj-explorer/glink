@@ -39,6 +39,13 @@ public class H3IndexTest {
   }
 
   @Test
+  public void getGeoBoundaryTest() {
+    double lat = 35.50, lng = 114.45;
+    long index = gridIndex.getIndex(lat, lng);
+    gridIndex.getGeoBoundary(index);
+  }
+
+  @Test
   public void test() {
     System.out.println("1".hashCode());
     System.out.println("2".hashCode());

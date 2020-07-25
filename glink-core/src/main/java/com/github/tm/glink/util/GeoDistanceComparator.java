@@ -1,7 +1,7 @@
 package com.github.tm.glink.util;
 
 import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
+import com.github.tm.glink.feature.Coordinate;
 
 import java.util.Comparator;
 
@@ -10,9 +10,9 @@ import java.util.Comparator;
  */
 public class GeoDistanceComparator implements Comparator<Point> {
 
-  private QueryPoint queryPoint;
+  private Coordinate queryPoint;
 
-  public GeoDistanceComparator(QueryPoint queryPoint) {
+  public GeoDistanceComparator(Coordinate queryPoint) {
     this.queryPoint = queryPoint;
   }
 
