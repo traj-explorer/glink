@@ -1,4 +1,4 @@
-package com.github.tm.glink.util;
+package com.github.tm.glink.fearures.util;
 
 import com.github.tm.glink.fearures.Coordinate;
 import com.github.tm.glink.fearures.Point;
