@@ -1,7 +1,8 @@
 package com.github.tm.glink.util;
 
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.Coordinate;
+import com.github.tm.glink.fearures.Coordinate;
+import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.fearures.utils.GeoDistanceComparator;
 import org.junit.Test;
 
 import java.util.PriorityQueue;

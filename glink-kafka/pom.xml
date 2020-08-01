@@ -11,5 +11,25 @@
 
     <artifactId>glink-kafka</artifactId>
 
+    <dependencies>
+        <!-- Kafka dependency -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>bijection-core_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>bijection-avro_${scala.binary.version}</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-features</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
