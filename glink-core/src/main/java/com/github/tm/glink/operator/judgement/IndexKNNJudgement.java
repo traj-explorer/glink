@@ -1,7 +1,7 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.Coordinate;
+import com.github.tm.glink.fearures.Coordinate;
+import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.H3Index;
 import org.apache.flink.configuration.Configuration;

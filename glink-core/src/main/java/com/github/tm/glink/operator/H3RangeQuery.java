@@ -1,9 +1,8 @@
 package com.github.tm.glink.operator;
 
+import com.github.tm.glink.fearures.Point;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
-import com.github.tm.glink.feature.GeoObject;
-import com.github.tm.glink.feature.Point;
 import com.github.tm.glink.index.H3Index;
 import com.github.tm.glink.operator.judgement.H3RangeJudgement;
 import com.github.tm.glink.operator.judgement.NativeRangeJudgement;

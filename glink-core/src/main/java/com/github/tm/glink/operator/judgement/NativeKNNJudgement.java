@@ -1,8 +1,8 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.Coordinate;
-import com.github.tm.glink.util.GeoDistanceComparator;
+import com.github.tm.glink.fearures.Coordinate;
+import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.fearures.utils.GeoDistanceComparator;
 import org.apache.flink.streaming.api.functions.windowing.AllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

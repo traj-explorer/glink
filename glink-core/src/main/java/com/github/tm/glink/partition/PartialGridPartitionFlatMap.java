@@ -1,7 +1,7 @@
 package com.github.tm.glink.partition;
 
-import com.github.tm.glink.feature.BoundingBox;
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.fearures.BoundingBox;
+import com.github.tm.glink.fearures.Point;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;

@@ -1,9 +1,9 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.feature.ClassfiedGrids;
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.Coordinate;
-import com.github.tm.glink.util.GeoUtil;
+import com.github.tm.glink.fearures.ClassfiedGrids;
+import com.github.tm.glink.fearures.Coordinate;
+import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.fearures.utils.GeoUtil;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
 import org.locationtech.jts.geom.Geometry;

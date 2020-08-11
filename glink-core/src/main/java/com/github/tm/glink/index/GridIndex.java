@@ -1,6 +1,6 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.feature.ClassfiedGrids;
+import com.github.tm.glink.fearures.ClassfiedGrids;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;

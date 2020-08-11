@@ -1,15 +1,13 @@
 package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.operator.RangeQuery;
-import com.github.tm.glink.source.CSVPointSource;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
@@ -30,7 +28,8 @@ public class RangeQueryJob {
     ParameterTool globalParam = ParameterTool.fromMap(param);
     env.getConfig().setGlobalJobParameters(globalParam);
 
-    String path = KNNQueryJob.class.getResource("/gps_20161101_0710").getPath();
+//    String path = KNNQueryJob.class.getResource("/gps_20161101_0710").getPath();
+    String path = "/home/liebing/input/gps_20161101_0710";
     DataStream<Point> pointDataStream = env.addSource(new CSVDiDiGPSPointSource(path))
         .assignTimestampsAndWatermarks(new KNNQueryJob.EventTimeAssigner(5000));
 

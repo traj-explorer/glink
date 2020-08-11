@@ -1,7 +1,7 @@
 package com.github.tm.glink.operator;
 
-import com.github.tm.glink.feature.BoundingBox;
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.fearures.BoundingBox;
+import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.operator.process.NativeBufferProcess;
 import com.github.tm.glink.partition.PartialGridPartitionFlatMap;
 import com.github.tm.glink.partition.PartialGridPartitioner;

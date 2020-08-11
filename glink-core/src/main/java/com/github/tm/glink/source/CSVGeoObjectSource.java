@@ -1,6 +1,6 @@
 package com.github.tm.glink.source;
 
-import com.github.tm.glink.feature.GeoObject;
+import com.github.tm.glink.fearures.GeoObject;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
