@@ -1,6 +1,5 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.fearures.Coordinate;
 import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.H3Index;
@@ -9,6 +8,7 @@ import org.apache.flink.streaming.api.functions.windowing.RichAllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class IndexKNNJudgement {
           Collector<Point> collector) {
     long startTime = System.currentTimeMillis();
 
-    long queryPointIndex = gridIndex.getIndex(queryPoint.getLat(), queryPoint.getLng());
+    long queryPointIndex = gridIndex.getIndex(queryPoint.getX(), queryPoint.getY());
     // build index
     Map<Long, List<Point>> pointsInGrid = new HashMap<>();
     for (Point p : iterable) {

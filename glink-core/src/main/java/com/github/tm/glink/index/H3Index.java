@@ -1,16 +1,11 @@
 package com.github.tm.glink.index;
 
 import com.github.tm.glink.fearures.ClassfiedGrids;
-import com.github.tm.glink.fearures.Coordinate;
 import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.fearures.utils.GeoUtil;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +19,6 @@ import java.util.List;
 public class H3Index extends GridIndex {
 
   private H3Core h3Core;
-  private int res;
 
   public H3Index(int res) {
     try {
@@ -43,6 +37,11 @@ public class H3Index extends GridIndex {
   @Override
   public long getIndex(double lat, double lng) {
     return h3Core.geoToH3(lat, lng, res);
+  }
+
+  @Override
+  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
+    return null;
   }
 
   @Override

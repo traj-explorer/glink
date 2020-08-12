@@ -1,6 +1,7 @@
 package com.github.tm.glink.fearures;
 
 import com.github.tm.glink.fearures.utils.GeoUtil;
+import org.locationtech.jts.geom.Coordinate;
 
 import java.io.Serializable;
 
@@ -48,27 +49,27 @@ public class BoundingBox implements Serializable {
 
     // bottom left
     c1 = GeoUtil.calculateEndingLatLng(bottomLeft, 180, distance);
-    bufferMinLat = Math.min(bufferMinLat, c1.getLat());
+    bufferMinLat = Math.min(bufferMinLat, c1.getX());
     c2 = GeoUtil.calculateEndingLatLng(bottomLeft, 270, distance);
-    bufferMinLng = Math.min(bufferMinLng, c2.getLng());
+    bufferMinLng = Math.min(bufferMinLng, c2.getY());
 
     // upper left
     c1 = GeoUtil.calculateEndingLatLng(upperLeft, 0, distance);
-    bufferMaxLat = Math.max(bufferMaxLat, c1.getLat());
+    bufferMaxLat = Math.max(bufferMaxLat, c1.getX());
     c2 = GeoUtil.calculateEndingLatLng(upperLeft, 270, distance);
-    bufferMinLng = Math.min(bufferMinLng, c2.getLng());
+    bufferMinLng = Math.min(bufferMinLng, c2.getY());
 
     // upper right
     c1 = GeoUtil.calculateEndingLatLng(upperRight, 0, distance);
-    bufferMaxLat = Math.max(bufferMaxLat, c1.getLat());
+    bufferMaxLat = Math.max(bufferMaxLat, c1.getX());
     c2 = GeoUtil.calculateEndingLatLng(upperRight, 90, distance);
-    bufferMaxLng = Math.max(bufferMaxLng, c2.getLng());
+    bufferMaxLng = Math.max(bufferMaxLng, c2.getY());
 
     // bottom right
     c1 = GeoUtil.calculateEndingLatLng(bottomRight, 90, distance);
-    bufferMaxLng = Math.max(bufferMaxLng, c1.getLng());
+    bufferMaxLng = Math.max(bufferMaxLng, c1.getY());
     c2 = GeoUtil.calculateEndingLatLng(bottomRight, 180, distance);
-    bufferMinLat = Math.min(bufferMinLat, c2.getLat());
+    bufferMinLat = Math.min(bufferMinLat, c2.getX());
 
     return new BoundingBox(bufferMinLat, bufferMaxLat, bufferMinLng, bufferMaxLng);
   }

@@ -13,24 +13,27 @@ import java.util.List;
 /**
  * @author Yu Liebing
  */
-public class NativeBufferProcess implements WindowFunction<Tuple3<Integer, Boolean, Point>, List<Point>, Integer, TimeWindow> {
+public class NativeRangeJoinProcess
+        implements WindowFunction<Tuple3<Integer, Boolean, Point>, List<Point>, Integer, TimeWindow> {
 
   private double distance;
 
-  public NativeBufferProcess(double distance) {
+  public NativeRangeJoinProcess(double distance) {
     this.distance = distance;
   }
 
   @SuppressWarnings("checkstyle:NeedBraces")
   @Override
-  public void apply(Integer key, TimeWindow timeWindow, Iterable<Tuple3<Integer, Boolean, Point>> iterable, Collector<List<Point>> collector)
+  public void apply(Integer key,
+                    TimeWindow timeWindow,
+                    Iterable<Tuple3<Integer, Boolean, Point>> iterable,
+                    Collector<List<Point>> collector)
           throws Exception {
-//    System.out.println("Window ThreadId: " + Thread.currentThread().getId() + ", window key: " + key);
     List<Tuple3<Integer, Boolean, Point>> windowPoints = new ArrayList<>();
     for (Tuple3<Integer, Boolean, Point> t : iterable) {
       windowPoints.add(t);
     }
-//    System.out.println("window points: " + windowPoints.size());
+
     for (int i = 0, len = windowPoints.size(); i < len; ++i) {
       if (!windowPoints.get(i).f1) continue;
       List<Point> nearPoints = new ArrayList<>();

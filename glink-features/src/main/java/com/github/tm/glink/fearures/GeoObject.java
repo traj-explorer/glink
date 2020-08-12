@@ -13,4 +13,6 @@ public abstract class GeoObject {
 
   public abstract Envelope getEnvelope();
 
+  public abstract Envelope getBufferedEnvelope(double distance);
+
 }

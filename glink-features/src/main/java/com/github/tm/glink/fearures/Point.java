@@ -1,5 +1,6 @@
 package com.github.tm.glink.fearures;
 
+import com.github.tm.glink.fearures.utils.GeoUtil;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Coordinate;
@@ -90,5 +91,15 @@ public class Point extends GeoObject {
   @Override
   public Envelope getEnvelope() {
     return new Envelope(lat, lat, lng, lng);
+  }
+
+  @Override
+  public Envelope getBufferedEnvelope(double distance) {
+    Coordinate start = new Coordinate(lat, lng);
+    Coordinate upper = GeoUtil.calculateEndingLatLng(start, 0, distance);
+    Coordinate right = GeoUtil.calculateEndingLatLng(start, 90, distance);
+    Coordinate bottom = GeoUtil.calculateEndingLatLng(start, 180, distance);
+    Coordinate left = GeoUtil.calculateEndingLatLng(start, 270, distance);
+    return new Envelope(bottom.getX(), upper.getX(), left.getY(), right.getY());
   }
 }

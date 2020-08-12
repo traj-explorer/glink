@@ -1,12 +1,12 @@
 package com.github.tm.glink.operator;
 
-import com.github.tm.glink.fearures.Coordinate;
 import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.operator.judgement.IndexKNNJudgement;
 import com.github.tm.glink.operator.judgement.NativeKNNJudgement;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * @author Yu Liebing

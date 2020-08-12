@@ -1,8 +1,7 @@
 package com.github.tm.glink.fearures.utils;
 
-
-import com.github.tm.glink.fearures.Coordinate;
 import com.github.tm.glink.fearures.Point;
+import org.locationtech.jts.geom.Coordinate;
 
 import java.util.Comparator;
 
