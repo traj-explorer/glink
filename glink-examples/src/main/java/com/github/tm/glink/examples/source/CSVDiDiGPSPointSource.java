@@ -14,7 +14,6 @@ public class CSVDiDiGPSPointSource extends CSVGeoObjectSource<Point> {
 
   @Override
   public Point parseLine(String line) {
-    System.out.println("parse line");
     String[] items = line.split(",");
     return new Point(items[1],
             Double.parseDouble(items[4]),

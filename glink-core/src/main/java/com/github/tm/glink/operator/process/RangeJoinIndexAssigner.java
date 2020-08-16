@@ -36,7 +36,6 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple2<Bo
     long index = gridIndex.getIndex(point.getLat(), point.getLng());
     point.setIndex(index);
     collector.collect(new Tuple2<>(false, point));
-//    System.out.println(new Tuple2<>(false, point));
 
     List<Long> rangeIndexes = gridIndex.getRangeIndex(point.getLat(), point.getLng(), distance, fullMode);
     for (long idx : rangeIndexes) {
@@ -44,8 +43,6 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple2<Bo
         continue;
       }
       collector.collect(new Tuple2<>(true, new Point(
-              point.getId(), point.getLat(), point.getLng(), point.getTimestamp(), idx)));
-      System.out.println(new Tuple2<>(true, new Point(
               point.getId(), point.getLat(), point.getLng(), point.getTimestamp(), idx)));
     }
   }

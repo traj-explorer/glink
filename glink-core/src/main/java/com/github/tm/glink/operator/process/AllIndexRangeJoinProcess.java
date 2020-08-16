@@ -4,7 +4,6 @@ import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.index.RTreeIndex;
 import com.github.tm.glink.index.SpatialTreeIndex;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -20,15 +19,9 @@ public class AllIndexRangeJoinProcess extends RichWindowFunction<Tuple2<Boolean,
   private static final int RTREE_NODE_CAPACITY = 50;
 
   private double distance;
-  private transient SpatialTreeIndex<Point> treeIndex;
 
   public AllIndexRangeJoinProcess(double distance) {
     this.distance = distance;
-  }
-
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    treeIndex = new RTreeIndex<>(RTREE_NODE_CAPACITY);
   }
 
   @Override
@@ -36,10 +29,13 @@ public class AllIndexRangeJoinProcess extends RichWindowFunction<Tuple2<Boolean,
                     TimeWindow timeWindow,
                     Iterable<Tuple2<Boolean, Point>> iterable,
                     Collector<List<Point>> collector) throws Exception {
+    SpatialTreeIndex<Point> treeIndex = new RTreeIndex<>(RTREE_NODE_CAPACITY);
     // build index
     List<Point> points = new ArrayList<>();
     for (Tuple2<Boolean, Point> t : iterable) {
-      points.add(t.f1);
+      if (!t.f0) {
+        points.add(t.f1);
+      }
       treeIndex.insert(t.f1);
     }
     // query

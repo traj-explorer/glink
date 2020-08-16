@@ -80,7 +80,8 @@ public class Point extends GeoObject {
 
   @Override
   public String toString() {
-    return String.format("Point{id=%s, lat=%f, lng=%f, timestamp=%d, index=%d}", id, lat, lng, timestamp, index);
+//    return String.format("Point{id=%s, lat=%f, lng=%f, timestamp=%d, index=%d}", id, lat, lng, timestamp, index);
+    return id;
   }
 
   @Override
