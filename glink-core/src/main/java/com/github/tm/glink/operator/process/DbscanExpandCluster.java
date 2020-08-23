@@ -8,7 +8,6 @@ import org.apache.flink.util.Collector;
 
 import com.github.tm.glink.features.Point;
 
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -75,12 +74,6 @@ public class DbscanExpandCluster extends ProcessAllWindowFunction<Tuple2<Point, 
         noisePoints.add(point);
       }
     }
-    FileWriter fw = new FileWriter("/Users/haocheng/Desktop/glink/glink-examples/src/main/resources/cluster_result.txt", true);
-    for (Point point: noisePoints) {
-      fw.write(point.getLat() + "," + point.getLng() + "," + -1);
-      fw.write("\n");
-    }
-    fw.close();
   }
 
   private void addToCounter(Tuple2<Point, Point> in) {
