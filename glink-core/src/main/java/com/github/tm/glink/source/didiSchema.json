@@ -1,0 +1,12 @@
+{
+  "namespace": "com.github.tm.glink.source",
+  "type": "record",
+  "name": "Customer",
+  "fieleds": [
+{"name": "id1", "type": "string"},
+{"name": "id2", "type": "string"},
+{"name": "timestamp", "type": "long"},
+{"name": "lng", "type": "double"},
+{"name": "lat", "type": "double"}
+]
+}
