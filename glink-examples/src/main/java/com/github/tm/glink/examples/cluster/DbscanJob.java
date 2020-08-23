@@ -7,7 +7,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import com.github.tm.glink.examples.query.KNNQueryJob;
 import com.github.tm.glink.features.Point;
 import com.github.tm.glink.operator.DBSCAN;
-import com.github.tm.glink.source.CSVPointSource;
+import com.github.tm.glink.source.DidiCSVPointSource;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,7 +19,8 @@ public class DbscanJob {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     env.getConfig().setAutoWatermarkInterval(1000L);
     String path = args[0];
-    DataStream<Point> pointDataStream = env.addSource(new CSVPointSource(path))
+    // 使用gps_20161101_0710作为实验数据
+    DataStream<Point> pointDataStream = env.addSource(new DidiCSVPointSource(path))
         .assignTimestampsAndWatermarks(new KNNQueryJob.EventTimeAssigner(100));
     int windowSize = 1;
     double distance = 30.d;
