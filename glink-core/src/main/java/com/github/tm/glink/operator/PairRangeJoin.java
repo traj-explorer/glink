@@ -19,7 +19,7 @@ public class PairRangeJoin {
           double gridWidth) {
     return geoDataStream
             .flatMap(new RangeJoinIndexAssigner(distance, gridWidth, false))
-            .keyBy(p -> p.f1.getIndex())
+            .keyBy(p -> p.f1)
             .window(TumblingEventTimeWindows.of(Time.seconds(windowSize)))
             .apply(new PairIndexRangeJoinProcess(distance));
   }

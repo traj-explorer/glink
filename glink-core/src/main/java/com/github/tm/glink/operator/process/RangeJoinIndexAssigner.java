@@ -4,7 +4,7 @@ import com.github.tm.glink.fearures.Point;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.UGridIndex;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author Yu Liebing
  */
-public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple2<Boolean, Point>> {
+public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Boolean, Long, Point>> {
 
   private double distance;
   private double gridWidth;
@@ -32,18 +32,17 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple2<Bo
   }
 
   @Override
-  public void flatMap(Point point, Collector<Tuple2<Boolean, Point>> collector) throws Exception {
+  public void flatMap(Point point, Collector<Tuple3<Boolean, Long, Point>> collector) throws Exception {
     long index = gridIndex.getIndex(point.getLat(), point.getLng());
-    point.setIndex(index);
-    collector.collect(new Tuple2<>(false, point));
+    collector.collect(new Tuple3<>(false, index, point));
 
     List<Long> rangeIndexes = gridIndex.getRangeIndex(point.getLat(), point.getLng(), distance, fullMode);
     for (long idx : rangeIndexes) {
       if (idx == index) {
         continue;
       }
-      collector.collect(new Tuple2<>(true, new Point(
-              point.getId(), point.getLat(), point.getLng(), point.getTimestamp(), idx)));
+      collector.collect(new Tuple3<>(true, idx, new Point(
+              point.getId(), point.getLat(), point.getLng(), point.getTimestamp())));
     }
   }
 }
