@@ -1,8 +1,9 @@
 package com.github.tm.glink.source;
 
-import com.github.tm.glink.feature.GeoObject;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
+
+import com.github.tm.glink.features.GeoObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

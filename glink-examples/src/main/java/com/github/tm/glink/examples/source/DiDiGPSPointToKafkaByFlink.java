@@ -1,17 +1,14 @@
 package com.github.tm.glink.examples.source;
 
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.TimeCharacteristic;
-import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer011;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.examples.util.PointSchema;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.source.DidiGPSPointPartitionar;
 import com.github.tm.glink.source.DidiGPSPointSource;
-import com.github.tm.glink.util.PointSchema;
 
 import java.util.Properties;
 
@@ -34,7 +31,7 @@ public class DiDiGPSPointToKafkaByFlink {
     KeyedStream<Point, String> rides = env.addSource(new DidiGPSPointSource(FILE_PATH, servingSpeedFactor, 1477955400L))
         .keyBy(Point::getId);
 
-    rides.addSink(new FlinkKafkaProducer011<Point>(DIDI_GPS_POINTS_TOPIC, new PointSchema(), props, java.util.Optional.of(new DidiGPSPointPartitionar())));
+    rides.addSink(new FlinkKafkaProducer(DIDI_GPS_POINTS_TOPIC, new PointSchema(), props, java.util.Optional.of(new DidiGPSPointPartitionar())));
     rides.print();
     env.execute("DidiGPSPointToKafka");
   }

@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.feature.GeoObject;
+import com.github.tm.glink.features.GeoObject;
 import org.locationtech.jts.geom.*;
 
 import java.util.*;

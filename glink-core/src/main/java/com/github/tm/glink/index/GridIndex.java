@@ -1,6 +1,6 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.feature.ClassfiedGrids;
+import com.github.tm.glink.features.ClassfiedGrids;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -11,9 +11,16 @@ import java.util.List;
  */
 public abstract class GridIndex implements Serializable {
 
+  @SuppressWarnings("checkstyle:VisibilityModifier")
+  protected int res;
+
   public abstract int getRes();
 
   public abstract long getIndex(double lat, double lng);
+
+  public abstract List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode);
+
+  public abstract void getGeoBoundary(long index);
 
   public abstract long getParent(long index);
 

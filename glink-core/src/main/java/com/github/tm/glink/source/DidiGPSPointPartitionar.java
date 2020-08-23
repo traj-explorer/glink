@@ -2,7 +2,7 @@ package com.github.tm.glink.source;
 
 import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner;
 
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.features.Point;
 
 public class DidiGPSPointPartitionar extends FlinkKafkaPartitioner<Point> {
   @Override

@@ -1,7 +1,6 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.H3Index;
 import org.apache.flink.configuration.Configuration;
@@ -9,6 +8,7 @@ import org.apache.flink.streaming.api.functions.windowing.RichAllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
+import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 public class IndexKNNJudgement {
 
   public static void windowApply(
-          QueryPoint queryPoint,
+          Coordinate queryPoint,
           int k,
           GridIndex gridIndex,
           Integer windowKey,
@@ -32,7 +32,7 @@ public class IndexKNNJudgement {
           Collector<Point> collector) {
     long startTime = System.currentTimeMillis();
 
-    long queryPointIndex = gridIndex.getIndex(queryPoint.getLat(), queryPoint.getLng());
+    long queryPointIndex = gridIndex.getIndex(queryPoint.getX(), queryPoint.getY());
     // build index
     Map<Long, List<Point>> pointsInGrid = new HashMap<>();
     for (Point p : iterable) {
@@ -87,12 +87,12 @@ public class IndexKNNJudgement {
   public static class IndexKeyedKNNJudgement extends RichWindowFunction<Point, Point, Integer, TimeWindow> {
     private static Logger logger = LoggerFactory.getLogger(IndexKeyedKNNJudgement.class);
 
-    private QueryPoint queryPoint;
+    private Coordinate queryPoint;
     private int k;
     private transient GridIndex gridIndex;
     private int indexRes;
 
-    public IndexKeyedKNNJudgement(QueryPoint queryPoint, int k, int indexRes) {
+    public IndexKeyedKNNJudgement(Coordinate queryPoint, int k, int indexRes) {
       this.queryPoint = queryPoint;
       this.k = k;
       this.indexRes = indexRes;
@@ -112,12 +112,12 @@ public class IndexKNNJudgement {
 
   public static class IndexAllKNNJudgement extends RichAllWindowFunction<Point, Point, TimeWindow> {
 
-    private QueryPoint queryPoint;
+    private Coordinate queryPoint;
     private int k;
     private transient GridIndex gridIndex;
     private int indexRes;
 
-    public IndexAllKNNJudgement(QueryPoint queryPoint, int k, int indexRes) {
+    public IndexAllKNNJudgement(Coordinate queryPoint, int k, int indexRes) {
       this.queryPoint = queryPoint;
       this.k = k;
       this.indexRes = indexRes;

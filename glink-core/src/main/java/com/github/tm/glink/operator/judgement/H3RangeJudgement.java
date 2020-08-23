@@ -2,12 +2,18 @@ package com.github.tm.glink.operator.judgement;
 
 
 import org.apache.flink.configuration.Configuration;
-import com.github.tm.glink.feature.ClassfiedGrids;
-import com.github.tm.glink.feature.Point;
+
+import com.github.tm.glink.features.ClassfiedGrids;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.index.H3Index;
-import org.locationtech.jts.geom.*;
-import java.io.IOException;
-import java.util.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Yu Liebing

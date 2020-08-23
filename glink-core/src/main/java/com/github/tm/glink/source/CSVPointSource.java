@@ -1,13 +1,23 @@
 package com.github.tm.glink.source;
 
-import com.github.tm.glink.feature.Point;
 import org.apache.flink.configuration.Configuration;
+
+import com.github.tm.glink.features.Point;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
+ * This class is used to parse point objects from csv files.
+ * In each csv file, one line represents a point, and each
+ * line contains the following four elements:
+ * 1. id, will be parsed as <code>String<code/>
+ * 2. lat, will be parsed as <code>double<code/>
+ * 3. lng, will be parsed as <code>double</code>
+ * 4. time, the format is yyyy-MM-dd HH:mm:ss
+ * Each element is separated by a comma.
+ *
  * @author Yu Liebing
  */
 public class CSVPointSource extends CSVGeoObjectSource<Point> {

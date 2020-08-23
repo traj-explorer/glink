@@ -1,6 +1,6 @@
 package com.github.tm.glink.source;
 
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.features.Point;
 
 import java.io.IOException;
 
@@ -55,7 +55,6 @@ public class DidiGPSPointSource extends CSVGeoObjectSource<Point> {
     }
     for (String str : buffer) {
       sourceContext.collect(parseLine(str));
-      System.out.println(str);
     }
   }
 }

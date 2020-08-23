@@ -1,6 +1,6 @@
 package com.github.tm.glink.examples.source;
 
-import com.github.tm.glink.feature.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.source.CSVGeoObjectSource;
 
 /**
@@ -14,6 +14,7 @@ public class CSVDiDiGPSPointSource extends CSVGeoObjectSource<Point> {
 
   @Override
   public Point parseLine(String line) {
+    System.out.println("parse line");
     String[] items = line.split(",");
     return new Point(items[1],
             Double.parseDouble(items[4]),

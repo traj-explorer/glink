@@ -1,14 +1,11 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.feature.ClassfiedGrids;
+import com.github.tm.glink.features.ClassfiedGrids;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoUtil;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +19,6 @@ import java.util.List;
 public class H3Index extends GridIndex {
 
   private H3Core h3Core;
-  private int res;
 
   public H3Index(int res) {
     try {
@@ -41,6 +37,24 @@ public class H3Index extends GridIndex {
   @Override
   public long getIndex(double lat, double lng) {
     return h3Core.geoToH3(lat, lng, res);
+  }
+
+  @Override
+  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
+    return null;
+  }
+
+  @Override
+  public void getGeoBoundary(long index) {
+    List<GeoCoord> boundary = h3Core.h3ToGeoBoundary(index);
+    GeoCoord pre = null;
+    for (GeoCoord c : boundary) {
+      if (pre != null) {
+        double dis = GeoUtil.computeGeoDistance(new Coordinate(pre.lat, pre.lng), new Point(c.lat, c.lng));
+        System.out.println(dis);
+      }
+      pre = c;
+    }
   }
 
   @Override
@@ -100,8 +114,8 @@ public class H3Index extends GridIndex {
 
   private List<GeoCoord> geometryToGeoCoordList(Geometry geometry) {
     List<GeoCoord> boundry = new LinkedList<>();
-    Coordinate[] coordinates = geometry.getCoordinates();
-    for (Coordinate coordinate:coordinates) {
+    org.locationtech.jts.geom.Coordinate[] coordinates = geometry.getCoordinates();
+    for (org.locationtech.jts.geom.Coordinate coordinate:coordinates) {
       boundry.add(new GeoCoord(coordinate.x, coordinate.y));
     }
     boundry.add(new GeoCoord(coordinates[0].x, coordinates[0].y));
@@ -112,10 +126,10 @@ public class H3Index extends GridIndex {
   private Boolean intersectWith(long index, Geometry geometry) {
     List<GeoCoord> boundry = h3Core.h3ToGeoBoundary(index);
     // List转化为Coordinate[]
-    Coordinate[] coorArray = new Coordinate[7];
+    org.locationtech.jts.geom.Coordinate[] coorArray = new org.locationtech.jts.geom.Coordinate[7];
     int counter = 0;
     for (GeoCoord gc : boundry) {
-      coorArray[counter] = new Coordinate(gc.lat, gc.lng);
+      coorArray[counter] = new org.locationtech.jts.geom.Coordinate(gc.lat, gc.lng);
       counter++;
     }
     coorArray[counter] = coorArray[0];

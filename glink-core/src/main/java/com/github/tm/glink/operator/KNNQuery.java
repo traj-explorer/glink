@@ -1,12 +1,14 @@
 package com.github.tm.glink.operator;
 
-import com.github.tm.glink.feature.Point;
-import com.github.tm.glink.feature.QueryPoint;
-import com.github.tm.glink.operator.judgement.IndexKNNJudgement;
-import com.github.tm.glink.operator.judgement.NativeKNNJudgement;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.operator.judgement.IndexKNNJudgement;
+import com.github.tm.glink.operator.judgement.NativeKNNJudgement;
+import com.github.tm.glink.operator.process.H3IndexAssigner;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * @author Yu Liebing
@@ -15,14 +17,14 @@ public class KNNQuery {
 
   public static DataStream<Point> pointKNNQuery(
           DataStream<Point> geoDataStream,
-          QueryPoint queryPoint,
+          Coordinate queryPoint,
           int k,
           int windowSize,
           boolean useIndex,
           int indexRes) {
     int partitionNum = 2;
     if (useIndex) {
-      return geoDataStream.map(new IndexAssigner(indexRes))
+      return geoDataStream.map(new H3IndexAssigner(indexRes))
               .keyBy(r -> Math.abs(r.getId().hashCode() % partitionNum))
               .window(TumblingEventTimeWindows.of(Time.seconds(windowSize)))
               .apply(new IndexKNNJudgement.IndexKeyedKNNJudgement(queryPoint, k, indexRes))
