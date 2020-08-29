@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.operator.cluster.WindowAllDBSCAN;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;

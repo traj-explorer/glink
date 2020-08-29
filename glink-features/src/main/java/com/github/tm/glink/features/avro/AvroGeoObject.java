@@ -1,6 +1,6 @@
-package com.github.tm.glink.fearures.avro;
+package com.github.tm.glink.features.avro;
 
-import com.github.tm.glink.fearures.GeoObject;
+import com.github.tm.glink.features.GeoObject;
 
 /**
  * @author Yu Liebing

@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator.cluster;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.windowing.RichAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -35,8 +35,9 @@ public class WindowAllDBSCAN extends RichAllWindowFunction<Tuple2<Point, Point>,
     int k = 0;
     for (Map.Entry<Point, List<Point>> entry : point2Neighbours.entrySet()) {
       if (!visited.contains(entry.getKey())) {
-        visited.add(entry.getKey());
+//        visited.add(entry.getKey());
         if (entry.getValue().size() >= minPts) {
+          visited.add(entry.getKey());
           Queue<Point> q = new LinkedList<>();
           q.offer(entry.getKey());
           while (!q.isEmpty()) {

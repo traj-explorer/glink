@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator.process;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.UGridIndex;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;

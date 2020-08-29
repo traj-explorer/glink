@@ -1,6 +1,6 @@
 package com.github.tm.glink.examples.kafka;
 
-import com.github.tm.glink.fearures.avro.AvroPoint;
+import com.github.tm.glink.features.avro.AvroPoint;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.flink.formats.avro.AvroDeserializationSchema;

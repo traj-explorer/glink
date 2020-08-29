@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator.judgement;
 
-import com.github.tm.glink.fearures.GeoObject;
+import com.github.tm.glink.features.GeoObject;
 import org.apache.flink.api.common.functions.RichFilterFunction;
 
 import java.io.IOException;

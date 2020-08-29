@@ -1,9 +1,8 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import org.junit.Test;
 import org.locationtech.jts.geom.Envelope;
-import org.omg.PortableServer.POA;
 
 import java.util.List;
 

@@ -1,13 +1,9 @@
-package com.github.tm.glink.fearures;
+package com.github.tm.glink.features;
 
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.utils.GeoUtil;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Deque;
 
 public class PointTest {
 

@@ -1,6 +1,6 @@
 package com.github.tm.glink.operator;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.operator.process.PairIndexRangeJoinProcess;
 import com.github.tm.glink.operator.process.RangeJoinIndexAssigner;
 import org.apache.flink.api.java.tuple.Tuple2;

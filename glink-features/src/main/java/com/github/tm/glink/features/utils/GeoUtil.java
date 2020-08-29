@@ -1,6 +1,6 @@
-package com.github.tm.glink.fearures.utils;
+package com.github.tm.glink.features.utils;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
 import org.gavaghan.geodesy.GeodeticCurve;

@@ -1,10 +1,8 @@
-package com.github.tm.glink.fearures.util;
+package com.github.tm.glink.features.util;
 
-import com.github.tm.glink.fearures.Point;
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoUtil;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class GeoUtilTest {
 

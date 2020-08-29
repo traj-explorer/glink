@@ -1,6 +1,6 @@
-package com.github.tm.glink.fearures.avro;
+package com.github.tm.glink.features.avro;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import org.junit.Test;
 
 import java.util.Date;

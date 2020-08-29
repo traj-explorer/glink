@@ -1,6 +1,9 @@
 package com.github.tm.glink.index;
 
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 
 import java.util.List;
 
@@ -8,7 +11,7 @@ import static org.junit.Assert.*;
 
 public class UGridIndexTest {
 
-  GridIndex gridIndex = new UGridIndex(90.d);
+  private GridIndex gridIndex = new UGridIndex(90.d);
 
   @Test
   public void getIndexTest() {
@@ -26,13 +29,19 @@ public class UGridIndexTest {
   }
 
   @Test
-  public void test() {
-    long x = 1;
-    long y = 2;
-    long z = (x << 30) | y;
-
-    System.out.println(z >> 30);
-    System.out.println(z & 0xfffffff);
+  public void getIntersectIndexTest() {
+    GeometryFactory factory = new GeometryFactory();
+    Coordinate[] cs = new Coordinate[4];
+    cs[0] = new Coordinate(10, 20);
+    cs[1] = new Coordinate(100, 25);
+    cs[2] = new Coordinate(50, 30);
+    cs[3] = cs[0];
+    Geometry geometry = factory.createPolygon(cs);
+    System.out.println(geometry.getEnvelopeInternal());
+    List<Long> indexes = gridIndex.getIntersectIndex(geometry);
+    for (long index : indexes) {
+      System.out.println(index);
+    }
   }
 
 }

@@ -1,6 +1,6 @@
 package com.github.tm.glink.examples.query;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.operator.PairRangeJoin;
 import com.github.tm.glink.source.CSVPointSource;
 import org.apache.flink.api.java.tuple.Tuple2;

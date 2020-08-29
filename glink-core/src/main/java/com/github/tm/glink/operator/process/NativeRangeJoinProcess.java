@@ -1,7 +1,7 @@
 package com.github.tm.glink.operator.process;
 
-import com.github.tm.glink.fearures.Point;
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoUtil;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

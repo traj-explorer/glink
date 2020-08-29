@@ -1,7 +1,7 @@
 package com.github.tm.glink.kafka;
 
-import com.github.tm.glink.fearures.Point;
-import com.github.tm.glink.fearures.avro.AvroPoint;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.avro.AvroPoint;
 
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;

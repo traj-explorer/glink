@@ -1,6 +1,6 @@
-package com.github.tm.glink.fearures;
+package com.github.tm.glink.features;
 
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.utils.GeoUtil;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Coordinate;

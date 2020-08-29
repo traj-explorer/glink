@@ -1,8 +1,8 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.fearures.ClassfiedGrids;
-import com.github.tm.glink.fearures.Point;
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.ClassfiedGrids;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoUtil;
 import com.uber.h3core.H3Core;
 import com.uber.h3core.util.GeoCoord;
 import org.locationtech.jts.geom.*;
@@ -41,6 +41,11 @@ public class H3Index extends GridIndex {
 
   @Override
   public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getIntersectIndex(Geometry geoObject) {
     return null;
   }
 

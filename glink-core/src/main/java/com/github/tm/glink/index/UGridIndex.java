@@ -1,8 +1,9 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.fearures.ClassfiedGrids;
-import com.github.tm.glink.fearures.utils.GeoUtil;
+import com.github.tm.glink.features.ClassfiedGrids;
+import com.github.tm.glink.features.utils.GeoUtil;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
@@ -88,6 +89,22 @@ public class UGridIndex extends GridIndex {
         return res;
       }
     }
+  }
+
+  @Override
+  public List<Long> getIntersectIndex(Geometry geoObject) {
+    Envelope envelope = geoObject.getEnvelopeInternal();
+    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
+    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
+    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
+    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
+    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
+    for (long x = minX; x <= maxX; ++x) {
+      for (long y = minY; y <= maxY; ++y) {
+        indexes.add(combineXY(x, y));
+      }
+    }
+    return indexes;
   }
 
   @Override

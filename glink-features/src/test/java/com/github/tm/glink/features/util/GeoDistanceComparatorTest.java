@@ -1,7 +1,7 @@
-package com.github.tm.glink.fearures.util;
+package com.github.tm.glink.features.util;
 
-import com.github.tm.glink.fearures.Point;
-import com.github.tm.glink.fearures.utils.GeoDistanceComparator;
+import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoDistanceComparator;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 

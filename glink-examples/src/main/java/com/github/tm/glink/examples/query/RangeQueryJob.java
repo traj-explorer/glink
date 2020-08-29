@@ -1,7 +1,7 @@
 package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.operator.RangeQuery;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;

@@ -1,6 +1,6 @@
 package com.github.tm.glink.examples.source;
 
-import com.github.tm.glink.fearures.Point;
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.source.CSVGeoObjectSource;
 
 /**

@@ -1,4 +1,4 @@
-package com.github.tm.glink.fearures.utils;
+package com.github.tm.glink.features.utils;
 
 /**
  * @author Yu Liebing

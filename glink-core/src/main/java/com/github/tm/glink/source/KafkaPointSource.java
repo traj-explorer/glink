@@ -1,11 +1,7 @@
 package com.github.tm.glink.source;
 
-import com.github.tm.glink.fearures.Point;
-import org.apache.flink.api.common.serialization.DeserializationSchema;
-import org.apache.flink.formats.avro.AvroDeserializationSchema;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-
-import java.util.Properties;
 
 public class KafkaPointSource {
 

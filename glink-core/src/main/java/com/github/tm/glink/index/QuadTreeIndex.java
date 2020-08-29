@@ -1,6 +1,6 @@
 package com.github.tm.glink.index;
 
-import com.github.tm.glink.fearures.GeoObject;
+import com.github.tm.glink.features.GeoObject;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.quadtree.Quadtree;
 

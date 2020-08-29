@@ -1,4 +1,4 @@
-package com.github.tm.glink.fearures;
+package com.github.tm.glink.features;
 
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
