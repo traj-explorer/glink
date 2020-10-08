@@ -69,7 +69,13 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
         System.out.println(keyValue.key);
         if (isAsync) {
           producer.send(producerRecord, (recordMetadata, e) -> {
-            // TODO: do something when failed
+            if (recordMetadata != null) {
+              System.out.println("key: " + recordMetadata.topic() + "send at: " + recordMetadata.timestamp());
+            }
+            else {
+              System.out.println("failed");
+              e.printStackTrace();
+            }
           });
         } else {
           producer.send(producerRecord);
@@ -79,12 +85,13 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    producer.flush();
     latch.countDown();
   }
 
-  protected static class KeyValue<K, V> {
+  public static class KeyValue<K, V> {
 
-    KeyValue(K key, V value) {
+    public KeyValue(K key, V value) {
       this.key = key;
       this.value = value;
     }

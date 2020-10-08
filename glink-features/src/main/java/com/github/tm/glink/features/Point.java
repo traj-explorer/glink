@@ -13,16 +13,16 @@ import java.util.Objects;
  */
 public class Point extends GeoObject {
 
-  private static int MAX_PRECISION = 10000000;
+  private static final int MAX_PRECISION = 10000000;
 
   // attributes of point
-  private String id;
-  private int lat;
-  private int lng;
-  private long timestamp;
+  protected String id;
+  protected int lat;
+  protected int lng;
+  protected long timestamp;
 
   // index
-  private long index;
+  protected long index;
 
   public Point() { }
 
@@ -123,14 +123,15 @@ public class Point extends GeoObject {
             this.timestamp == p.timestamp && this.index == p.index;
   }
 
-  private double getDoubleLat() {
+  protected double getDoubleLat() {
     return (double) lat / MAX_PRECISION;
   }
 
-  private double getDoubleLng() {
+  protected double getDoubleLng() {
     return (double) lng / MAX_PRECISION;
   }
-  private int getIntLatLng(double doubleValue) {
+
+  protected int getIntLatLng(double doubleValue) {
     double CARRY = 0.00000005;
     return (int) ((doubleValue + CARRY) * MAX_PRECISION);
   }

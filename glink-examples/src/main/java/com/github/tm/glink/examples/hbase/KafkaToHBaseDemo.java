@@ -1,6 +1,8 @@
-package com.github.tm.glink.examples.kafka;
+package com.github.tm.glink.examples.hbase;
 
 import com.github.tm.glink.features.avro.AvroPoint;
+import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
+import com.github.tm.glink.hbase.sink.HBaseTableSink;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.flink.formats.avro.AvroDeserializationSchema;
@@ -13,21 +15,25 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import java.util.Properties;
 
 /**
+ * This class import simple point data from kafka broker to hbase table
+ *
  * @author Yu Liebing
  * */
-public class FlinkKafkaConsumerJob {
+public class KafkaToHBaseDemo {
 
   public static void main(String[] args) throws Exception {
-    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
+    final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    // kafka deserialize schema
     Schema schema = new Schema.Parser().parse(AvroPoint.SCHEMA);
     Properties props = new Properties();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     FlinkKafkaConsumer<GenericRecord> consumer = new FlinkKafkaConsumer<>(
-            "point", AvroDeserializationSchema.forGeneric(schema), props);
+            "hbase-demo", AvroDeserializationSchema.forGeneric(schema), props);
     DataStream<GenericRecord> dataStream = env.addSource(consumer);
+    dataStream.map(AvroPoint::genericToPoint)
+            .addSink(new HBaseTableSink<>("point"));
 
     dataStream.print();
 
