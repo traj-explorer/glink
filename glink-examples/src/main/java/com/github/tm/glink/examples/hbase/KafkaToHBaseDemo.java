@@ -1,7 +1,6 @@
 package com.github.tm.glink.examples.hbase;
 
 import com.github.tm.glink.features.avro.AvroPoint;
-import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import com.github.tm.glink.hbase.sink.HBaseTableSink;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;

@@ -1,11 +1,10 @@
 package com.github.tm.glink.features.avro;
 
+import com.github.tm.glink.features.Point;
 import com.github.tm.glink.features.TrajectoryPoint;
-import com.twitter.bijection.Injection;
-import com.twitter.bijection.avro.GenericAvroCodecs;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+
+import java.util.Properties;
 
 /**
  * @author Yu Liebing
@@ -22,11 +21,19 @@ public class AvroTrajectoryPoint extends AvroGeoObject<TrajectoryPoint> {
               "{\"name\": \"lng\", \"type\": \"double\"}," +
               "{\"name\": \"timestamp\", \"type\": \"long\"}," +
               "{\"name\": \"index\", \"type\": \"long\"}" +
-            "]" +
+              "%s" + // attributes schema
+          "]" +
           "}";
-  private final Schema schema = new Schema.Parser().parse(SCHEMA);
-  private final GenericRecord genericRecord = new GenericData.Record(schema);
-  private final Injection<GenericRecord, byte[]> injection = GenericAvroCodecs.toBinary(schema);
+
+  public AvroTrajectoryPoint() {
+    String schema = String.format(SCHEMA, "");
+    init(schema);
+  }
+
+  public AvroTrajectoryPoint(String attributesSchema) {
+    String schema = toAvroSchema(SCHEMA, attributesSchema);
+    init(schema);
+  }
 
   @Override
   public byte[] serialize(TrajectoryPoint trajectoryPoint) {
@@ -36,12 +43,18 @@ public class AvroTrajectoryPoint extends AvroGeoObject<TrajectoryPoint> {
     genericRecord.put("lng", trajectoryPoint.getLng());
     genericRecord.put("timestamp", trajectoryPoint.getTimestamp());
     genericRecord.put("index", trajectoryPoint.getIndex());
+    if (trajectoryPoint.getAttributes() != null) {
+      serializeAttributes(genericRecord, trajectoryPoint.getAttributes());
+    }
     return injection.apply(genericRecord);
   }
 
   @Override
   public TrajectoryPoint deserialize(byte[] data) {
     GenericRecord record = injection.invert(data).get();
+    Properties attributes = deserializeAttributes(record);
+    Point point = genericToTrajectoryPoint(record);
+    point.setAttributes(attributes);
     return genericToTrajectoryPoint(record);
   }
 

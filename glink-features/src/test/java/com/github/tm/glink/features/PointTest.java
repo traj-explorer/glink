@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 
+import java.util.Map;
+import java.util.Properties;
+
 public class PointTest {
 
   @Test
@@ -43,5 +46,16 @@ public class PointTest {
     System.out.println(p1.hashCode());
     System.out.println(p2.hashCode());
     System.out.println(p1.equals(p2));
+  }
+
+  @Test
+  public void test() {
+    Properties p = new Properties();
+    p.put("a", 1);
+
+    for (Map.Entry<Object, Object> entry : p.entrySet()) {
+      System.out.println(entry.getKey());
+      System.out.println(entry.getValue());
+    }
   }
 }
