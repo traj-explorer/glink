@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * @author Yu Liebing
  * */
-public class KafkaProduceJob {
+public class KafkaSimplePointProduce {
 
   private static int getThreadNum(int fileNum) {
     int maxThreads = Runtime.getRuntime().availableProcessors() + 1;
@@ -40,7 +40,7 @@ public class KafkaProduceJob {
               host,
               port,
               topic,
-              "CSVPointProducer" + i,
+              "CSVPointProducer-" + i,
               StringSerializer.class.getName(),
               ByteArraySerializer.class.getName(),
               isAsync,

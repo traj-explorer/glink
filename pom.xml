@@ -16,6 +16,7 @@
         <module>glink-examples</module>
         <module>glink-mapmatching</module>
         <module>glink-hbase</module>
+        <module>glink-utils</module>
     </modules>
 
     <properties>
@@ -100,6 +101,12 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_${scala.binary.version}</artifactId>
                 <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+                <scope>compile</scope>
             </dependency>
 
             <!-- avro dependencies -->

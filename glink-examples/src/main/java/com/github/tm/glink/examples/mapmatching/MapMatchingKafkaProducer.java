@@ -36,7 +36,7 @@ public class MapMatchingKafkaProducer {
               host,
               port,
               topic,
-              "CSVPointProducer" + i,
+              "XiamenTrajectoryCSVProducer" + i,
               IntegerSerializer.class.getName(),
               ByteArraySerializer.class.getName(),
               isAsync,

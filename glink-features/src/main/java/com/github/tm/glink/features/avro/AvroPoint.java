@@ -63,8 +63,4 @@ public class AvroPoint extends AvroGeoObject<Point> {
     long index = (long) record.get("index");
     return new Point(id, lat, lng, timestamp, index);
   }
-
-  public static void main(String[] args) {
-    new AvroPoint();
-  }
 }

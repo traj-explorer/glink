@@ -27,7 +27,7 @@ let consumers = [
 		'name': 'common',
 		'offset': 0,
 		'topic':[
-			{'topic': 'mapmatching'}
+			{'topic': 'map-matching-result'}
 		]
 	}
 ];

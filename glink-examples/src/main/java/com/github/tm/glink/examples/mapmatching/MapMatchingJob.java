@@ -31,13 +31,13 @@ public class MapMatchingJob {
     ParameterTool globalParam = ParameterTool.fromArgs(args);
     env.getConfig().setGlobalJobParameters(globalParam);
 
-    Schema schema = new Schema.Parser().parse(AvroTrajectoryPoint.SCHEMA);
+    Schema schema = new Schema.Parser().parse(String.format(AvroTrajectoryPoint.SCHEMA, ""));
     Properties props = new Properties();
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     FlinkKafkaConsumer<GenericRecord> consumer = new FlinkKafkaConsumer<>(
-            "map-mathcing-origin", AvroDeserializationSchema.forGeneric(schema), props);
+            "map-matching-origin", AvroDeserializationSchema.forGeneric(schema), props);
     DataStream<GenericRecord> dataStream = env.addSource(consumer);
     DataStream<TrajectoryPoint> trajectoryDataStream = dataStream.map(AvroTrajectoryPoint::genericToTrajectoryPoint);
 
@@ -47,7 +47,7 @@ public class MapMatchingJob {
               String res = "{\"time\": %d, \"id\": %d, \"point\": \"POINT (%f %f)\"}";
               return String.format(res, r.getTimestamp(), r.getPid(), r.getLng(), r.getLat());
             })
-            .addSink(new FlinkKafkaProducer("localhost:9092", "mapmatching", new SimpleStringSchema()));
+            .addSink(new FlinkKafkaProducer("localhost:9092", "map-matching-result", new SimpleStringSchema()));
 
     matchResult.print();
     env.execute("Map matching");

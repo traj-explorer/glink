@@ -63,10 +63,12 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
   public void run() {
     String line;
     try {
+      int i = 0;
       while ((line = bufferedReader.readLine()) != null) {
         KeyValue<K, V> keyValue = parseLine(line);
         ProducerRecord<K, V> producerRecord = new ProducerRecord<>(topic, keyValue.key, keyValue.value);
-        System.out.println(keyValue.key);
+        System.out.println(i);
+        ++i;
         if (isAsync) {
           producer.send(producerRecord, (recordMetadata, e) -> {
             if (recordMetadata != null) {
