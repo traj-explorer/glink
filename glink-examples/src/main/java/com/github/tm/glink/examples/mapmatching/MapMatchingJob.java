@@ -44,8 +44,8 @@ public class MapMatchingJob {
     DataStream<TrajectoryPoint> matchResult = MapMatcher.mapMatch(trajectoryDataStream);
     matchResult
             .map(r -> {
-              String res = "{\"time\": %d, \"id\": %d, \"point\": \"POINT (%f %f)\"}";
-              return String.format(res, r.getTimestamp(), r.getPid(), r.getLng(), r.getLat());
+              String res = "{\"time\": %d, \"id\": \"%s\", \"point\": \"POINT (%f %f)\"}";
+              return String.format(res, r.getTimestamp(), r.getId() + "-" + r.getPid(), r.getLng(), r.getLat());
             })
             .addSink(new FlinkKafkaProducer("localhost:9092", "map-matching-result", new SimpleStringSchema()));
 

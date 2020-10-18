@@ -17,6 +17,7 @@
         <module>glink-mapmatching</module>
         <module>glink-hbase</module>
         <module>glink-utils</module>
+        <module>glink-visualization</module>
     </modules>
 
     <properties>
