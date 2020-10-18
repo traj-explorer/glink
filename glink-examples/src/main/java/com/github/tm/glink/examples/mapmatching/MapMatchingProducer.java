@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * @author Yu Liebing
  */
-public class MapMatchingKafkaProducer {
+public class MapMatchingProducer {
 
   /**
    * @param args 0 (string) - dir contains trajectory files
