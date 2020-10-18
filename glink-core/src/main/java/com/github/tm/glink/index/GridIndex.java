@@ -32,7 +32,7 @@ public abstract class GridIndex implements Serializable {
 
   public abstract List<Long> getChildren(long index, int res);
 
-  public abstract ClassfiedGrids getContainGrids(Geometry geometry);
+  public abstract ClassfiedGrids getRelatedGrids(Geometry geometry);
 
   public abstract List<Long> kRing(long index, int k);
 }
