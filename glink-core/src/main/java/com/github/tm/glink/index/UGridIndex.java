@@ -133,7 +133,7 @@ public class UGridIndex extends GridIndex {
   }
 
   @Override
-  public ClassfiedGrids getContainGrids(Geometry geometry) {
+  public ClassfiedGrids getRelatedGrids(Geometry geometry) {
     return null;
   }
 
