@@ -5,6 +5,7 @@ import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import com.github.tm.glink.kafka.BaseCSVProducer;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -14,7 +15,7 @@ public class XiamenTrajectoryCSVProducer extends BaseCSVProducer<Integer, byte[]
 
   private AvroTrajectoryPoint avroTrajectoryPoint = new AvroTrajectoryPoint();
 
-  public XiamenTrajectoryCSVProducer(String filePath,
+  public XiamenTrajectoryCSVProducer(List<String> filePaths,
                                      String serverUrl,
                                      int serverPort,
                                      String topic,
@@ -22,8 +23,9 @@ public class XiamenTrajectoryCSVProducer extends BaseCSVProducer<Integer, byte[]
                                      String keySerializer,
                                      String valueSerializer,
                                      boolean isAsync,
-                                     CountDownLatch latch) throws FileNotFoundException {
-    super(filePath, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch);
+                                     CountDownLatch latch,
+                                     final int sleep) throws FileNotFoundException {
+    super(filePaths, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
   }
 
   @Override
@@ -36,11 +38,7 @@ public class XiamenTrajectoryCSVProducer extends BaseCSVProducer<Integer, byte[]
     long timestamp = Long.parseLong(items[6]) * 1000;
     TrajectoryPoint point = new TrajectoryPoint(carno, pid, lat, lng, timestamp);
     byte[] data = avroTrajectoryPoint.serialize(point);
-    try {
-      Thread.sleep(3000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+    System.out.printf("Thread %d: %d%n", Thread.currentThread().getId(), pid);
     return new KeyValue<>(pid, data);
   }
 }

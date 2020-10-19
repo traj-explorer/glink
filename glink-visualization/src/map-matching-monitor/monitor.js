@@ -55,30 +55,8 @@ mq.AddConsumer(conn, consumers[0].topic, consumers[0].options, function(message)
 	console.log(typeof update)
 	let id = update['id'];
 
-	// if (buffer && id in objects && objects[id]['time'] >= update['time']) {
-	// 	console.log('warning: out of order update for object ' + id);
-	// 	return;
-	// }
-
-	// if (!('point' in update)) {
-	// 	if (buffer) {
-	// 		console.log('delete object ' + id);
-	// 		delete objects[id];
-	// 	}
-	// } else if (id in objects) {
-	// 	if (buffer) {
-	// 		objects[id] = update;
-	// 	}
-	// } else {
-	// 	if (buffer) {
-	// 		console.log('insert object ' + id);
-	// 		objects[id] = update;
-	// 	}
-	// }
-
 	if (buffer) {
 		console.log('insert object ' + id);
-		// objects[id] = update;
 		objects.push(update);
 	}
 

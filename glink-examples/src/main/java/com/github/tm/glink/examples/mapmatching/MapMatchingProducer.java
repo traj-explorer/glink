@@ -1,10 +1,11 @@
 package com.github.tm.glink.examples.mapmatching;
 
+import com.github.tm.glink.examples.utils.CommonUtils;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -26,13 +27,14 @@ public class MapMatchingProducer {
     int port = Integer.parseInt(args[3]);
     boolean isAsync = args.length == 5 && args[4].trim().equalsIgnoreCase("sync");
 
-    String[] files = listFiles(path);
-    int threadNum = getThreadNum(files.length);
+    String[] files = CommonUtils.listFiles(path);
+    int threadNum = CommonUtils.getThreadNum(files.length);
+    List<List<String>> fileDistributions = CommonUtils.distributionFiles(files, threadNum);
     CountDownLatch latch = new CountDownLatch(threadNum);
     int i = 0;
-    for (String file : files) {
+    for (List<String> threadFiles : fileDistributions) {
       XiamenTrajectoryCSVProducer producer = new XiamenTrajectoryCSVProducer(
-              path + File.separator + file,
+              threadFiles,
               host,
               port,
               topic,
@@ -40,20 +42,11 @@ public class MapMatchingProducer {
               IntegerSerializer.class.getName(),
               ByteArraySerializer.class.getName(),
               isAsync,
-              latch);
+              latch,
+              3);
       producer.start();
       ++i;
     }
     latch.await();
-  }
-
-  private static int getThreadNum(int fileNum) {
-    int maxThreads = Runtime.getRuntime().availableProcessors() + 1;
-    return Math.min(fileNum, maxThreads);
-  }
-
-  private static String[] listFiles(String path) {
-    File file = new File(path);
-    return file.list();
   }
 }

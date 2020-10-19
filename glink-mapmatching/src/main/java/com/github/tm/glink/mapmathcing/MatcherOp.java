@@ -51,7 +51,6 @@ public class MatcherOp<T extends TrajectoryPoint>
 
     if (candidate == null) return new TrajectoryPoint();
     Point roadPoint = candidate.point().geometry();
-    Thread.sleep(3000);
     return new TrajectoryPoint(p.getId(), p.getPid(), roadPoint.getY(), roadPoint.getX(), p.getTimestamp());
   }
 }

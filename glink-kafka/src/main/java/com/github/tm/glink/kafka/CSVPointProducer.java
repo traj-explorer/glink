@@ -34,8 +34,21 @@ public class CSVPointProducer extends BaseCSVProducer<String, byte[]> {
                           String keySerializer,
                           String valueSerializer,
                           boolean isAsync,
+                          CountDownLatch latch,
+                          final int sleep) throws FileNotFoundException {
+    super(filePath, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
+  }
+
+  public CSVPointProducer(String filePath,
+                          String serverUrl,
+                          int serverPort,
+                          String topic,
+                          String clientIdConfig,
+                          String keySerializer,
+                          String valueSerializer,
+                          boolean isAsync,
                           CountDownLatch latch) throws FileNotFoundException {
-    super(filePath, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch);
+    super(filePath, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, -1);
   }
 
   @Override
