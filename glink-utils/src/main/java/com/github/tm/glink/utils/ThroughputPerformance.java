@@ -26,7 +26,7 @@ public class ThroughputPerformance {
 
     KafkaConsumer<Integer, String> consumer = new KafkaConsumer<>(props);
 
-    consumer.subscribe(Collections.singletonList("XiamenTrajectory"));
+    consumer.subscribe(Collections.singletonList("map-matching-result-throughput"));
     long timeWindow = 100;
     long startTime = 0;
     long endTime = 0;

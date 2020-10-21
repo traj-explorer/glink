@@ -1,6 +1,5 @@
 package com.github.tm.glink.features.serialization;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
@@ -39,7 +38,7 @@ public class FlinkTrajectoryDeSerialize implements DeserializationSchema<Traject
 
   @Override
   public TypeInformation<TrajectoryPoint> getProducedType() {
-    return TypeInformation.of(new TypeHint<TrajectoryPoint>() {});
+    return TypeInformation.of(new TypeHint<TrajectoryPoint>() { });
   }
 
   private void checkAvroInitialized() {

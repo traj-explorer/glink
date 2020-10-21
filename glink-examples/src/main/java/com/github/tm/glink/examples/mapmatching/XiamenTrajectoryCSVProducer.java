@@ -38,7 +38,6 @@ public class XiamenTrajectoryCSVProducer extends BaseCSVProducer<Integer, byte[]
     long timestamp = Long.parseLong(items[6]) * 1000;
     TrajectoryPoint point = new TrajectoryPoint(carno, pid, lat, lng, timestamp);
     byte[] data = avroTrajectoryPoint.serialize(point);
-    System.out.printf("Thread %d: %d%n", Thread.currentThread().getId(), pid);
     return new KeyValue<>(pid, data);
   }
 }

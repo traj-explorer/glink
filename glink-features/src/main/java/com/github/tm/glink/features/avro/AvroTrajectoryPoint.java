@@ -11,6 +11,7 @@ import java.util.Properties;
  * */
 public class AvroTrajectoryPoint extends AvroGeoObject<TrajectoryPoint> {
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   public static final String SCHEMA = "{" +
           "\"type\": \"record\"," +
           "\"name\": \"Point\"," +

@@ -10,6 +10,6 @@ public class MapMatcher {
 
   public static DataStream<TrajectoryPoint> mapMatch(DataStream<TrajectoryPoint> trajectoryDataStream) {
     return trajectoryDataStream.keyBy(TrajectoryPoint::getId)
-            .map(new MatcherOp<>());
+            .flatMap(new MatcherOp<>());
   }
 }

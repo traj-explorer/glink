@@ -38,7 +38,7 @@ public class FlinkPointDeSerialize implements DeserializationSchema<Point> {
 
   @Override
   public TypeInformation<Point> getProducedType() {
-    return TypeInformation.of(new TypeHint<Point>() {});
+    return TypeInformation.of(new TypeHint<Point>() { });
   }
 
   private void checkAvroInitialized() {

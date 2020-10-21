@@ -18,16 +18,22 @@ public class MapMatchingProducer {
    *             1 (string) - kafka topic
    *             2 (string) - kafka host
    *             3 (int) - kafka port
-   *             4 (string, option) - `sync` to indicate kafka send message synchronized
+   *             4 (int) - sleep seconds: -1 for throughput test
+   *             5 (string, option) - `sync` to indicate kafka send message synchronized
    * */
   public static void main(String[] args) throws FileNotFoundException, InterruptedException {
     String path = args[0];
     String topic = args[1];
     String host = args[2];
     int port = Integer.parseInt(args[3]);
-    boolean isAsync = args.length == 5 && args[4].trim().equalsIgnoreCase("sync");
+    int sleep = Integer.parseInt(args[4]);
+    boolean isAsync = args.length == 6 && args[5].trim().equalsIgnoreCase("sync");
 
     String[] files = CommonUtils.listFiles(path);
+    if (files == null) {
+      System.out.printf("No files in dir %s\n", path);
+      System.exit(1);
+    }
     int threadNum = CommonUtils.getThreadNum(files.length);
     List<List<String>> fileDistributions = CommonUtils.distributionFiles(files, threadNum);
     CountDownLatch latch = new CountDownLatch(threadNum);
@@ -43,7 +49,7 @@ public class MapMatchingProducer {
               ByteArraySerializer.class.getName(),
               isAsync,
               latch,
-              3);
+              sleep);
       producer.start();
       ++i;
     }

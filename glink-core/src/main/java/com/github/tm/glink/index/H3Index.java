@@ -83,6 +83,11 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public ClassfiedGrids getRelatedGrids(Geometry geometry) {
+    return null;
+  }
+
+//  @Override
   public ClassfiedGrids getContainGrids(Geometry geometry) {
     ArrayList<Long> allIndexs = (ArrayList<Long>) h3Core.polyfill(geometryToGeoCoordList(geometry), null, res);
     // 将all_indexes分为两类：六边形完全内含于geometry的索引与六边形不完全内含于geometry的索引。

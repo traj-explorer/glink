@@ -23,6 +23,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
   private CountDownLatch latch;
   private int sleep;
 
+  @SuppressWarnings("checkstyle:VisibilityModifier")
   protected LinkedList<BufferedReader> bufferedReaders = new LinkedList<>();
 
   public BaseCSVProducer(final String filePath,
@@ -84,6 +85,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
 
   public abstract KeyValue<K, V> parseLine(String line);
 
+  @SuppressWarnings("checkstyle:InnerAssignment")
   @Override
   public void run() {
     String line;
@@ -101,8 +103,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
               producer.send(producerRecord, (recordMetadata, e) -> {
                 if (recordMetadata != null) {
                   System.out.println("key: " + recordMetadata.topic() + "send at: " + recordMetadata.timestamp());
-                }
-                else {
+                } else {
                   System.out.println("failed");
                   e.printStackTrace();
                 }
@@ -125,6 +126,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
     latch.countDown();
   }
 
+  @SuppressWarnings("checkstyle:VisibilityModifier")
   public static class KeyValue<K, V> {
 
     public KeyValue(K key, V value) {

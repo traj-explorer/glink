@@ -118,8 +118,8 @@ public class Point extends GeoObject {
     if (o == this) return true;
     if (!(o instanceof Point)) return false;
     Point p = (Point) o;
-    return this.id.equals(p.id) && this.lat == p.lat && this.lng == p.lng &&
-            this.timestamp == p.timestamp && this.index == p.index;
+    return this.id.equals(p.id) && this.lat == p.lat && this.lng == p.lng
+            && this.timestamp == p.timestamp && this.index == p.index;
   }
 
   protected double getDoubleLat() {
@@ -130,6 +130,7 @@ public class Point extends GeoObject {
     return (double) lng / MAX_PRECISION;
   }
 
+  @SuppressWarnings("checkstyle:LocalVariableName")
   protected int getIntLatLng(double doubleValue) {
     double CARRY = 0.00000005;
     return (int) ((doubleValue + CARRY) * MAX_PRECISION);

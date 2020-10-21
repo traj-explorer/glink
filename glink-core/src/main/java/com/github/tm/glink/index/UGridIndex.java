@@ -67,7 +67,7 @@ public class UGridIndex extends GridIndex {
     } else if (minX == maxX && minY < maxY) {
       res.add(combineXY(minX, minY));
       return res;
-    } else if (minX < maxX && minY == maxY){
+    } else if (minX < maxX && minY == maxY) {
       res.add(combineXY(maxX, minY));
       return res;
     } else {

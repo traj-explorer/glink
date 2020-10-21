@@ -10,6 +10,7 @@ import java.util.Properties;
  * */
 public class AvroPoint extends AvroGeoObject<Point> {
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   public static final String SCHEMA = "{" +
           "\"type\": \"record\"," +
           "\"name\": \"Point\"," +
