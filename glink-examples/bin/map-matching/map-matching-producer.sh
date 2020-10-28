@@ -1,0 +1,1 @@
+java -cp glink-examples-1.0-SNAPSHOT.jar com.github.tm.glink.examples.mapmatching.MapMatchingProducer /home/liebing/input/multi map-matching-origin u0:9092 1 -1

@@ -16,9 +16,8 @@ public class KafkaXiamenTrajectoryProducer {
   public static void main(String[] args) throws FileNotFoundException, InterruptedException {
     String path = args[0];
     String topic = args[1];
-    String host = args[2];
-    int port = Integer.parseInt(args[3]);
-    boolean isAsync = args.length == 5 && args[4].trim().equalsIgnoreCase("sync");
+    String brokerList = args[2];
+    boolean isAsync = args.length == 4 && args[3].trim().equalsIgnoreCase("sync");
 
     String[] files = CommonUtils.listFiles(path);
     int threadNum = CommonUtils.getThreadNum(files.length);
@@ -27,8 +26,7 @@ public class KafkaXiamenTrajectoryProducer {
     for (String file : files) {
       CSVXiamenTrajectoryProducer producer = new CSVXiamenTrajectoryProducer(
               path + File.separator + file,
-              host,
-              port,
+              brokerList,
               topic,
               "CSVXiamenTrajectoryProducer-" + i,
               StringSerializer.class.getName(),

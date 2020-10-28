@@ -15,8 +15,8 @@ public class CSVXiamenTrajectoryProducer extends BaseCSVProducer<String, byte[]>
 
   private AvroTrajectoryPoint avroTrajectoryPoint;
 
-  public CSVXiamenTrajectoryProducer(String filePath, String serverUrl, int serverPort, String topic, String clientIdConfig, String keySerializer, String valueSerializer, boolean isAsync, CountDownLatch latch) throws FileNotFoundException {
-    super(filePath, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, -1);
+  public CSVXiamenTrajectoryProducer(String filePath, String brokerList, String topic, String clientIdConfig, String keySerializer, String valueSerializer, boolean isAsync, CountDownLatch latch) throws FileNotFoundException {
+    super(filePath, brokerList, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, -1);
     String schema = "speed:double;azimuth:int;status:int";
     avroTrajectoryPoint = new AvroTrajectoryPoint(schema);
   }

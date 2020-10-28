@@ -28,6 +28,10 @@
             <groupId>com.github.tm</groupId>
             <artifactId>glink-mapmatching</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-traffic</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -46,6 +50,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_${scala.binary.version}</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
             <scope>compile</scope>
         </dependency>
@@ -53,6 +62,29 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-avro</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-csv</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Table ecosystem -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
         </dependency>
     </dependencies>
 
