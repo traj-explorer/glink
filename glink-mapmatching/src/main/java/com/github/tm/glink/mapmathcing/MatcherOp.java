@@ -54,6 +54,8 @@ public class MatcherOp<T extends TrajectoryPoint>
   public void flatMap(T p, Collector<TrajectoryPoint> collector) throws Exception {
     // get k state
     MatcherKState currentKState = state.value();
+    // if k state is null, init
+    if (currentKState == null) currentKState = new MatcherKState();
     // create matcher sample
     Point point = new Point(p.getLng(), p.getLat());
     MatcherSample sample = new MatcherSample(String.valueOf(p.getPid()), p.getTimestamp(), point);

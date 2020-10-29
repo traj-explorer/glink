@@ -14,7 +14,7 @@ import java.io.IOException;
 public class FlinkTrajectoryDeSerialize implements DeserializationSchema<TrajectoryPoint> {
 
   private String attributesSchema;
-  private transient AvroTrajectoryPoint avroTrajectoryPoint;
+  private transient AvroTrajectoryPoint  avroTrajectoryPoint;
 
   public FlinkTrajectoryDeSerialize() {
     avroTrajectoryPoint = new AvroTrajectoryPoint();

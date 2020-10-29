@@ -1,6 +1,7 @@
 package com.github.tm.glink.operator.judgement;
 
 import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.utils.GeoDistanceComparator;
 import com.github.tm.glink.index.GridIndex;
 import com.github.tm.glink.index.H3Index;
 import org.apache.flink.configuration.Configuration;
@@ -11,17 +12,25 @@ import org.apache.flink.util.Collector;
 import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.java8.FuturesConvertersImpl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Yu Liebing
  */
 public class IndexKNNJudgement {
 
+  /**
+   * Apply KNN on the collected points.
+   * @param queryPoint Query point's coordinate.
+   * @param k Parameter "k" in kNN.
+   * @param gridIndex The type of index used in query.
+   * @param windowKey The index of the points collected by current window. If assigned,
+   * @param timeWindow A timewindow object provided by window function.
+   * @param iterable Used to traverse the points inside the window.
+   * @param collector Used to collect results.
+   */
   public static void windowApply(
           Coordinate queryPoint,
           int k,
@@ -49,6 +58,8 @@ public class IndexKNNJudgement {
     int curRes = gridIndex.getRes();
     long curNum = 0;
     List<Long> grids = new ArrayList<>();
+    List<Long> outestGrids = new ArrayList<>();
+    List<Long> confirmedGrids = new ArrayList<>();
     grids.add(curIndex);
     while (true) {
       for (long grid : grids) {
@@ -77,7 +88,56 @@ public class IndexKNNJudgement {
         }
       }
     }
-
+//    int kring = 1;
+//    while (true) {
+//      for (long grid : grids) {
+//        List<Point> points = pointsInGrid.get(grid);
+//        if(points!=null) {
+//          curNum += points.size();
+//        }
+//      }
+//      if (curNum >= k) {
+//        break;
+//      } else {
+//        // 外扩一层, 当外扩失败时,已经为最大时, break, 输出已有点。
+//        List<Long> toAddGrids = gridIndex.kRing(curIndex, ++kring);
+//        confirmedGrids.clear();
+//        confirmedGrids.addAll(grids);
+//        boolean expand_success = true;
+//        // 设置接下来需要遍历的grids与outest grids.
+//        if (expand_success) {
+//          List<Long> tempGrids = new ArrayList<>();
+//          for (Long toAddGrid : toAddGrids) {
+//            if(!grids.contains(toAddGrid)) {
+//              tempGrids.add(toAddGrid);
+//            }
+//          }
+//          grids.clear();
+//          grids.addAll(tempGrids);
+//          outestGrids.clear();
+//          outestGrids.addAll(tempGrids);
+//        } else {
+//          System.out.println("Didn't get k points.");
+//          break;
+//        }
+//      }
+//    }
+//    int totalGrids = 0;
+//    int current_points = 0;
+//    for ( Long confirmedGrid : confirmedGrids) {
+//      totalGrids ++;
+//      List<Point> points = pointsInGrid.get(confirmedGrid);
+//      for( Point point : points){
+//        collector.collect(point);
+//        current_points++;
+//      }
+//    }
+//    PriorityQueue<Point> priorityQueue = new PriorityQueue<>(new GeoDistanceComparator(queryPoint));
+//    for ( Long outGrids : outestGrids) {
+//      totalGrids ++;
+//      priorityQueue.addAll(pointsInGrid.get(outGrids));
+//    }
+//    priorityQueue.
     long endTime = System.currentTimeMillis();
     // log information for debug
     System.out.println(String.format("ThreadId: %d, key: %d, total grids: %d, time: %d",

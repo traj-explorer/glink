@@ -32,7 +32,7 @@ public class TrajectoryPoint extends Point {
 
   @Override
   public String toString() {
-    return String.format("TrajectoryPoint{id=%s, pid=%d, lat=%.07f, lng=%.07f, timestamp=%d}",
-            id, pid, getDoubleLat(), getDoubleLng(), timestamp);
+    return String.format("TrajectoryPoint{id=%s, pid=%d, lat=%.07f, lng=%.07f, timestamp=%d, attributes=%s}",
+            id, pid, getDoubleLat(), getDoubleLng(), timestamp, attributes);
   }
 }

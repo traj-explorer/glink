@@ -8,10 +8,23 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 /**
+ * Process DBSCAN on all coming events. It is done by following steps:
+ * 1. Get neighbor stream using {@link PairRangeJoin}.
+ * 2. Window the indexed data stream in the style of tumbling time window. 将轨迹点window至时长为window size的TumblingEventTimewindow.
+ * 3. Process DBSCAN and get a result data stream composed of Tuple2(Cluster_id, Point_info).
  * @author Yu Liebing
  */
 public class DBSCAN {
-
+  /**
+   * Process DBSCAN on a point data stream based on a tumbling time window, now using {@link com.github.tm.glink.index.UGridIndex}
+   * @param geoDataStream The input point data stream.
+   * @param windowSize The window size(seconds).
+   * @param distance Distance(meters) value to search for neighbors.
+   * @param minPts The number of samples in a neighborhood for a point to be considered as a core point.
+   * @param gridWidth 暂时没用
+   * @return Cluster data stream composed of <b>Tuple2<Integer,Point></b>, where the first indicates the cluster id, and
+   *  the other indicates the point information.
+   */
   public static DataStream<Tuple2<Integer, Point>> dbscan(
           DataStream<Point> geoDataStream,
           int windowSize,

@@ -8,10 +8,19 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 /**
+ * Perform k-NN query with the points collected in a tumbling time window.
  * @author Yu Liebing
  */
 public class RangeQuery {
-
+  /**
+   * Get the points inside the query geometry in parallel, the degree of parallelization depends
+   * on the provided partition number.
+   * @param geoDataStream The input point data stream.
+   * @param queryGeometry A geometry, now only polygons are allowed.
+   * @param partitionNum The number of partitions.
+   * @param res The resolution level of H3Index.
+   * @return Point data stream filtered by query geometry.
+   */
   public static <U extends Geometry> DataStream<Point> spatialRangeQuery(
       DataStream<Point> geoDataStream,
       U queryGeometry,
@@ -23,7 +32,7 @@ public class RangeQuery {
     } else if (index.equals("all")) {
       return null;
     } else if (index.equals("polygon")) {
-      return geoDataStream.map(new IndexAssigner(res))
+      return geoDataStream.map(new H3IndexAssigner(res))
           .keyBy(r -> Math.abs(r.getId().hashCode() % partitionNum))
           .filter(new H3RangeJudgement<>(queryGeometry, res));
     } else {
@@ -36,7 +45,7 @@ public class RangeQuery {
       Envelope queryWindow,
       int partitionNum,
       int res) {
-    return geoDataStream.map(new IndexAssigner(res))
+    return geoDataStream.map(new H3IndexAssigner(res))
         .keyBy(r -> Math.abs(r.getId().hashCode() % partitionNum))
         .filter(new H3RangeJudgement<>(queryWindow, res));
   }
