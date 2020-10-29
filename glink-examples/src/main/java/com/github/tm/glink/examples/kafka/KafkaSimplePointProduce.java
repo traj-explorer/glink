@@ -26,9 +26,8 @@ public class KafkaSimplePointProduce {
   public static void main(String[] args) throws FileNotFoundException, InterruptedException {
     String path = args[0];
     String topic = args[1];
-    String host = args[2];
-    int port = Integer.parseInt(args[3]);
-    boolean isAsync = args.length == 5 && args[4].trim().equalsIgnoreCase("sync");
+    String brokerList = args[2];
+    boolean isAsync = args.length == 4 && args[3].trim().equalsIgnoreCase("sync");
 
     String[] files = listFiles(path);
     int threadNum = getThreadNum(files.length);
@@ -37,8 +36,7 @@ public class KafkaSimplePointProduce {
     for (String file : files) {
       CSVPointProducer producer = new CSVPointProducer(
               path + File.separator + file,
-              host,
-              port,
+              brokerList,
               topic,
               "CSVPointProducer-" + i,
               StringSerializer.class.getName(),

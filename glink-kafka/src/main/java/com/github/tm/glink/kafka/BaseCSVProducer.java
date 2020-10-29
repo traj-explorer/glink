@@ -27,8 +27,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
   protected LinkedList<BufferedReader> bufferedReaders = new LinkedList<>();
 
   public BaseCSVProducer(final String filePath,
-                         final String serverUrl,
-                         final int serverPort,
+                         final String brokerList,
                          final String topic,
                          final String clientIdConfig,
                          final String keySerializer,
@@ -38,12 +37,11 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
                          final int sleep) throws FileNotFoundException {
     List<String> filePaths = new ArrayList<>(1);
     filePaths.add(filePath);
-    init(filePaths, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
+    init(filePaths, brokerList, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
   }
 
   public BaseCSVProducer(final List<String> filePaths,
-                         final String serverUrl,
-                         final int serverPort,
+                         final String brokerList,
                          final String topic,
                          final String clientIdConfig,
                          final String keySerializer,
@@ -51,12 +49,11 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
                          final boolean isAsync,
                          final CountDownLatch latch,
                          final int sleep) throws FileNotFoundException {
-    init(filePaths, serverUrl, serverPort, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
+    init(filePaths, brokerList, topic, clientIdConfig, keySerializer, valueSerializer, isAsync, latch, sleep);
   }
 
   public void init(final List<String> filePaths,
-                   final String serverUrl,
-                   final int serverPort,
+                   final String brokerList,
                    final String topic,
                    final String clientIdConfig,
                    final String keySerializer,
@@ -65,7 +62,7 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
                    final CountDownLatch latch,
                    final int sleep) throws FileNotFoundException {
     Properties props = new Properties();
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, serverUrl + ":" + serverPort);
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
     props.put(ProducerConfig.CLIENT_ID_CONFIG, clientIdConfig);
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
@@ -126,7 +123,6 @@ public abstract class BaseCSVProducer<K, V> extends Thread {
     latch.countDown();
   }
 
-  @SuppressWarnings("checkstyle:VisibilityModifier")
   public static class KeyValue<K, V> {
 
     public KeyValue(K key, V value) {

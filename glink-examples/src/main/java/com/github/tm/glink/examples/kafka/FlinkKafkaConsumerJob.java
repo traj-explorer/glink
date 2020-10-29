@@ -1,7 +1,7 @@
 package com.github.tm.glink.examples.kafka;
 
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.features.serialization.FlinkPointDeSerialize;
+import com.github.tm.glink.features.serialization.FlinkPointSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -23,7 +23,7 @@ public class FlinkKafkaConsumerJob {
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     FlinkKafkaConsumer<Point> consumer = new FlinkKafkaConsumer<>(
-            "point", new FlinkPointDeSerialize(), props);
+            "point", new FlinkPointSchema(), props);
     DataStream<Point> dataStream = env.addSource(consumer);
 
     dataStream.print();

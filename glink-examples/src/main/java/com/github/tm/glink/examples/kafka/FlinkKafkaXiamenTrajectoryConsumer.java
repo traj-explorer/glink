@@ -1,7 +1,7 @@
 package com.github.tm.glink.examples.kafka;
 
 import com.github.tm.glink.features.TrajectoryPoint;
-import com.github.tm.glink.features.serialization.FlinkTrajectoryDeSerialize;
+import com.github.tm.glink.features.serialization.FlinkTrajectoryPointSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -24,7 +24,7 @@ public class FlinkKafkaXiamenTrajectoryConsumer {
 
     FlinkKafkaConsumer<TrajectoryPoint> consumer = new FlinkKafkaConsumer<>(
             "XiamenTrajectory",
-            new FlinkTrajectoryDeSerialize("speed:double;azimuth:int;status:int"),
+            new FlinkTrajectoryPointSchema("speed:double;azimuth:int;status:int"),
             props);
     DataStream<TrajectoryPoint> dataStream = env.addSource(consumer);
 

@@ -3,6 +3,7 @@ package com.github.tm.glink.features.serialization;
 import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
+import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 
@@ -11,18 +12,25 @@ import java.io.IOException;
 /**
  * @author Yu Liebing
  * */
-public class FlinkTrajectoryDeSerialize implements DeserializationSchema<TrajectoryPoint> {
+public class FlinkTrajectoryPointSchema
+        implements SerializationSchema<TrajectoryPoint>, DeserializationSchema<TrajectoryPoint> {
 
   private String attributesSchema;
   private transient AvroTrajectoryPoint  avroTrajectoryPoint;
 
-  public FlinkTrajectoryDeSerialize() {
+  public FlinkTrajectoryPointSchema() {
     avroTrajectoryPoint = new AvroTrajectoryPoint();
   }
 
-  public FlinkTrajectoryDeSerialize(String attributesSchema) {
+  public FlinkTrajectoryPointSchema(String attributesSchema) {
     this.attributesSchema = attributesSchema;
     avroTrajectoryPoint = new AvroTrajectoryPoint(attributesSchema);
+  }
+
+  @Override
+  public byte[] serialize(TrajectoryPoint trajectoryPoint) {
+    checkAvroInitialized();
+    return avroTrajectoryPoint.serialize(trajectoryPoint);
   }
 
   @Override

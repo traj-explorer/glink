@@ -35,13 +35,13 @@ public class MatcherOp<T extends TrajectoryPoint>
   @Override
   public void open(Configuration parameters) throws Exception {
     StateTtlConfig ttlConfig = StateTtlConfig
-            .newBuilder(Time.minutes(10))
+            .newBuilder(Time.seconds(1))
             .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
             .setStateVisibility(StateTtlConfig.StateVisibility.NeverReturnExpired)
             .build();
     ValueStateDescriptor<MatcherKState> descriptor = new ValueStateDescriptor<>(
             "matcher-k-state", TypeInformation.of(new TypeHint<MatcherKState>() { }), new MatcherKState());
-    descriptor.enableTimeToLive(ttlConfig);
+//    descriptor.enableTimeToLive(ttlConfig);
     state = getRuntimeContext().getState(descriptor);
 
     ParameterTool parameterTool = (ParameterTool) getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
@@ -73,6 +73,7 @@ public class MatcherOp<T extends TrajectoryPoint>
     attributes.put("roadLng", roadPoint.getX());
     attributes.put("roadId", roadId);
     p.setAttributes(attributes);
+    System.out.println(p + ", roadId: " + roadId);
     collector.collect(p);
   }
 

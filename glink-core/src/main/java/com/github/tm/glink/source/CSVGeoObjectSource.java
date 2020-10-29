@@ -12,9 +12,7 @@ import java.io.FileReader;
  */
 public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSourceFunction<T> {
 
-  @SuppressWarnings("checkstyle:VisibilityModifier")
   protected String filePath;
-  @SuppressWarnings("checkstyle:VisibilityModifier")
   protected BufferedReader bufferedReader;
 
   public abstract T parseLine(String line);
