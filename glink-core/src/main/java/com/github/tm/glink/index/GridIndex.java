@@ -11,7 +11,6 @@ import java.util.List;
  */
 public abstract class GridIndex implements Serializable {
 
-  @SuppressWarnings("checkstyle:VisibilityModifier")
   protected int res;
 
   public abstract int getRes();

@@ -59,13 +59,13 @@ public class MapMatchingJob {
               .map(r -> {
                 String res = "{\"time\": %d, \"id\": \"%s\", \"point\": \"POINT (%f %f)\"}";
                 Properties attributes = r.getAttributes();
-                double lat = (double) attributes.get("lat");
-                double lng = (double) attributes.get("lng");
+                double lat = (double) attributes.get("roadLat");
+                double lng = (double) attributes.get("roadLng");
                 return String.format(res, r.getTimestamp(), r.getId() + "-" + r.getPid(), lng, lat);
               })
               .addSink(new FlinkKafkaProducer<>(brokerList, resultTopic, new SimpleStringSchema()));
 
-      matchResult.print();
+//      matchResult.print();
     } else {
       String schema = "roadLat:double;roadLng:double;roadId:long";
       matchResult.addSink(new FlinkKafkaProducer<>(brokerList, resultTopic,

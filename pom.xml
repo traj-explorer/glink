@@ -19,6 +19,7 @@
         <module>glink-utils</module>
         <module>glink-visualization</module>
         <module>glink-traffic</module>
+        <module>glink-sql</module>
     </modules>
 
     <properties>
