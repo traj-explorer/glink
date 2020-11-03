@@ -25,6 +25,12 @@ public class CommonUtils {
     return files;
   }
 
+  /**
+   *
+   * @param files
+   * @param numThreads
+   * @return
+   */
   public static List<List<String>> distributionFiles(String[] files, int numThreads) {
     int threadFileNum = files.length / numThreads;
     List<List<String>> res = new ArrayList<>();

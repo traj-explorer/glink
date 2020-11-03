@@ -11,6 +11,8 @@ import org.apache.flink.util.Collector;
 import java.util.List;
 
 /**
+ * Assign one or more indexes for points. When the point locates near the edges of grid it located at, it will also be
+ * assigned with a index of the neighbor grid. As for exact data broadcast mechanism, see {@link UGridIndex}.
  * @author Yu Liebing
  */
 public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Boolean, Long, Point>> {
@@ -20,6 +22,12 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Bo
   private boolean fullMode;
   private transient GridIndex gridIndex;
 
+  /**
+   * Init a pair range join index assigner based on {@link UGridIndex}
+   * @param distance The distance(meters) from 2 points to be regarded as a pair.
+   * @param gridWidth The original width of grids.
+   * @param fullMode 暂时没用.
+   */
   public RangeJoinIndexAssigner(double distance, double gridWidth, boolean fullMode) {
     this.distance = distance;
     this.gridWidth = gridWidth;
@@ -31,6 +39,13 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Bo
     gridIndex = new UGridIndex(gridWidth);
   }
 
+  /**
+   * @param collector To collect index results composed of 3 items:
+   *                  1: Boolean, ture if the output indicate a "broadcast" to a neighbor grid.
+   *                  2: Long, the index which the output will be keyed by. Note: the index DO NOT represents
+   *                  the actual grid where the point locates.
+   *                  3: Point, the original point object.
+   */
   @Override
   public void flatMap(Point point, Collector<Tuple3<Boolean, Long, Point>> collector) throws Exception {
     long index = gridIndex.getIndex(point.getLat(), point.getLng());

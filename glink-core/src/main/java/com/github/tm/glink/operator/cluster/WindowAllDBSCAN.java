@@ -15,6 +15,9 @@ public class WindowAllDBSCAN extends RichAllWindowFunction<Tuple2<Point, Point>,
 
   private int minPts;
 
+  /**
+   * @param minPts The number of samples in a neighborhood for a point to be considered as a core point.
+   */
   public WindowAllDBSCAN(int minPts) {
     this.minPts = minPts;
   }

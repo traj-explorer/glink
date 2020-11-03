@@ -16,7 +16,7 @@ public class FlinkTrajectoryPointSchema
         implements SerializationSchema<TrajectoryPoint>, DeserializationSchema<TrajectoryPoint> {
 
   private String attributesSchema;
-  private transient AvroTrajectoryPoint avroTrajectoryPoint;
+  private transient AvroTrajectoryPoint  avroTrajectoryPoint;
 
   public FlinkTrajectoryPointSchema() {
     avroTrajectoryPoint = new AvroTrajectoryPoint();

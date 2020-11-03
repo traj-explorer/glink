@@ -21,11 +21,15 @@ import java.util.Map;
  */
 public class RangeQueryJob {
 
+  /**
+   * --rangeIndex Whether to assign indexes for the query conditions.
+   * "null" Do not assign any index.
+   * "all" Assign indexes for all of the query conditions.
+   * "polygon" Only assign indexes for the polygon query conditions.
+   */
   public static void main(String[] args) throws Exception {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    Map<String, String> param = new HashMap<>();
-    param.put("rangeIndex", "polygon");
-    ParameterTool globalParam = ParameterTool.fromMap(param);
+    ParameterTool globalParam = ParameterTool.fromArgs(args);
     env.getConfig().setGlobalJobParameters(globalParam);
 
 //    String path = KNNQueryJob.class.getResource("/gps_20161101_0710").getPath();

@@ -20,6 +20,12 @@ public class H3Index extends GridIndex {
 
   private H3Core h3Core;
 
+  /**
+   * Initialize the resolution of H3 index.
+   * @see  <a href="https://h3geo.org/docs/core-library/overview">H3 Index Overview</a>
+   * @param res Resolution. The resolution of H3 index ranges from 0 to 15, the finest resolution, resolution 15,
+   * has cells with an area of less than 1m^2.
+   */
   public H3Index(int res) {
     try {
       h3Core = H3Core.newInstance();

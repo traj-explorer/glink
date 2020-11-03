@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * The redundant version of {@link PairIndexRangeJoinProcess}, which means it will generate
+ * one pair of neighbor for 2 times, in separate lists.
  * @author Yu Liebing
  */
 public class AllIndexRangeJoinProcess
@@ -21,7 +23,7 @@ public class AllIndexRangeJoinProcess
 
   private double distance;
 
-  public AllIndexRangeJoinProcess(double distance) {
+  public  AllIndexRangeJoinProcess(double distance) {
     this.distance = distance;
   }
 

@@ -7,14 +7,15 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 
 /**
+ * Assign H3Index for coming points.
  * @author Yu Liebing
  */
-public class IndexAssigner extends RichMapFunction<Point, Point> {
+public class H3IndexAssigner extends RichMapFunction<Point, Point> {
 
   private int res;
   private transient GridIndex gridIndex;
 
-  public IndexAssigner(int res) {
+  public H3IndexAssigner(int res) {
     this.res = res;
   }
 
