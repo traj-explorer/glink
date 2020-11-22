@@ -25,7 +25,7 @@
     <properties>
         <flink.version>1.11.2</flink.version>
         <kafka.version>2.5.0</kafka.version>
-        <avro.version>1.10.0</avro.version>
+        <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
         <scala.binary.version>2.12</scala.binary.version>
         <log4j.version>2.12.1</log4j.version>
@@ -35,6 +35,7 @@
         <h3.version>3.6.3</h3.version>
         <geodesy.version>1.1.3</geodesy.version>
         <stindex.version>0.1.0</stindex.version>
+        <geotools.version>23.2</geotools.version>
     </properties>
 
     <dependencyManagement>
@@ -138,6 +139,11 @@
                 <artifactId>glink-traffic</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-sql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Kafka dependency -->
             <dependency>
@@ -189,6 +195,61 @@
                 <groupId>com.github.tm</groupId>
                 <artifactId>stindex</artifactId>
                 <version>${stindex.version}</version>
+            </dependency>
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-epsg-hsql</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-epsg-extension</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-main</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.vividsolutions</groupId>
+                        <artifactId>jts</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--The following GeoTools dependencies use GNU Lesser General Public License and thus are excluded from the binary distribution-->
+            <!-- Users have to include them by themselves manually -->
+            <!-- See https://www.apache.org/legal/resolved.html#category-x -->
+            <!-- See https://github.com/geotools/geotools#license -->
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-referencing</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Junit dependency -->
@@ -262,5 +323,15 @@
 
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </repository>
+    </repositories>
 
 </project>

@@ -33,6 +33,10 @@
             <groupId>com.github.tm</groupId>
             <artifactId>glink-traffic</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-sql</artifactId>
+        </dependency>
 
         <!-- Flink dependencies -->
         <dependency>
@@ -63,7 +67,7 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-avro</artifactId>
-            <scope>compile</scope>
+<!--            <scope>compile</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -88,6 +92,11 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -106,6 +115,9 @@
                             <artifactSet>
                                 <excludes>
                                     <exclude>org.apache.flink:*</exclude>
+                                    <exclude>META-INF/*.SF</exclude>
+                                    <exclude>META-INF/*.DSA</exclude>
+                                    <exclude>META-INF/*.RSA</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>

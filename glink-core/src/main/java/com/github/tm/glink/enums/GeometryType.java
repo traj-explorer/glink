@@ -1,5 +1,8 @@
 package com.github.tm.glink.enums;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.locationtech.jts.geom.*;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +19,33 @@ public enum GeometryType implements Serializable {
   GEOMETRYCOLLECTION,
   CIRCLE,
   RECTANGLE;
+
+  public <T extends Geometry> TypeInformation<T> getTypeInformation() {
+    switch (this) {
+      case POINT:
+        return (TypeInformation<T>) TypeInformation.of(Point.class);
+      case POLYGON:
+        return (TypeInformation<T>) TypeInformation.of(Polygon.class);
+      case LINESTRING:
+        return (TypeInformation<T>) TypeInformation.of(LineString.class);
+      case MULTIPOINT:
+        return (TypeInformation<T>) TypeInformation.of(MultiPoint.class);
+      case MULTIPOLYGON:
+        return (TypeInformation<T>) TypeInformation.of(MultiPolygon.class);
+      case MULTILINESTRING:
+        return (TypeInformation<T>) TypeInformation.of(MultiLineString.class);
+      case GEOMETRYCOLLECTION:
+        return (TypeInformation<T>) TypeInformation.of(GeometryCollection.class);
+      case CIRCLE:
+        // TODO
+        return null;
+      case RECTANGLE:
+        // TODO
+        return null;
+      default:
+        return null;
+    }
+  }
 
   /**
    * Gets the GeometryType.

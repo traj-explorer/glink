@@ -1,25 +1,25 @@
-package com.github.tm.glink.examples.demo;
+package com.github.tm.glink.examples.sql;
 
+import com.github.tm.glink.sql.GlinkSQLRegister;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.types.Row;
 
-
-public final class SpatialSQLExample {
+/**
+ * @author Yu Liebing
+ */
+public class StreamSpatialSQLExample {
 
   @SuppressWarnings("checkstyle:OperatorWrap")
   public static void main(String[] args) throws Exception {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    env.setParallelism(1);
     final StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
-    tEnv.registerFunction("ST_Contains", new SpatialTypes.ST_Contains());
-    tEnv.registerFunction("ST_GeomFromText", new SpatialTypes.ST_GeomFromText());
-    tEnv.registerFunction("ST_Point", new SpatialTypes.ST_Point());
+    GlinkSQLRegister.registerUDF(tEnv);
 
     // register a table in the catalog
     tEnv.executeSql(
-        "CREATE TABLE Points (\n" +
+            "CREATE TABLE Points (\n" +
                     " x DOUBLE,\n" +
                     " y DOUBLE,\n" +
                     " id STRING\n" +
@@ -35,7 +35,7 @@ public final class SpatialSQLExample {
     // define a dynamic aggregating query
     final Table result = tEnv.sqlQuery("SELECT * FROM Points WHERE " +
             "ST_Contains(" +
-              "ST_GeomFromText('POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))'), ST_Point(x, y)" +
+            "ST_GeomFromText('POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))'), ST_Point(x, y)" +
             ")");
 
     // print the result to the console

@@ -3,6 +3,7 @@ package com.github.tm.glink.format;
 import com.github.tm.glink.enums.GeometryType;
 import com.github.tm.glink.enums.TextFileSplitter;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.locationtech.jts.geom.Coordinate;
@@ -44,9 +45,11 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
   /**
    * Non-spatial attributes in each input row will be concatenated to a tab separated string
    */
-  protected String otherAttributes = "";
+  protected Tuple otherAttributes;
 
-  protected GeometryType geometryType = null;
+  protected Class<?>[] attributesType;
+
+  protected GeometryType geometryType;
 
   /**
    *  Allow mapping of invalid geometries.
@@ -62,13 +65,15 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
           int startOffset,
           int endOffset,
           TextFileSplitter splitter,
+          GeometryType geometryType,
           boolean carryInputData,
-          GeometryType geometryType) {
+          Class<?>[] types) {
     this.startOffset = startOffset;
     this.endOffset = endOffset;
     this.splitter = splitter;
     this.carryInputData = carryInputData;
     this.geometryType = geometryType;
+    this.attributesType = types;
     allowTopologicallyInvalidGeometries = true;
     skipSyntacticallyInvalidGeometries = true;
     if (geometryType == null) {
@@ -90,12 +95,6 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
     if (splitter.equals(TextFileSplitter.WKB)) {
       wkbReader = new WKBReader();
     }
-  }
-
-  @Override
-  public void flatMap(String line, Collector<T> collector) throws Exception {
-    T geometry = (T) readGeometry(line);
-    collector.collect(geometry);
   }
 
   private Geometry readGeometry(String line) {
@@ -157,24 +156,28 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
             ? this.endOffset : (this.geometryType == GeometryType.POINT ? startOffset + 1 : columns.length - 1);
     final Coordinate[] coordinates = new Coordinate[(actualEndOffset - startOffset + 1) / 2];
     for (int i = this.startOffset; i <= actualEndOffset; i += 2) {
-      coordinates[(i - startOffset) / 2 ] = new Coordinate(Double.parseDouble(columns[i]), Double.parseDouble(columns[i + 1]));
+      coordinates[(i - startOffset) / 2 ] = new Coordinate(Double.parseDouble(columns[i]),
+              Double.parseDouble(columns[i + 1]));
     }
     if (carryInputData) {
-      boolean firstColumnFlag = true;
-      otherAttributes = "";
+      int attributesLen = columns.length - (actualEndOffset - startOffset + 1);
+      otherAttributes = Tuple.newInstance(attributesLen);
+      int j = 0;
       for (int i = 0; i < startOffset; i++) {
-        if (firstColumnFlag) {
-          otherAttributes += columns[i];
-          firstColumnFlag = false;
-        } else otherAttributes += "\t" + columns[i];
+        otherAttributes.setField(Schema.stringCastToPrimitive(columns[i], attributesType[j]), j);
+        ++j;
       }
       for (int i = actualEndOffset + 1; i < columns.length; i++) {
-        if (firstColumnFlag) {
-          otherAttributes += columns[i];
-          firstColumnFlag = false;
-        } else otherAttributes += "\t" + columns[i];
+        otherAttributes.setField(Schema.stringCastToPrimitive(columns[i], attributesType[j]), j);
+        ++j;
       }
     }
     return coordinates;
+  }
+
+  @Override
+  public void flatMap(String line, Collector<T> collector) throws Exception {
+    T geometry = (T) readGeometry(line);
+    collector.collect(geometry);
   }
 }

@@ -1,12 +1,10 @@
-package com.github.tm.glink.utils;
+package com.github.tm.glink.examples.demo.crs_transform;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ public class ThroughputPerformance {
           startTime = record.timestamp();
           endTime = startTime + timeWindow;
         }
-        System.out.println(Double.parseDouble(record.value().split(",")[0]));
+
         if (record.timestamp() >= endTime) {
           startTime = record.timestamp();
           endTime = startTime + timeWindow;
@@ -69,11 +67,11 @@ public class ThroughputPerformance {
       }
 
       if (num == 0) {
-//        double timeInterval = ((double) (realEndTime - startTime)) / 1000;
-//        double throughput = windowNum / timeInterval;
-//        System.out.println("final time interval: " + timeInterval);
-//        System.out.println("final windowNum: " + windowNum);
-//        throughputList.add(throughput);
+        double timeInterval = ((double) (realEndTime - startTime)) / 1000;
+        double throughput = windowNum / timeInterval;
+        System.out.println("final time interval: " + timeInterval);
+        System.out.println("final windowNum: " + windowNum);
+        throughputList.add(throughput);
         break;
       }
     }

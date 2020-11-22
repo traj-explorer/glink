@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.mapmatching;
+package com.github.tm.glink.examples.demo.mapmatching;
 
 import com.github.tm.glink.examples.utils.KafkaUtils;
 import com.github.tm.glink.features.TrajectoryPoint;
