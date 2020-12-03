@@ -1,14 +1,12 @@
 package com.github.tm.glink.examples.query;
 
-import com.github.tm.glink.datastream.SpatialDataStream;
-import com.github.tm.glink.enums.GeometryType;
-import com.github.tm.glink.enums.TextFileSplitter;
-import com.github.tm.glink.format.Schema;
-import kafka.controller.LeaderIsrAndControllerEpoch;
+import com.github.tm.glink.core.datastream.SpatialDataStream;
+import com.github.tm.glink.core.enums.GeometryType;
+import com.github.tm.glink.core.enums.TextFileSplitter;
+import com.github.tm.glink.core.format.Schema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
 import java.util.ArrayList;

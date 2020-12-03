@@ -2,7 +2,7 @@ package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.operator.RangeQuery;
+import com.github.tm.glink.core.operator.RangeQuery;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -12,9 +12,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yu Liebing

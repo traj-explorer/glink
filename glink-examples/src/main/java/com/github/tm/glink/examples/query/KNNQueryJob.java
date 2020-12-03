@@ -2,7 +2,7 @@ package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.operator.KNNQuery;
+import com.github.tm.glink.core.operator.KNNQuery;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;

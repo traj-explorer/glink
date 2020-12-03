@@ -1,8 +1,8 @@
 package com.github.tm.glink.examples.demo.mapmatching;
 
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import com.github.tm.glink.kafka.BaseCSVProducer;
+import com.github.tm.glink.features.TrajectoryPoint;
 
 import java.io.FileNotFoundException;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.operator.DBSCAN;
-import com.github.tm.glink.source.CSVPointSource;
+import com.github.tm.glink.core.operator.DBSCAN;
+import com.github.tm.glink.core.source.CSVPointSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;

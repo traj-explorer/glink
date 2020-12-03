@@ -17,7 +17,12 @@ public class Schema {
     return expressions;
   }
 
+  @Deprecated
   public static Class<?>[] types(Class<?>... types) {
+    return types;
+  }
+
+  public static TypeInformation<?>[] types(TypeInformation<?>... types) {
     return types;
   }
 

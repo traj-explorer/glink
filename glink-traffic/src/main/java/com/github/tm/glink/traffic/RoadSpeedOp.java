@@ -1,7 +1,7 @@
 package com.github.tm.glink.traffic;
 
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.utils.GeoUtil;
+import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

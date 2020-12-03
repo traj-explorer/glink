@@ -1,7 +1,7 @@
 package com.github.tm.glink.examples.source;
 
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.source.CSVGeoObjectSource;
+import com.github.tm.glink.core.source.CSVGeoObjectSource;
 
 /**
  * @author Yu Liebing

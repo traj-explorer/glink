@@ -1,7 +1,7 @@
 package com.github.tm.glink.features.serialization;
 
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
+import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -16,7 +16,7 @@ public class FlinkTrajectoryPointSchema
         implements SerializationSchema<TrajectoryPoint>, DeserializationSchema<TrajectoryPoint> {
 
   private String attributesSchema;
-  private transient AvroTrajectoryPoint  avroTrajectoryPoint;
+  private transient AvroTrajectoryPoint avroTrajectoryPoint;
 
   public FlinkTrajectoryPointSchema() {
     avroTrajectoryPoint = new AvroTrajectoryPoint();

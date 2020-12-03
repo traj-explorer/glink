@@ -1,7 +1,7 @@
 package com.github.tm.glink.sql;
 
-import com.github.tm.glink.sql.udf.Functions;
 import com.github.tm.glink.sql.udf.GeometryConstructor;
+import com.github.tm.glink.sql.udf.Functions;
 import com.github.tm.glink.sql.udf.GlinkFunctions;
 import com.github.tm.glink.sql.udf.Predicates;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;

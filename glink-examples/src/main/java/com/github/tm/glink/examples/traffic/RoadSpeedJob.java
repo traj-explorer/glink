@@ -1,14 +1,9 @@
 package com.github.tm.glink.examples.traffic;
 
 import com.github.tm.glink.examples.utils.EventTimeAssigner;
-import com.github.tm.glink.features.GeoObject;
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.features.serialization.FlinkTrajectoryPointSchema;
-import com.github.tm.glink.mapmathcing.MapMatcher;
+import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.traffic.RoadSpeedPipeline;
-import org.apache.flink.api.common.eventtime.WatermarkGenerator;
-import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
