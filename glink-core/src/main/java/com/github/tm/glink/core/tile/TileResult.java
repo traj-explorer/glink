@@ -41,10 +41,13 @@ public class TileResult<V> {
   public String toString() {
     StringBuilder data = new StringBuilder();
     for (PixelResult<V> pixelResult : result) {
-      data.append(pixelResult.getPixel().getPixelNo()).append(":").append(pixelResult.getResult()).append(",");
+      data.append("\"").append(pixelResult.getPixel().getPixelNo()).append("\"")
+              .append(":")
+              .append(pixelResult.getResult())
+              .append(",");
     }
     data.setLength(data.length() - 1);
-    return String.format("{zoom_level: %d, x: %d, y: %d, data: {%s}}",
+    return String.format("{\"zoom_level\": %d, \"x\": %d, \"y\": %d, \"data\": {%s}}",
             tile.getLevel(), getTile().getX(), getTile().getY(), data);
   }
 }
