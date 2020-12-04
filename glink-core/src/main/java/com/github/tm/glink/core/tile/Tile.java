@@ -60,4 +60,19 @@ public class Tile implements Serializable {
   public String toString() {
     return String.format("Tile{level=%d, x=%d, y=%d}", level, x, y);
   }
+
+  public long toLong() {
+    long res = 0L;
+    res |= ((long) level) << 46;
+    res |= ((long) x) << 23;
+    res |= y;
+    return res;
+  }
+
+  public Tile fromLong(long tileId) {
+    int level  = (int) (tileId >> 46);
+    int x = (int) ((tileId & (0x007f_ffffL << 23)) >> 23);
+    int y = (int) (tileId & (0x007f_ffffL));
+    return new Tile(level, x, y);
+  }
 }

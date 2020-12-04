@@ -14,10 +14,10 @@ public class TileGrid {
   public static final double MAX_LAT = 85.05112877980659;
   public static final double MAX_LNG = 180.;
 
-  private double minLat;
-  private double minLng;
-  private double maxLat;
-  private double maxLng;
+  private final double minLat;
+  private final double minLng;
+  private final double maxLat;
+  private final double maxLng;
 
   private int level = MAX_LEVEL;
 
@@ -59,9 +59,7 @@ public class TileGrid {
       lat = centroid.getX();
       lng = centroid.getY();
     }
-    int x = (int) ((lng - minLng) / lngStep);
-    int y = (int) ((maxLat - lat) / latStep);
-    return new Tile(level, x, y);
+    return getTile(lat, lng);
   }
 
   public Pixel getPixel(Geometry geometry) {
@@ -88,8 +86,14 @@ public class TileGrid {
 
     int pixelX = (int) ((lng - tileMinLng) / tileLngStep);
     int pixelY = (int) ((tileMaxLat - lat) / tileLatStep);
-    int pixelNo = pixelX * 256 + pixelY;
+    int pixelNo = pixelX + pixelY * 256;
 
     return new Pixel(tile, pixelNo);
+  }
+
+  public Tile getTile(double lat, double lng) {
+    int x = (int) ((lng - minLng) / lngStep);
+    int y = (int) ((maxLat - lat) / latStep);
+    return new Tile(level, x, y);
   }
 }
