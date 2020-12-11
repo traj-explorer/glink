@@ -42,7 +42,7 @@ public class TileExample {
             }));
 
     TileResultDataStream<Integer> gridDataStream = pointDataStream
-            .grid(13).gridSum(TumblingEventTimeWindows.of(Time.seconds(1)));
+            .grid(2).gridSum(TumblingEventTimeWindows.of(Time.seconds(1)));
 
 //    gridDataStream.print();
 

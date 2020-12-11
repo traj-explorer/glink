@@ -37,6 +37,11 @@
             <groupId>com.github.tm</groupId>
             <artifactId>glink-sql</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-connector-geomesa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Flink dependencies -->
         <dependency>

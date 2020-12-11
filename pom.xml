@@ -20,14 +20,15 @@
         <module>glink-visualization</module>
         <module>glink-traffic</module>
         <module>glink-sql</module>
+        <module>glink-connector</module>
     </modules>
 
     <properties>
         <flink.version>1.11.2</flink.version>
-        <kafka.version>2.5.0</kafka.version>
+        <kafka.version>2.4.1</kafka.version>
         <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
-        <scala.binary.version>2.12</scala.binary.version>
+        <scala.binary.version>2.11</scala.binary.version>
         <log4j.version>2.12.1</log4j.version>
         <junit.version>4.13</junit.version>
         <jackson.version>2.10.1</jackson.version>
@@ -325,6 +326,11 @@
     </build>
 
     <repositories>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+        </repository>
         <repository>
             <id>osgeo</id>
             <name>OSGeo Release Repository</name>

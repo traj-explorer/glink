@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>glink-connector</artifactId>
+        <groupId>com.github.tm</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>glink-connector-geomesa</artifactId>
+
+    <properties>
+        <geomesa.version>3.1.0</geomesa.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- this scope:import injects the entire dependencyManagement section from the main GeoMesa pom -->
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa_2.11</artifactId>
+                <version>${geomesa.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-index-api_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-feature-avro_${scala.binary.version}</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.locationtech.geomesa</groupId>
+            <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
