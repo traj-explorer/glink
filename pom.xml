@@ -41,6 +41,12 @@
         <geomesa.version>3.1.0</geomesa.version>
     </properties>
 
+    <scm>
+        <url>https://github.com/traj-explorer/glink</url>
+        <connection>https://github.com/traj-explorer/glink.git</connection>
+        <developerConnection>scm:git:https://github.com/traj-explorer/glink.git</developerConnection>
+    </scm>
+
     <dependencyManagement>
         <dependencies>
             <!-- Glink dependencies -->
@@ -400,6 +406,15 @@
 <!--                </executions>-->
 <!--            </plugin>-->
 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
 
         </plugins>
     </build>
