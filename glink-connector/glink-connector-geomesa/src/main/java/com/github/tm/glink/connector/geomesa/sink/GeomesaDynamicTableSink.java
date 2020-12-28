@@ -1,6 +1,6 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
-import com.github.tm.glink.connector.geomesa.options.GeomesaParam;
+import com.github.tm.glink.connector.geomesa.options.param.GeomesaDataStoreParam;
 import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.table.connector.ChangelogMode;
@@ -17,10 +17,10 @@ import org.apache.flink.types.RowKind;
 @Internal
 public class GeomesaDynamicTableSink implements DynamicTableSink {
 
-  private final GeomesaParam param;
+  private final GeomesaDataStoreParam param;
   private final GeomesaTableSchema geomesaTableSchema;
 
-  public GeomesaDynamicTableSink(GeomesaParam param, GeomesaTableSchema geomesaTableSchema) {
+  public GeomesaDynamicTableSink(GeomesaDataStoreParam param, GeomesaTableSchema geomesaTableSchema) {
     this.param = param;
     this.geomesaTableSchema = geomesaTableSchema;
   }
@@ -39,7 +39,8 @@ public class GeomesaDynamicTableSink implements DynamicTableSink {
 
   @Override
   public SinkRuntimeProvider getSinkRuntimeProvider(Context context) {
-    GeomesaSinkFunction<RowData> sinkFunction = new GeomesaSinkFunction<>(param, geomesaTableSchema);
+    GeomesaSinkFunction<RowData> sinkFunction = new GeomesaSinkFunction<>(
+            param, geomesaTableSchema, new RowDataToSimpleFeatureConverter(geomesaTableSchema));
     return SinkFunctionProvider.of(sinkFunction);
   }
 

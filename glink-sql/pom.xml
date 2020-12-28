@@ -17,22 +17,6 @@
             <groupId>com.github.tm</groupId>
             <artifactId>glink-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-hbase</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-mapmatching</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-traffic</artifactId>
-        </dependency>
 
         <!-- Flink dependencies -->
         <dependency>
@@ -90,4 +74,44 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <!-- To make sure the extended geomesa datastore such as HBaseDataStoreFactory included
+                                     in the jar file
+                                 -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.apache.flink:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,12 +1,14 @@
 package com.github.tm.glink.connector.geomesa.options;
 
+import org.apache.flink.table.api.ValidationException;
+
 public class GeomesaConfigOptionFactory {
 
-  public static GeomesaConfigOption createGeomesaConfigOption(String backendName) {
-    if (backendName.equalsIgnoreCase("hbase")) {
+  public static GeomesaConfigOption createGeomesaConfigOption(String dataStore) {
+    if (dataStore.equalsIgnoreCase("hbase")) {
       return new HBaseConfigOption();
     } else {
-      throw new IllegalArgumentException("Unsupported backend database");
+      throw new ValidationException("Unsupported data store.");
     }
   }
 }

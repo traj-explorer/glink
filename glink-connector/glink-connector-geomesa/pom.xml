@@ -11,22 +11,18 @@
 
     <artifactId>glink-connector-geomesa</artifactId>
 
-    <properties>
-        <geomesa.version>3.1.0</geomesa.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <!-- this scope:import injects the entire dependencyManagement section from the main GeoMesa pom -->
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa_2.11</artifactId>
-                <version>${geomesa.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            &lt;!&ndash; this scope:import injects the entire dependencyManagement section from the main GeoMesa pom &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>org.locationtech.geomesa</groupId>-->
+<!--                <artifactId>geomesa_2.11</artifactId>-->
+<!--                <version>${geomesa.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
 
     <dependencies>
         <dependency>

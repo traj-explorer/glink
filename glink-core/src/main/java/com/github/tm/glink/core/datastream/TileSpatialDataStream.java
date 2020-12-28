@@ -99,7 +99,7 @@ public class TileSpatialDataStream<T extends Geometry> extends SpatialDataStream
     private final int level;
     private TileGrid tileGrid;
 
-    public PixelMap(int level) {
+    PixelMap(int level) {
       this.level = level;
     }
 
