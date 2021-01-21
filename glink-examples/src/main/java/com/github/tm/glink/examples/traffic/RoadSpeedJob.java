@@ -40,7 +40,7 @@ public class RoadSpeedJob {
 //    DataStream<TrajectoryPoint> matchedStream = MapMatcher.mapMatch(dataStream);
 
     DataStream<Tuple2<Long, Double>> geoObjectDataStream = RoadSpeedPipeline.roadSpeedPipeline(
-            dataStream, 60, 20);
+            dataStream, 2, 1);
     geoObjectDataStream.print();
 
     env.execute();

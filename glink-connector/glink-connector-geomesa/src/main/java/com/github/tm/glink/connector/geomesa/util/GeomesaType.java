@@ -6,7 +6,7 @@ import static org.apache.flink.table.types.logical.utils.LogicalTypeChecks.getPr
 
 /**
  * Enumeration of types supported by geomesa.
- * More details refer to https://www.geomesa.org/documentation/stable/user/datastores/attributes.html
+ * For more details please refer to https://www.geomesa.org/documentation/stable/user/datastores/attributes.html
  *
  * @author Yu Liebing
  * */
@@ -55,47 +55,44 @@ public enum  GeomesaType {
 
   public static GeomesaType mapLogicalTypeToGeomesaType(LogicalType logicalType) {
     switch (logicalType.getTypeRoot()) {
-      case CHAR:
+      case CHAR:          // CHAR / VARCHAR / STRING -> String
       case VARCHAR:
         return STRING;
-      case BOOLEAN:
+      case BOOLEAN:       // BOOLEAN -> Boolean
         return BOOLEAN;
-      case BINARY:
+      case BINARY:        // BINARY / VARBINARY -> byte[]
       case VARBINARY:
         return BYTES;
-      case DECIMAL:
-        throw new UnsupportedOperationException("Unsupported type: " + logicalType);
-      case TINYINT:
+      case TINYINT:       // TINYINT / SMALLINT / INT -> Integer
       case SMALLINT:
       case INTEGER:
-      case DATE:
-      case INTERVAL_YEAR_MONTH:
         return INTEGER;
+      case BIGINT:        // BIGINT -> Long
+        return LONG;
+      case FLOAT:         // FLOAT -> Float
+        return FLOAT;
+      case DOUBLE:        // DOUBLE -> Double
+        return DOUBLE;
+      case DATE:          // DATE / TIME -> Date
+        return DATE;
       case TIME_WITHOUT_TIME_ZONE:
         final int timePrecision = getPrecision(logicalType);
         if (timePrecision < MIN_TIME_PRECISION || timePrecision > MAX_TIME_PRECISION) {
           throw new UnsupportedOperationException(
-                  String.format("The precision %s of TIME type is out of the range [%s, %s] supported by " +
-                          "HBase connector", timePrecision, MIN_TIME_PRECISION, MAX_TIME_PRECISION));
+                  String.format("The precision %s of TIME type is out of the range [%s, %s] supported by "
+                          + "HBase connector", timePrecision, MIN_TIME_PRECISION, MAX_TIME_PRECISION));
         }
-        return TIMESTAMP;
-      case BIGINT:
-      case INTERVAL_DAY_TIME:
-        return LONG;
-      case FLOAT:
-        return FLOAT;
-      case DOUBLE:
-        return DOUBLE;
-      case TIMESTAMP_WITHOUT_TIME_ZONE:
-      case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
+        return DATE;
+      case TIMESTAMP_WITHOUT_TIME_ZONE: // TIMESTAMP -> Timestamp
         final int timestampPrecision = getPrecision(logicalType);
         if (timestampPrecision < MIN_TIMESTAMP_PRECISION || timestampPrecision > MAX_TIMESTAMP_PRECISION) {
           throw new UnsupportedOperationException(
-                  String.format("The precision %s of TIMESTAMP type is out of the range [%s, %s] supported by " +
-                          "HBase connector", timestampPrecision, MIN_TIMESTAMP_PRECISION, MAX_TIMESTAMP_PRECISION));
+                  String.format("The precision %s of TIMESTAMP type is out of the range [%s, %s] supported by "
+                          + "HBase connector", timestampPrecision, MIN_TIMESTAMP_PRECISION, MAX_TIMESTAMP_PRECISION));
         }
         return TIMESTAMP;
-      default:
+      default:  // unsupported: DECIMAL / TIMESTAMP WITH TIME ZONE / TIMESTAMP WITH LOCAL TIME ZONE
+                // INTERVAL YEAR TO MONTH / INTERVAL DAY TO SECOND
         throw new UnsupportedOperationException("Unsupported type: " + logicalType);
     }
   }

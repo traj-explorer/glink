@@ -5,7 +5,7 @@ import org.apache.flink.configuration.ConfigOptions;
 
 import java.util.Set;
 
-public class HBaseConfigOption extends GeomesaConfigOption {
+public class HBaseConfigOption extends GeoMesaConfigOption {
 
   /**
    * Used for HBase data store.
@@ -23,8 +23,8 @@ public class HBaseConfigOption extends GeomesaConfigOption {
           .key("hbase.zookeepers")
           .stringType()
           .noDefaultValue()
-          .withDescription("A comma-separated list of servers in the HBase zookeeper ensemble. " +
-                  "This is optional, the preferred method for defining the HBase connection is with hbase-site.xml");
+          .withDescription("A comma-separated list of servers in the HBase zookeeper ensemble. "
+                  + "This is optional, the preferred method for defining the HBase connection is with hbase-site.xml");
 
   /** Optional */
   public static final ConfigOption<String> HBASE_COPROCESSOR_URL = ConfigOptions
@@ -59,8 +59,8 @@ public class HBaseConfigOption extends GeomesaConfigOption {
           .key("hbase.remote.filtering")
           .booleanType()
           .noDefaultValue()
-          .withDescription("Can be used to disable remote filtering and coprocessors, " +
-                  "for environments where custom code can’t be installed");
+          .withDescription("Can be used to disable remote filtering and coprocessors, "
+                  + "for environments where custom code can’t be installed");
 
   /** Optional */
   public static final ConfigOption<Boolean> HBASE_SECURITY_ENABLED = ConfigOptions

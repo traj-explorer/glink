@@ -1,11 +1,11 @@
 package com.github.tm.glink.connector.geomesa;
 
-import com.github.tm.glink.connector.geomesa.options.GeomesaConfigOption;
-import com.github.tm.glink.connector.geomesa.options.GeomesaConfigOptionFactory;
-import com.github.tm.glink.connector.geomesa.options.param.GeomesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.options.param.GeomesaDataStoreParamFactory;
-import com.github.tm.glink.connector.geomesa.sink.GeomesaDynamicTableSink;
-import com.github.tm.glink.connector.geomesa.source.GeomesaDynamicTableSource;
+import com.github.tm.glink.connector.geomesa.options.GeoMesaConfigOption;
+import com.github.tm.glink.connector.geomesa.options.GeoMesaConfigOptionFactory;
+import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
+import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParamFactory;
+import com.github.tm.glink.connector.geomesa.sink.GeoMesaDynamicTableSink;
+import com.github.tm.glink.connector.geomesa.source.GeoMesaDynamicTableSource;
 import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.table.api.TableSchema;
@@ -25,40 +25,42 @@ import static org.apache.flink.table.factories.FactoryUtil.createTableFactoryHel
  *
  * @author Yu Liebing
  * */
-public class GeomesaDynamicTableFactory implements DynamicTableSourceFactory, DynamicTableSinkFactory {
+public class GeoMesaDynamicTableFactory implements DynamicTableSourceFactory, DynamicTableSinkFactory {
 
   private static final String IDENTIFIER = "geomesa";
 
-  private GeomesaConfigOption geomesaConfigOption;
+  private GeoMesaConfigOption geomesaConfigOption;
 
   @Override
   public DynamicTableSink createDynamicTableSink(Context context) {
     // create GeomesaConfigOption based on the datastore
-    String dataStore = context.getCatalogTable().getOptions().get(GeomesaConfigOption.GEOMESA_DATA_STORE.key());
-    geomesaConfigOption = GeomesaConfigOptionFactory.createGeomesaConfigOption(dataStore);
+    String dataStore = context.getCatalogTable().getOptions().get(GeoMesaConfigOption.GEOMESA_DATA_STORE.key());
+    geomesaConfigOption = GeoMesaConfigOptionFactory.createGeomesaConfigOption(dataStore);
 
     TableFactoryHelper helper = createTableFactoryHelper(this, context);
     helper.validate();
     TableSchema tableSchema = context.getCatalogTable().getSchema();
     validatePrimaryKey(tableSchema);
     // get geomesa datastore params
-    GeomesaDataStoreParam geomesaDataStoreParam = GeomesaDataStoreParamFactory.createGeomesaDataStoreParam(dataStore);
+    GeoMesaDataStoreParam geomesaDataStoreParam = GeoMesaDataStoreParamFactory.createGeomesaDataStoreParam(dataStore);
     geomesaDataStoreParam.initFromConfigOptions(helper.getOptions());
     // convert flink table schema to geomesa schema
     GeomesaTableSchema geomesaTableSchema = GeomesaTableSchema.fromTableSchemaAndOptions(
             tableSchema, helper.getOptions());
 
-    return new GeomesaDynamicTableSink(geomesaDataStoreParam, geomesaTableSchema);
+    return new GeoMesaDynamicTableSink(geomesaDataStoreParam, geomesaTableSchema);
   }
 
   @Override
   public DynamicTableSource createDynamicTableSource(Context context) {
-    // TODO: write source function for geomesa
+    String dataStore = context.getCatalogTable().getOptions().get(GeoMesaConfigOption.GEOMESA_DATA_STORE.key());
+    geomesaConfigOption = GeoMesaConfigOptionFactory.createGeomesaConfigOption(dataStore);
+
     TableFactoryHelper helper = createTableFactoryHelper(this, context);
     helper.validate();
     TableSchema tableSchema = context.getCatalogTable().getSchema();
 
-    return new GeomesaDynamicTableSource();
+    return new GeoMesaDynamicTableSource();
   }
 
   @Override

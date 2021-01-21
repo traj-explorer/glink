@@ -3,6 +3,7 @@ package com.github.tm.glink.sql.udf.standard.output;
 import org.apache.flink.table.functions.FunctionContext;
 import org.apache.flink.table.functions.ScalarFunction;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTWriter;
 
 @SuppressWarnings("checkstyle:TypeName")
@@ -15,7 +16,7 @@ public class ST_AsText extends ScalarFunction {
     wktWriter = new WKTWriter();
   }
 
-  public String eval(Geometry geom) {
+  public String eval(Point geom) {
     return wktWriter.write(geom);
   }
 }

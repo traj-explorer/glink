@@ -1,7 +1,7 @@
 package com.github.tm.glink.core.serialize;
 
-import com.github.tm.glink.features.Point;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.locationtech.jts.geom.Point;
 
 /**
  * @author Yu Liebing

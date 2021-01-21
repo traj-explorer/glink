@@ -1,6 +1,6 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
-import com.github.tm.glink.connector.geomesa.options.param.GeomesaDataStoreParam;
+import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
 import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.configuration.Configuration;
@@ -25,23 +25,23 @@ import org.slf4j.LoggerFactory;
  * @author Yu Liebing
  * */
 @Internal
-public class GeomesaSinkFunction<T>
+public class GeoMesaSinkFunction<T>
         extends RichSinkFunction<T>
         implements CheckpointedFunction {
 
   private static final long serialVersionUID = 1L;
-  private static final Logger LOG = LoggerFactory.getLogger(GeomesaSinkFunction.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GeoMesaSinkFunction.class);
 
-  private GeomesaDataStoreParam params;
+  private GeoMesaDataStoreParam params;
   private GeomesaTableSchema schema;
-  private GeomesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter;
+  private GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter;
 
   private transient DataStore dataStore;
   private transient FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter;
 
-  public GeomesaSinkFunction(GeomesaDataStoreParam params,
+  public GeoMesaSinkFunction(GeoMesaDataStoreParam params,
                              GeomesaTableSchema schema,
-                             GeomesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter) {
+                             GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter) {
     this.params = params;
     this.schema = schema;
     this.geomesaSimpleFeatureConverter = geomesaSimpleFeatureConverter;
@@ -91,7 +91,7 @@ public class GeomesaSinkFunction<T>
       featureWriter.close();
     }
     if (dataStore != null) {
-      dataStore.dispose();
+//      dataStore.dispose();
     }
   }
 }

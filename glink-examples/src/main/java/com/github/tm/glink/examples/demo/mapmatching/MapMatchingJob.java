@@ -30,6 +30,8 @@ public class MapMatchingJob {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     ParameterTool globalParam = ParameterTool.fromArgs(args);
     env.getConfig().setGlobalJobParameters(globalParam);
+    int parallelism = Integer.parseInt(globalParam.get("parallelism"));
+    env.setParallelism(parallelism);
 
     String brokerList = globalParam.get("broker-list");
     String originTopic = globalParam.get("origin-topic");

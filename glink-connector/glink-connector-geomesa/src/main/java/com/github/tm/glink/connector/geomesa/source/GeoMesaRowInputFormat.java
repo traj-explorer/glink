@@ -1,4 +1,4 @@
 package com.github.tm.glink.connector.geomesa.source;
 
-public class GeomesaRowInputFormat {
+public class GeoMesaRowInputFormat {
 }

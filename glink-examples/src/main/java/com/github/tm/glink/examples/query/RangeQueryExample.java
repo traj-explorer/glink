@@ -25,6 +25,7 @@ public class RangeQueryExample {
             Schema.types(Integer.class, String.class),
             "22.3,33.4,1,hangzhou", "22.4,33.6,2,wuhan");
 
+//    pointSpatialDataStream.print();
     // create query polygons
     WKTReader wktReader = new WKTReader();
     Polygon queryPolygon1 = (Polygon) wktReader.read("POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))");

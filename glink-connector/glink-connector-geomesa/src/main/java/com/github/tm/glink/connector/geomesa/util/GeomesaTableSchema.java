@@ -1,6 +1,6 @@
 package com.github.tm.glink.connector.geomesa.util;
 
-import com.github.tm.glink.connector.geomesa.options.GeomesaConfigOption;
+import com.github.tm.glink.connector.geomesa.options.GeoMesaConfigOption;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.ReadableConfig;
 import org.apache.flink.table.api.TableSchema;
@@ -23,6 +23,8 @@ public class GeomesaTableSchema implements Serializable {
 
   private String schemaName;
   private int primaryKeyIndex;
+  private String defaultGeometry;
+  private String defaultDate;
   private List<Tuple2<String, GeomesaType>> fieldNameToType = new ArrayList<>();
   private List<GeomesaFieldEncoder> fieldEncoders = new ArrayList<>();
 
@@ -33,13 +35,14 @@ public class GeomesaTableSchema implements Serializable {
   public SimpleFeatureType getSchema() {
     SchemaBuilder builder  = SchemaBuilder.builder();
     for (Tuple2<String, GeomesaType> ft : fieldNameToType) {
+      boolean isDefault = ft.f0.equals(defaultGeometry) || ft.f0.equals(defaultDate);
       switch (ft.f1) {
         case POINT:
-          builder.addPoint(ft.f0, false);
+          builder.addPoint(ft.f0, isDefault);
           break;
         case DATE:
         case TIMESTAMP:
-          builder.addDate(ft.f0, false);
+          builder.addDate(ft.f0, isDefault);
           break;
         case LONG:
           builder.addLong(ft.f0);
@@ -63,25 +66,27 @@ public class GeomesaTableSchema implements Serializable {
           builder.addInt(ft.f0);
           break;
         case POLYGON:
-          builder.addPolygon(ft.f0, false);
+          builder.addPolygon(ft.f0, isDefault);
           break;
         case GEOMETRY:
           break;
         case LINE_STRING:
-          builder.addLineString(ft.f0, false);
+          builder.addLineString(ft.f0, isDefault);
           break;
         case MULTI_POINT:
-          builder.addMultiPoint(ft.f0, false);
+          builder.addMultiPoint(ft.f0, isDefault);
           break;
         case MULTI_POLYGON:
-          builder.addMultiPolygon(ft.f0, false);
+          builder.addMultiPolygon(ft.f0, isDefault);
           break;
         case MULTI_LINE_STRING:
-          builder.addMultiLineString(ft.f0,false);
+          builder.addMultiLineString(ft.f0, isDefault);
           break;
         case GEOMETRY_COLLECTION:
-          builder.addGeometryCollection(ft.f0, false);
+          builder.addGeometryCollection(ft.f0, isDefault);
           break;
+        default:
+          throw new IllegalArgumentException("Unsupported type: " + ft.f1);
       }
     }
     SimpleFeatureType sft = builder.build(schemaName);
@@ -107,15 +112,19 @@ public class GeomesaTableSchema implements Serializable {
   public static GeomesaTableSchema fromTableSchemaAndOptions(TableSchema tableSchema, ReadableConfig readableConfig) {
     GeomesaTableSchema geomesaTableSchema = new GeomesaTableSchema();
     // schema name
-    geomesaTableSchema.schemaName = readableConfig.get(GeomesaConfigOption.GEOMESA_SCHEMA_NAME);
+    geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
     // primary key name
     String primaryKey = tableSchema.getPrimaryKey().get().getColumns().get(0);
     // spatial fields
     Map<String, GeomesaType> spatialFields = getSpatialFields(
-            readableConfig.get(GeomesaConfigOption.GEOMESA_SPATIAL_FIELDS));
+            readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
     // all fields and field encoders
     String[] fieldNames = tableSchema.getFieldNames();
     DataType[] fieldTypes = tableSchema.getFieldDataTypes();
+    // default geometry and Data field
+    geomesaTableSchema.defaultGeometry = readableConfig.get(GeoMesaConfigOption.GEOMESA_DEFAULT_GEOMETRY);
+    geomesaTableSchema.defaultDate = readableConfig.get(GeoMesaConfigOption.GEOMESA_DEFAULT_DATE);
+    checkDefaultIndexFields(geomesaTableSchema.defaultGeometry, geomesaTableSchema.defaultDate, fieldNames);
     for (int i = 0; i < fieldNames.length; ++i) {
       // check primary key
       if (primaryKey.equals(fieldNames[i])) {
@@ -151,5 +160,18 @@ public class GeomesaTableSchema implements Serializable {
       nameToType.put(name, type);
     }
     return nameToType;
+  }
+
+  private static void checkDefaultIndexFields(String defaultGeometry, String defaultDate, String[] fieldNames) {
+    if (defaultGeometry == null && defaultDate == null) return;
+    boolean isGeometryValid = false, isDateValid = false;
+    for (String fieldName : fieldNames) {
+      if (fieldName.equals(defaultGeometry)) isGeometryValid = true;
+      if (fieldName.equals(defaultDate)) isDateValid = true;
+    }
+    if (defaultGeometry != null && !isGeometryValid)
+      throw new IllegalArgumentException("The default geometry field is not in the table schema.");
+    if (defaultDate != null && !isDateValid)
+      throw new IllegalArgumentException("The default Date field is not in the table schema.");
   }
 }

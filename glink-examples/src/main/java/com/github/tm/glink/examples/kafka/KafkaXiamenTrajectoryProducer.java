@@ -25,7 +25,7 @@ public class KafkaXiamenTrajectoryProducer {
     int i = 0;
     for (String file : files) {
       CSVXiamenTrajectoryProducer producer = new CSVXiamenTrajectoryProducer(
-              path + File.separator + file,
+              file,
               brokerList,
               topic,
               "CSVXiamenTrajectoryProducer-" + i,

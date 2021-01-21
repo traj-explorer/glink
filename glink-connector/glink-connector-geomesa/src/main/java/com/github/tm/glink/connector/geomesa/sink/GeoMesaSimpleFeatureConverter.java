@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @param <T> type of input record.
  */
 @Internal
-public interface GeomesaSimpleFeatureConverter<T> extends Serializable {
+public interface GeoMesaSimpleFeatureConverter<T> extends Serializable {
 
   /**
    * Initialization method for the function. It is called once before conversion method.

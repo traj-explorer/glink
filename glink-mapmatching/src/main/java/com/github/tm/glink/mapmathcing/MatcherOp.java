@@ -73,7 +73,7 @@ public class MatcherOp<T extends TrajectoryPoint>
     attributes.put("roadLng", roadPoint.getX());
     attributes.put("roadId", roadId);
     p.setAttributes(attributes);
-    System.out.println(p + ", roadId: " + roadId);
+//    System.out.println(p + ", roadId: " + roadId);
     collector.collect(p);
   }
 

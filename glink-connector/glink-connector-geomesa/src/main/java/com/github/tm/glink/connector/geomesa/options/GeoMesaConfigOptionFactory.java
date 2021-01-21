@@ -2,9 +2,9 @@ package com.github.tm.glink.connector.geomesa.options;
 
 import org.apache.flink.table.api.ValidationException;
 
-public class GeomesaConfigOptionFactory {
+public class GeoMesaConfigOptionFactory {
 
-  public static GeomesaConfigOption createGeomesaConfigOption(String dataStore) {
+  public static GeoMesaConfigOption createGeomesaConfigOption(String dataStore) {
     if (dataStore.equalsIgnoreCase("hbase")) {
       return new HBaseConfigOption();
     } else {

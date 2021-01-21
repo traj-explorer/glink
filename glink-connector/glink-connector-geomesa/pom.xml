@@ -9,37 +9,72 @@
 
     <artifactId>glink-connector-geomesa</artifactId>
 
-<!--    <dependencyManagement>-->
-<!--        <dependencies>-->
-<!--            &lt;!&ndash; this scope:import injects the entire dependencyManagement section from the main GeoMesa pom &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>org.locationtech.geomesa</groupId>-->
-<!--                <artifactId>geomesa_2.11</artifactId>-->
-<!--                <version>${geomesa.version}</version>-->
-<!--                <type>pom</type>-->
-<!--                <scope>import</scope>-->
-<!--            </dependency>-->
-<!--        </dependencies>-->
-<!--    </dependencyManagement>-->
+    <properties>
+        <hbase.version>1.4.13</hbase.version>
+        <hadoop.version>2.7.7</hadoop.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.locationtech.geomesa</groupId>
-            <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.locationtech.geomesa</groupId>
-            <artifactId>geomesa-index-api_${scala.binary.version}</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.locationtech.geomesa</groupId>
-            <artifactId>geomesa-feature-avro_${scala.binary.version}</artifactId>
+            <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.locationtech.geomesa</groupId>
-            <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>${hbase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <!-- To make sure the extended geomesa datastore such as HBaseDataStoreFactory included
+                                     in the jar file
+                                 -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+                            <artifactSet>
+<!--                                <includes>-->
+<!--                                    <include>org.geotools:*</include>-->
+<!--                                    <include>org.locationtech.geomesa:*</include>-->
+<!--                                </includes>-->
+                                <excludes>
+<!--                                    <exclude>org.apache.hbase:hbase-client</exclude>-->
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

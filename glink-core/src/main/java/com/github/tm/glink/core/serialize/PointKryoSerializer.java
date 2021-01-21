@@ -18,6 +18,7 @@ public class PointKryoSerializer extends JavaSerializer<Point> {
 
   @Override
   public void write(Kryo kryo, Output output, Point point) {
+    System.out.println("+++++++++");
     byte[] geometryData = wkbWriter.write(point);
     output.writeInt(geometryData.length);
     output.write(geometryData);
@@ -31,6 +32,7 @@ public class PointKryoSerializer extends JavaSerializer<Point> {
 
   @Override
   public Point read(Kryo kryo, Input input, Class aClass) {
+    System.out.println("-----------------");
     try {
       int geometryLen = input.readInt();
       byte[] data = new byte[geometryLen];

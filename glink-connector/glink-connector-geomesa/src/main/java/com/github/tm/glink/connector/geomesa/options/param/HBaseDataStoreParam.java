@@ -9,7 +9,7 @@ import org.apache.flink.configuration.ReadableConfig;
  *
  * @author Yu Liebing
  * */
-public class HBaseDataStoreParam extends GeomesaDataStoreParam {
+public class HBaseDataStoreParam extends GeoMesaDataStoreParam {
 
   @Override
   public void initFromConfigOptions(ReadableConfig config) {

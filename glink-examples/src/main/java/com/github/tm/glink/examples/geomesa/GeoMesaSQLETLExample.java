@@ -1,17 +1,16 @@
 package com.github.tm.glink.examples.geomesa;
 
+import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import com.github.tm.glink.sql.GlinkSQLRegister;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-import org.apache.flink.types.Row;
 
-public class GeomesaSQLDemo {
+public class GeoMesaSQLETLExample {
 
   @SuppressWarnings("checkstyle:OperatorWrap")
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    env.setParallelism(1);
+    GlinkSerializerRegister.registerSerializer(env);
 
     final StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
     GlinkSQLRegister.registerUDF(tEnv);
@@ -47,11 +46,5 @@ public class GeomesaSQLDemo {
 
     // define a dynamic aggregating query
     tEnv.executeSql("INSERT INTO Geomesa_TDrive SELECT pid, `time`, ST_AsText(ST_Point(lng, lat)) FROM CSV_TDrive");
-
-    Table result = tEnv.sqlQuery("SELECT ST_Point(lng, lat) FROM CSV_TDrive");
-    // print the result to the console
-    tEnv.toRetractStream(result, Row.class).print();
-
-    env.execute();
   }
 }

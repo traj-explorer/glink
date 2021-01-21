@@ -6,7 +6,7 @@ import org.apache.flink.configuration.ConfigOptions;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GeomesaConfigOption {
+public class GeoMesaConfigOption {
 
   /**
    * Used for glink geomesa connector.
@@ -98,6 +98,31 @@ public class GeomesaConfigOption {
           .noDefaultValue()
           .withDescription("The spatial fields. Required if exists spatial fields");
 
+  /** Optional. If not set, the first declared geometry type will be indexed. */
+  public static final ConfigOption<String> GEOMESA_DEFAULT_GEOMETRY = ConfigOptions
+          .key("geomesa.default.geometry")
+          .stringType()
+          .noDefaultValue()
+          .withDescription("The default geometry field to create spatial index");
+
+  /** Optional. If not set, the first declared Date type will be indexed. */
+  public static final ConfigOption<String> GEOMESA_DEFAULT_DATE = ConfigOptions
+          .key("geomesa.default.date")
+          .stringType()
+          .noDefaultValue()
+          .withDescription("The default time field to create temporal index");
+
+  /**
+   * Used to index configuration
+   * */
+
+  /** Optional. Custom index configuration. */
+  public static final ConfigOption<String> GEOMESA_INDICES_ENABLED = ConfigOptions
+          .key("geomesa.indices.enabled")
+          .stringType()
+          .noDefaultValue()
+          .withDescription("Custom index configuration.");
+
   public Set<ConfigOption<?>> getRequiredOptions() {
     Set<ConfigOption<?>> set = new HashSet<>();
     // glink geomesa connector
@@ -119,6 +144,9 @@ public class GeomesaConfigOption {
     set.add(GEOMESA_QUERY_CACHING);
     // table schema
     set.add(GEOMESA_SPATIAL_FIELDS);
+    set.add(GEOMESA_DEFAULT_GEOMETRY);
+    set.add(GEOMESA_DEFAULT_DATE);
+    set.add(GEOMESA_INDICES_ENABLED);
     return set;
   }
 }

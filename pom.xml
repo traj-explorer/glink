@@ -27,8 +27,9 @@
         <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
         <scala.binary.version>2.11</scala.binary.version>
+        <scala.version>2.11.7</scala.version>
         <log4j.version>2.12.1</log4j.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <jackson.version>2.10.1</jackson.version>
         <flink.shaded.version>10.0</flink.shaded.version>
         <h3.version>3.6.3</h3.version>
@@ -43,11 +44,39 @@
         <url>https://github.com/traj-explorer/glink</url>
         <connection>https://github.com/traj-explorer/glink.git</connection>
         <developerConnection>scm:git:https://github.com/traj-explorer/glink.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencyManagement>
         <dependencies>
+            <!-- scala dependencies -->
+<!--            <dependency>-->
+<!--                <groupId>org.scala-lang</groupId>-->
+<!--                <artifactId>scala-library</artifactId>-->
+<!--                <version>${scala.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.scala-lang</groupId>-->
+<!--                <artifactId>scala-compiler</artifactId>-->
+<!--                <version>${scala.version}</version>-->
+<!--                <scope>provided</scope>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.scala-lang</groupId>-->
+<!--                <artifactId>jline</artifactId>-->
+<!--                <version>${scala.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.scala-lang</groupId>-->
+<!--                <artifactId>scala-reflect</artifactId>-->
+<!--                <version>${scala.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>org.scala-lang</groupId>-->
+<!--                <artifactId>scalap</artifactId>-->
+<!--                <version>${scala.version}</version>-->
+<!--            </dependency>-->
+
             <!-- Glink dependencies -->
             <dependency>
                 <groupId>com.github.tm</groupId>
@@ -117,6 +146,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
+                <artifactId>flink-sql-connector-hbase-1.4_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
                 <artifactId>flink-avro</artifactId>
                 <version>${flink.version}</version>
                 <scope>provided</scope>
@@ -132,24 +167,38 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+                <scope>provided</scope>
             </dependency>
-
-            <!-- https://mvnrepository.com/artifact/org.apache.flink/flink-csv -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-csv</artifactId>
@@ -167,7 +216,6 @@
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
                 <version>${kafka.version}</version>
-                <scope>compile</scope>
             </dependency>
 
             <!-- avro dependencies -->
@@ -192,72 +240,73 @@
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-index-api_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-feature-avro_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
-                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-rpc_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-server_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-server-hbase2_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-server-hbase1_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-distributed-runtime-hbase1_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-distributed-runtime-hbase2_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.locationtech.geomesa</groupId>
-                <artifactId>geomesa-hbase-gs-plugin_${scala.binary.version}</artifactId>
-                <version>${geomesa.version}</version>
-                <type>pom</type>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-jobs_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
             <dependency>
                 <groupId>org.locationtech.geomesa</groupId>
                 <artifactId>geomesa-hbase-tools_${scala.binary.version}</artifactId>
                 <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
             </dependency>
 
             <!-- Geographical things dependencies -->

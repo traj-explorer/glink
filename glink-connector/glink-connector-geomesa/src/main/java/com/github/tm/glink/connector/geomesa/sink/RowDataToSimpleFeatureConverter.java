@@ -7,10 +7,10 @@ import org.locationtech.jts.io.WKTReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
- * An implementation of {@link GeomesaSimpleFeatureConverter} which converts {@link RowData} into
+ * An implementation of {@link GeoMesaSimpleFeatureConverter} which converts {@link RowData} into
  * {@link org.opengis.feature.simple.SimpleFeature}.
  */
-public class RowDataToSimpleFeatureConverter implements GeomesaSimpleFeatureConverter<RowData> {
+public class RowDataToSimpleFeatureConverter implements GeoMesaSimpleFeatureConverter<RowData> {
 
   private GeomesaTableSchema geomesaTableSchema;
   private transient SimpleFeatureBuilder builder;
@@ -31,7 +31,6 @@ public class RowDataToSimpleFeatureConverter implements GeomesaSimpleFeatureConv
     for (int i = 0, len = record.getArity(); i < len; ++i) {
       builder.set(geomesaTableSchema.getFieldName(i), geomesaTableSchema.getFieldEncoder(i).encode(record, i));
     }
-//    SimpleFeature sf = builder.buildFeature(geomesaTableSchema.getPrimaryKey(record));
     return builder.buildFeature(geomesaTableSchema.getPrimaryKey(record));
   }
 }
