@@ -1,12 +1,13 @@
 package com.github.tm.glink.connector.geomesa.source;
 
+import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.table.connector.ChangelogMode;
-import org.apache.flink.table.connector.source.DynamicTableSource;
-import org.apache.flink.table.connector.source.LookupTableSource;
-import org.apache.flink.table.connector.source.ScanTableSource;
-import org.apache.flink.table.connector.source.SourceFunctionProvider;
+import org.apache.flink.table.connector.source.*;
 import org.apache.flink.table.connector.source.abilities.SupportsProjectionPushDown;
 import org.apache.flink.table.data.RowData;
+
+import static org.apache.flink.util.Preconditions.checkArgument;
 
 /**
  * Geomesa table source implementation.
@@ -16,18 +17,29 @@ import org.apache.flink.table.data.RowData;
 public class GeoMesaDynamicTableSource implements
         ScanTableSource, LookupTableSource, SupportsProjectionPushDown {
 
+  private GeoMesaDataStoreParam param;
+  private GeoMesaTableSchema schema;
+
+  public GeoMesaDynamicTableSource(GeoMesaDataStoreParam param, GeoMesaTableSchema schema) {
+    this.param = param;
+    this.schema = schema;
+  }
+
   @Override
   public LookupRuntimeProvider getLookupRuntimeProvider(LookupContext lookupContext) {
     int[][] keys = lookupContext.getKeys();
-    System.out.println("++++lookup");
-    return null;
+    checkArgument(keys.length == 1 && keys[0].length == 1,
+            "Currently, GeoMesa table can only be lookup by single geometry field.");
+    String queryField = schema.getFieldName(keys[0][0]);
+    GeoMesaRowConverter<RowData> geoMesaRowConverter = new SimpleFeatureToRowDataConverter(schema);
+    return TableFunctionProvider.of(new GeoMesaRowDataLookupFunction(param, schema, geoMesaRowConverter, queryField));
   }
 
   @Override
   public ScanRuntimeProvider getScanRuntimeProvider(ScanContext scanContext) {
-    System.out.println("+++scan");
-    GeoMesaSourceFunction<RowData> sourceFunction = new GeoMesaSourceFunction<>();
-    return SourceFunctionProvider.of(sourceFunction, false);
+    GeoMesaRowConverter<RowData> geoMesaRowConverter = new SimpleFeatureToRowDataConverter(schema);
+    GeoMesaSourceFunction<RowData> sourceFunction = new GeoMesaSourceFunction<>(param, schema, geoMesaRowConverter);
+    return SourceFunctionProvider.of(sourceFunction, true);
   }
 
   @Override

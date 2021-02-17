@@ -1,17 +1,14 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Transaction;
+import org.geotools.data.*;
 import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.util.factory.Hints;
 import org.opengis.feature.simple.SimpleFeature;
@@ -33,20 +30,21 @@ public class GeoMesaSinkFunction<T>
   private static final Logger LOG = LoggerFactory.getLogger(GeoMesaSinkFunction.class);
 
   private GeoMesaDataStoreParam params;
-  private GeomesaTableSchema schema;
+  private GeoMesaTableSchema schema;
   private GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter;
 
   private transient DataStore dataStore;
   private transient FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter;
 
   public GeoMesaSinkFunction(GeoMesaDataStoreParam params,
-                             GeomesaTableSchema schema,
+                             GeoMesaTableSchema schema,
                              GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter) {
     this.params = params;
     this.schema = schema;
     this.geomesaSimpleFeatureConverter = geomesaSimpleFeatureConverter;
   }
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   @Override
   public void open(Configuration parameters) throws Exception {
     LOG.info("start open ...");
@@ -55,9 +53,20 @@ public class GeoMesaSinkFunction<T>
       LOG.error("Could not create data store with provided parameters");
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    SimpleFeatureType sft = dataStore.getSchema(schema.getSchema().getTypeName());
+    SimpleFeatureType tableSft = schema.getSchema();
+    SimpleFeatureType sft = dataStore.getSchema(tableSft.getTypeName());
     if (sft == null) {
-      dataStore.createSchema(schema.getSchema());
+      LOG.info("Creating schema: " + DataUtilities.encodeType(tableSft));
+      tableSft.getUserData().put("override.reserved.words", true);
+      dataStore.createSchema(tableSft);
+    } else {
+      String providedSchema = DataUtilities.encodeType(tableSft);
+      String existSchema = DataUtilities.encodeType(sft);
+      if (!providedSchema.equals(existSchema)) {
+        throw new IllegalArgumentException("Schema " + tableSft.getTypeName() + " was already exists, " +
+                "but the schema you provided is different with the exists one. You provide " + providedSchema +
+                ", exists: " + existSchema);
+      }
     }
     featureWriter = dataStore.getFeatureWriterAppend(schema.getSchema().getTypeName(), Transaction.AUTO_COMMIT);
     geomesaSimpleFeatureConverter.open();
@@ -91,7 +100,7 @@ public class GeoMesaSinkFunction<T>
       featureWriter.close();
     }
     if (dataStore != null) {
-//      dataStore.dispose();
+      dataStore.dispose();
     }
   }
 }

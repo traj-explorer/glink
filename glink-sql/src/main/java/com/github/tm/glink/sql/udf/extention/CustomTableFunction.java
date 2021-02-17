@@ -42,17 +42,17 @@ public class CustomTableFunction{
     tEnv.registerTable("Orders", orders);
 
     //使用left join
-//    Table result = tEnv.sqlQuery(
-//            "SELECT o.currency, T.word, T.length FROM Orders as o LEFT JOIN " +
-//                    "LATERAL TABLE(split(currency)) as T(word, length) ON TRUE");
-//    tEnv.toAppendStream(result, Row.class).print();
+    Table result = tEnv.sqlQuery(
+            "SELECT o.currency, T.word, T.length FROM Orders as o LEFT JOIN " +
+                    "LATERAL TABLE(split(currency)) as T(word, length) ON TRUE");
+    tEnv.toAppendStream(result, Row.class).print();
 
     //----------------------------
 
-    String sql = "SELECT o.currency, T.word, T.length FROM Orders as o ," +
-            " LATERAL TABLE(split(currency)) as T(word, length)";
-    Table result1 = tEnv.sqlQuery(sql);
-    tEnv.toAppendStream(result1, Row.class).print();
+//    String sql = "SELECT o.currency, T.word, T.length FROM Orders as o ," +
+//            " LATERAL TABLE(split(currency)) as T(word, length)";
+//    Table result1 = tEnv.sqlQuery(sql);
+//    tEnv.toAppendStream(result1, Row.class).print();
 //
 //    //---------------------------
 //    //多种类型参数
@@ -82,9 +82,11 @@ public class CustomTableFunction{
     }
 
     public void eval(String str){
-      for (String s: str.split(separator)){
-        collect(new Tuple2<String,Integer>(s, s.length()));
-      }
+//      for (String s: str.split(separator)){
+//        collect(new Tuple2<String,Integer>(s, s.length()));
+//      }
+      String[] splits = str.split(separator);
+      if (splits.length == 1) collect(new Tuple2<>(splits[0], splits.length));
     }
   }
 

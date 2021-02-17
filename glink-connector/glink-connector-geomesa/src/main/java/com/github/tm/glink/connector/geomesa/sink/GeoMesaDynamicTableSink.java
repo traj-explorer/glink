@@ -1,7 +1,7 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.table.connector.ChangelogMode;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -18,9 +18,9 @@ import org.apache.flink.types.RowKind;
 public class GeoMesaDynamicTableSink implements DynamicTableSink {
 
   private final GeoMesaDataStoreParam param;
-  private final GeomesaTableSchema geomesaTableSchema;
+  private final GeoMesaTableSchema geomesaTableSchema;
 
-  public GeoMesaDynamicTableSink(GeoMesaDataStoreParam param, GeomesaTableSchema geomesaTableSchema) {
+  public GeoMesaDynamicTableSink(GeoMesaDataStoreParam param, GeoMesaTableSchema geomesaTableSchema) {
     this.param = param;
     this.geomesaTableSchema = geomesaTableSchema;
   }

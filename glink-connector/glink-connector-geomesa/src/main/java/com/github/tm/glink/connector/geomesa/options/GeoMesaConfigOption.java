@@ -123,6 +123,15 @@ public class GeoMesaConfigOption {
           .noDefaultValue()
           .withDescription("Custom index configuration.");
 
+  /**
+   * Used to instruct temporal table join spatial prediction
+   * */
+  public static final ConfigOption<String> GEOMESA_TEMPORAL_JOIN_PREDICT = ConfigOptions
+          .key("geomesa.temporal.join.predict")
+          .stringType()
+          .noDefaultValue()
+          .withDescription("Used to instruct temporal table join spatial prediction, default is intersect");
+
   public Set<ConfigOption<?>> getRequiredOptions() {
     Set<ConfigOption<?>> set = new HashSet<>();
     // glink geomesa connector
@@ -147,6 +156,8 @@ public class GeoMesaConfigOption {
     set.add(GEOMESA_DEFAULT_GEOMETRY);
     set.add(GEOMESA_DEFAULT_DATE);
     set.add(GEOMESA_INDICES_ENABLED);
+    // temporal table join
+    set.add(GEOMESA_TEMPORAL_JOIN_PREDICT);
     return set;
   }
 }
