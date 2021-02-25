@@ -36,6 +36,7 @@
         <h3.version>3.6.3</h3.version>
         <geodesy.version>1.1.3</geodesy.version>
         <stindex.version>0.1.0</stindex.version>
+        <spatial4j.version>0.8</spatial4j.version>
         <geotools.version>23.3</geotools.version>
         <jts.version>1.16.1</jts.version>
         <geomesa.version>3.1.0</geomesa.version>
@@ -304,6 +305,12 @@
                 <artifactId>stindex</artifactId>
                 <version>${stindex.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.locationtech.spatial4j</groupId>
+                <artifactId>spatial4j</artifactId>
+                <version>${spatial4j.version}</version>
+            </dependency>
+
             <!--for CRS transformation-->
             <dependency>
                 <groupId>org.geotools</groupId>

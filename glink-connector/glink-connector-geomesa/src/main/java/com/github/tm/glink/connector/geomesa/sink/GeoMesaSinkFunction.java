@@ -63,7 +63,7 @@ public class GeoMesaSinkFunction<T>
       String providedSchema = DataUtilities.encodeType(tableSft);
       String existSchema = DataUtilities.encodeType(sft);
       if (!providedSchema.equals(existSchema)) {
-        throw new IllegalArgumentException("Schema " + tableSft.getTypeName() + " was already exists, " +
+        throw new RuntimeException("GeoMesa schema " + tableSft.getTypeName() + " was already exists, " +
                 "but the schema you provided is different with the exists one. You provide " + providedSchema +
                 ", exists: " + existSchema);
       }

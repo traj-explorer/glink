@@ -12,6 +12,11 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
+/**
+ * A simple GeoMesa source function.
+ *
+ * @author Yu Liebing
+ * */
 public class GeoMesaSourceFunction<T> extends RichSourceFunction<T> implements CheckpointedFunction {
 
   private boolean isCanceled;
@@ -41,16 +46,26 @@ public class GeoMesaSourceFunction<T> extends RichSourceFunction<T> implements C
 
   }
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   @Override
   public void open(Configuration parameters) throws Exception {
     dataStore = DataStoreFinder.getDataStore(geoMesaDataStoreParam.getParams());
     if (dataStore == null) {
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    String typeName = geoMesaTableSchema.getSchema().getTypeName();
+    SimpleFeatureType providedSft = geoMesaTableSchema.getSchema();
+    String typeName = providedSft.getTypeName();
     SimpleFeatureType sft = dataStore.getSchema(typeName);
     if (sft == null) {
       throw new RuntimeException("GeoMesa schema doesn't exist, create it first.");
+    } else {
+      String providedSchema = DataUtilities.encodeType(providedSft);
+      String existsSchema = DataUtilities.encodeType(sft);
+      if (!providedSchema.equals(existsSchema)) {
+        throw new RuntimeException("GeoMesa schema " + sft.getTypeName() + " was already exists, " +
+                "but the schema you provided is different with the exists one. You provide " + providedSchema +
+                ", exists: " + existsSchema);
+      }
     }
     featureReader = dataStore.getFeatureReader(new Query(typeName, Filter.INCLUDE), Transaction.AUTO_COMMIT);
   }

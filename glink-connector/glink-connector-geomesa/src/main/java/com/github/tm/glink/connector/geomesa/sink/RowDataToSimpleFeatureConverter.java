@@ -8,6 +8,8 @@ import org.opengis.feature.simple.SimpleFeature;
 /**
  * An implementation of {@link GeoMesaSimpleFeatureConverter} which converts {@link RowData} into
  * {@link org.opengis.feature.simple.SimpleFeature}.
+ *
+ * @author Yu Liebing
  */
 public class RowDataToSimpleFeatureConverter implements GeoMesaSimpleFeatureConverter<RowData> {
 

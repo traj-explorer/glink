@@ -5,6 +5,11 @@ import org.apache.flink.configuration.ConfigOptions;
 
 import java.util.Set;
 
+/**
+ * GeoMesa config options, which is related to HBase.
+ *
+ * @author Yu Liebing
+ * */
 public class HBaseConfigOption extends GeoMesaConfigOption {
 
   /**

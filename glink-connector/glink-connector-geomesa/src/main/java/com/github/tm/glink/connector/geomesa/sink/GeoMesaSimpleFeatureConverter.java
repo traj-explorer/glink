@@ -8,6 +8,8 @@ import java.io.Serializable;
 /**
  * A converter used to converts the input record into Geomesa {@link org.opengis.feature.simple.SimpleFeature}.
  * @param <T> type of input record.
+ *
+ * @author Yu Liebing
  */
 @Internal
 public interface GeoMesaSimpleFeatureConverter<T> extends Serializable {

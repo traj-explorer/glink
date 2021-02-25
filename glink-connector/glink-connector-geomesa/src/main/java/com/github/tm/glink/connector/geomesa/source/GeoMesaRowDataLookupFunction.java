@@ -30,6 +30,8 @@ import java.io.IOException;
  * The GeoMesaRowDataLookupFunction is a standard user-defined table function, it can be used in
  * tableAPI and also useful for temporal table join plan in SQL. It looks up the result as {@link
  * RowData}.
+ *
+ * @author Yu Liebing
  */
 @Internal
 public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
@@ -83,16 +85,26 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
     }
   }
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   @Override
   public void open(FunctionContext context) throws Exception {
     dataStore = DataStoreFinder.getDataStore(geoMesaDataStoreParam.getParams());
     if (dataStore == null) {
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    typeName = geoMesaTableSchema.getSchema().getTypeName();
+    SimpleFeatureType providedSft = geoMesaTableSchema.getSchema();
+    typeName = providedSft.getTypeName();
     sft = dataStore.getSchema(typeName);
     if (sft == null) {
       throw new RuntimeException("GeoMesa schema doesn't exist, create it first.");
+    } else {
+      String providedSchema = DataUtilities.encodeType(providedSft);
+      String existsSchema = DataUtilities.encodeType(sft);
+      if (!providedSchema.equals(existsSchema)) {
+        throw new RuntimeException("GeoMesa schema " + sft.getTypeName() + " was already exists, " +
+                "but the schema you provided is different with the exists one. You provide " + providedSchema +
+                ", exists: " + existsSchema);
+      }
     }
     wktReader = new WKTReader();
     wktWriter = new WKTWriter();
@@ -114,8 +126,8 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
     } else {
       Envelope envelope = geometry.getEnvelopeInternal();
       Filter spatialFilter = filterFactory2.bbox(queryField,
-              envelope.getMinY(), envelope.getMinX(),
-              envelope.getMaxY(), envelope.getMaxX(),
+              envelope.getMinX(), envelope.getMinY(),
+              envelope.getMaxX(), envelope.getMaxY(),
               "EPSG:4326");
       return new Query(typeName, spatialFilter);
     }

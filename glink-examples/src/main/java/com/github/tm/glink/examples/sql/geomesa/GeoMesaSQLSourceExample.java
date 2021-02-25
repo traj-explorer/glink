@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.geomesa;
+package com.github.tm.glink.examples.sql.geomesa;
 
 import com.github.tm.glink.sql.GlinkSQLRegister;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;

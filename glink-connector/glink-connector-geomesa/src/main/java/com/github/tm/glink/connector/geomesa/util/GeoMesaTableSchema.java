@@ -16,6 +16,8 @@ import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.*;
 
 /**
  * Helps to specify a Geomesa Table's schema.
+ *
+ * @author Yu Liebing
  * */
 public final class GeoMesaTableSchema implements Serializable {
 

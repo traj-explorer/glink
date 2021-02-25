@@ -6,6 +6,11 @@ import org.apache.flink.configuration.ConfigOptions;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * GeoMesa config options, which is not related to backend storage.
+ *
+ * @author Yu Liebing
+ * */
 public class GeoMesaConfigOption {
 
   /**
