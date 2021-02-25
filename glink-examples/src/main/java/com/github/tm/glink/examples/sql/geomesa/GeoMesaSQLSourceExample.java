@@ -1,34 +1,20 @@
-package com.github.tm.glink.examples.geomesa;
+package com.github.tm.glink.examples.sql.geomesa;
 
-import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import com.github.tm.glink.sql.GlinkSQLRegister;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
+import org.apache.flink.types.Row;
 
-public class GeoMesaSQLETLExample {
+public class GeoMesaSQLSourceExample {
 
   @SuppressWarnings("checkstyle:OperatorWrap")
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-    GlinkSerializerRegister.registerSerializer(env);
-
     final StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
     GlinkSQLRegister.registerUDF(tEnv);
 
-    // create a source table from csv
-    tEnv.executeSql(
-            "CREATE TABLE CSV_TDrive (\n" +
-                    "pid STRING,\n" +
-                    "`time` TIMESTAMP(0),\n" +
-                    "lng DOUBLE,\n" +
-                    "lat DOUBLE)\n" +
-                    "WITH (\n" +
-                    "  'connector' = 'filesystem',\n" +
-                    "  'path' = 'file:///home/liebing/Code/javaworkspace/glink/glink-examples/src/main/resources/1277-reduced.txt',\n" +
-                    "  'format' = 'csv'\n" +
-                    ")");
-
-    // register a table in the catalog
+    // create a geomesa source table
     tEnv.executeSql(
             "CREATE TABLE Geomesa_TDrive (\n" +
                     "pid STRING,\n" +
@@ -44,7 +30,10 @@ public class GeoMesaSQLETLExample {
                     "  'hbase.catalog' = 'test-sql'\n" +
                     ")");
 
-    // define a dynamic aggregating query
-    tEnv.executeSql("INSERT INTO Geomesa_TDrive SELECT pid, `time`, ST_AsText(ST_Point(lng, lat)) FROM CSV_TDrive");
+    Table result = tEnv.sqlQuery("SELECT * FROM Geomesa_TDrive");
+    // print the result to the console
+    tEnv.toRetractStream(result, Row.class).print();
+
+    env.execute();
   }
 }

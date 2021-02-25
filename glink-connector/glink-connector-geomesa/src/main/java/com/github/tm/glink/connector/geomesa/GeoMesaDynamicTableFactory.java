@@ -6,7 +6,7 @@ import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParamFactory;
 import com.github.tm.glink.connector.geomesa.sink.GeoMesaDynamicTableSink;
 import com.github.tm.glink.connector.geomesa.source.GeoMesaDynamicTableSource;
-import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.connector.sink.DynamicTableSink;
@@ -45,7 +45,7 @@ public class GeoMesaDynamicTableFactory implements DynamicTableSourceFactory, Dy
     GeoMesaDataStoreParam geomesaDataStoreParam = GeoMesaDataStoreParamFactory.createGeomesaDataStoreParam(dataStore);
     geomesaDataStoreParam.initFromConfigOptions(helper.getOptions());
     // convert flink table schema to geomesa schema
-    GeomesaTableSchema geomesaTableSchema = GeomesaTableSchema.fromTableSchemaAndOptions(
+    GeoMesaTableSchema geomesaTableSchema = GeoMesaTableSchema.fromTableSchemaAndOptions(
             tableSchema, helper.getOptions());
 
     return new GeoMesaDynamicTableSink(geomesaDataStoreParam, geomesaTableSchema);
@@ -59,8 +59,15 @@ public class GeoMesaDynamicTableFactory implements DynamicTableSourceFactory, Dy
     TableFactoryHelper helper = createTableFactoryHelper(this, context);
     helper.validate();
     TableSchema tableSchema = context.getCatalogTable().getSchema();
+    validatePrimaryKey(tableSchema);
+    // get geomesa datastore params
+    GeoMesaDataStoreParam geoMesaDataStoreParam = GeoMesaDataStoreParamFactory.createGeomesaDataStoreParam(dataStore);
+    geoMesaDataStoreParam.initFromConfigOptions(helper.getOptions());
+    // convert flink table schema to geomesa schema
+    GeoMesaTableSchema geoMesaTableSchema = GeoMesaTableSchema.fromTableSchemaAndOptions(
+            tableSchema, helper.getOptions());
 
-    return new GeoMesaDynamicTableSource();
+    return new GeoMesaDynamicTableSource(geoMesaDataStoreParam, geoMesaTableSchema);
   }
 
   @Override

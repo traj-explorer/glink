@@ -12,29 +12,40 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import java.io.Serializable;
 import java.util.*;
 
-import static com.github.tm.glink.connector.geomesa.util.GeomesaSerde.*;
+import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.*;
 
 /**
  * Helps to specify a Geomesa Table's schema.
+ *
+ * @author Yu Liebing
  * */
-public class GeomesaTableSchema implements Serializable {
+public final class GeoMesaTableSchema implements Serializable {
 
   private static final long serialVersionUID = 1L;
+  private static final TemporalJoinPredict DEFAULT_TEMPORAL_JOIN_PREDICT = TemporalJoinPredict.INTERSECTS;
 
   private String schemaName;
   private int primaryKeyIndex;
   private String defaultGeometry;
   private String defaultDate;
-  private List<Tuple2<String, GeomesaType>> fieldNameToType = new ArrayList<>();
-  private List<GeomesaFieldEncoder> fieldEncoders = new ArrayList<>();
+  // join parameters, when do temporal table join with geomesa
+  private double joinDistance = 0.d;
+  private TemporalJoinPredict temporalJoinPredict = DEFAULT_TEMPORAL_JOIN_PREDICT;
+  private List<Tuple2<String, GeoMesaType>> fieldNameToType = new ArrayList<>();
+  private List<GeoMesaFieldEncoder> fieldEncoders = new ArrayList<>();
+  private List<GeoMesaFieldDecoder> fieldDecoders = new ArrayList<>();
 
   private Map<String, Serializable> indexedDateAttribute = new HashMap<>();
 
-  private GeomesaTableSchema() { }
+  private GeoMesaTableSchema() { }
+
+  public int getFieldNum() {
+    return fieldNameToType.size();
+  }
 
   public SimpleFeatureType getSchema() {
     SchemaBuilder builder  = SchemaBuilder.builder();
-    for (Tuple2<String, GeomesaType> ft : fieldNameToType) {
+    for (Tuple2<String, GeoMesaType> ft : fieldNameToType) {
       boolean isDefault = ft.f0.equals(defaultGeometry) || ft.f0.equals(defaultDate);
       switch (ft.f1) {
         case POINT:
@@ -97,8 +108,12 @@ public class GeomesaTableSchema implements Serializable {
     return sft;
   }
 
-  public GeomesaFieldEncoder getFieldEncoder(int pos) {
+  public GeoMesaFieldEncoder getFieldEncoder(int pos) {
     return fieldEncoders.get(pos);
+  }
+
+  public GeoMesaFieldDecoder getFieldDecoder(int pos) {
+    return fieldDecoders.get(pos);
   }
 
   public String getPrimaryKey(RowData record) {
@@ -109,14 +124,22 @@ public class GeomesaTableSchema implements Serializable {
     return fieldNameToType.get(pos).f0;
   }
 
-  public static GeomesaTableSchema fromTableSchemaAndOptions(TableSchema tableSchema, ReadableConfig readableConfig) {
-    GeomesaTableSchema geomesaTableSchema = new GeomesaTableSchema();
+  public TemporalJoinPredict getTemporalJoinPredict() {
+    return temporalJoinPredict;
+  }
+
+  public double getJoinDistance() {
+    return joinDistance;
+  }
+
+  public static GeoMesaTableSchema fromTableSchemaAndOptions(TableSchema tableSchema, ReadableConfig readableConfig) {
+    GeoMesaTableSchema geomesaTableSchema = new GeoMesaTableSchema();
     // schema name
     geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
     // primary key name
     String primaryKey = tableSchema.getPrimaryKey().get().getColumns().get(0);
     // spatial fields
-    Map<String, GeomesaType> spatialFields = getSpatialFields(
+    Map<String, GeoMesaType> spatialFields = getSpatialFields(
             readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
     // all fields and field encoders
     String[] fieldNames = tableSchema.getFieldNames();
@@ -128,35 +151,40 @@ public class GeomesaTableSchema implements Serializable {
     for (int i = 0; i < fieldNames.length; ++i) {
       // check primary key
       if (primaryKey.equals(fieldNames[i])) {
-        GeomesaType primaryKeyType = GeomesaType.mapLogicalTypeToGeomesaType(fieldTypes[i].getLogicalType());
-        if (primaryKeyType != GeomesaType.STRING) {
+        GeoMesaType primaryKeyType = GeoMesaType.mapLogicalTypeToGeomesaType(fieldTypes[i].getLogicalType());
+        if (primaryKeyType != GeoMesaType.STRING) {
           throw new IllegalArgumentException("Geomesa only supports STRING primary key.");
         }
         geomesaTableSchema.primaryKeyIndex = i;
       }
       boolean isSpatialField = spatialFields.containsKey(fieldNames[i]);
-      Tuple2<String, GeomesaType> ft = new Tuple2<>();
+      Tuple2<String, GeoMesaType> ft = new Tuple2<>();
       ft.f0 = fieldNames[i];
       if (isSpatialField) {
         ft.f1 = spatialFields.get(fieldNames[i]);
       } else {
-        ft.f1 = GeomesaType.mapLogicalTypeToGeomesaType(fieldTypes[i].getLogicalType());
+        ft.f1 = GeoMesaType.mapLogicalTypeToGeomesaType(fieldTypes[i].getLogicalType());
       }
       geomesaTableSchema.fieldNameToType.add(ft);
       geomesaTableSchema.fieldEncoders.add(
-              GeomesaSerde.getGeomesaFieldEncoder(fieldTypes[i].getLogicalType(), isSpatialField));
+              GeoMesaSerde.getGeoMesaFieldEncoder(fieldTypes[i].getLogicalType(), isSpatialField));
+      geomesaTableSchema.fieldDecoders.add(
+              GeoMesaSerde.getGeoMesaFieldDecoder(fieldTypes[i].getLogicalType(), isSpatialField));
     }
+    // temporal table join parameters
+    String joinPredict = readableConfig.get(GeoMesaConfigOption.GEOMESA_TEMPORAL_JOIN_PREDICT);
+    geomesaTableSchema.validTemporalJoinParam(joinPredict);
     return geomesaTableSchema;
   }
 
-  private static Map<String, GeomesaType> getSpatialFields(String spatialFields) {
-    if (spatialFields == null) return null;
-    Map<String, GeomesaType> nameToType = new HashMap<>();
+  private static Map<String, GeoMesaType> getSpatialFields(String spatialFields) {
+    Map<String, GeoMesaType> nameToType = new HashMap<>();
+    if (spatialFields == null) return nameToType;
     String[] items = spatialFields.split(",");
     for (String item : items) {
       String[] nt = item.split(":");
       String name = nt[0];
-      GeomesaType type = GeomesaType.getGeomesaType(nt[1]);
+      GeoMesaType type = GeoMesaType.getGeomesaType(nt[1]);
       nameToType.put(name, type);
     }
     return nameToType;
@@ -173,5 +201,19 @@ public class GeomesaTableSchema implements Serializable {
       throw new IllegalArgumentException("The default geometry field is not in the table schema.");
     if (defaultDate != null && !isDateValid)
       throw new IllegalArgumentException("The default Date field is not in the table schema.");
+  }
+
+  private void validTemporalJoinParam(String joinPredict) {
+    if (joinPredict == null) return;
+    if (joinPredict.startsWith("R")) {
+      String[] items = joinPredict.split(":");
+      if (items.length != 2) {
+        throw new IllegalArgumentException("geomesa.temporal.join.predict support R:<distance> format for distance join");
+      }
+      temporalJoinPredict = TemporalJoinPredict.RADIUS;
+      joinDistance = Double.parseDouble(items[1]);
+    } else {
+      temporalJoinPredict = TemporalJoinPredict.getTemporalJoinPredict(joinPredict);
+    }
   }
 }

@@ -1,29 +1,28 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
-import com.github.tm.glink.connector.geomesa.util.GeomesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.table.data.RowData;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.locationtech.jts.io.WKTReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * An implementation of {@link GeoMesaSimpleFeatureConverter} which converts {@link RowData} into
  * {@link org.opengis.feature.simple.SimpleFeature}.
+ *
+ * @author Yu Liebing
  */
 public class RowDataToSimpleFeatureConverter implements GeoMesaSimpleFeatureConverter<RowData> {
 
-  private GeomesaTableSchema geomesaTableSchema;
+  private GeoMesaTableSchema geomesaTableSchema;
   private transient SimpleFeatureBuilder builder;
-  private transient WKTReader wktReader;
 
-  public RowDataToSimpleFeatureConverter(GeomesaTableSchema geomesaTableSchema) {
+  public RowDataToSimpleFeatureConverter(GeoMesaTableSchema geomesaTableSchema) {
     this.geomesaTableSchema = geomesaTableSchema;
   }
 
   @Override
   public void open() {
     builder = new SimpleFeatureBuilder(geomesaTableSchema.getSchema());
-    wktReader = new WKTReader();
   }
 
   @Override

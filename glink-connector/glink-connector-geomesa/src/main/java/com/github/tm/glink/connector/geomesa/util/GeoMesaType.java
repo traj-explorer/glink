@@ -10,7 +10,7 @@ import static org.apache.flink.table.types.logical.utils.LogicalTypeChecks.getPr
  *
  * @author Yu Liebing
  * */
-public enum  GeomesaType {
+public enum GeoMesaType {
   // basic types
   STRING("String"),
   INTEGER("Integer"),
@@ -40,20 +40,20 @@ public enum  GeomesaType {
 
   private final String name;
 
-  GeomesaType(String name) {
+  GeoMesaType(String name) {
     this.name = name;
   }
 
-  public static GeomesaType getGeomesaType(String name) {
-    GeomesaType[] types = GeomesaType.values();
-    for (GeomesaType type : types) {
+  public static GeoMesaType getGeomesaType(String name) {
+    GeoMesaType[] types = GeoMesaType.values();
+    for (GeoMesaType type : types) {
       if (type.name.equalsIgnoreCase(name))
         return type;
     }
-    throw new IllegalArgumentException("[" + GeomesaType.class + "] Unsupported geometry type:" + name);
+    throw new IllegalArgumentException("[" + GeoMesaType.class + "] Unsupported geometry type:" + name);
   }
 
-  public static GeomesaType mapLogicalTypeToGeomesaType(LogicalType logicalType) {
+  public static GeoMesaType mapLogicalTypeToGeomesaType(LogicalType logicalType) {
     switch (logicalType.getTypeRoot()) {
       case CHAR:          // CHAR / VARCHAR / STRING -> String
       case VARCHAR:

@@ -1,0 +1,1966 @@
+﻿{
+  "paragraphs": [
+    {
+      "text": "%md\n# 时空数据管道 & ETL\n本案例通过Glink扩展的SQL将CSV文件中的点数据导入到GeoMesa中.\n\n1. 创建一个csv文件写入如下内容, 这里为演示方便只使用了4条记录.\n```\n1,2008-02-02 13:30:40,116.31412,70.89454\n2,2008-02-02 13:30:44,116.31412,39.89454\n3,2008-02-02 13:30:45,116.32674,39.89577\n4,2008-02-02 13:30:49,116.31412,39.89454\n```\ncsv文件创建完成后, 通过如下语句定义`csv_table`作为source table, **注意`path`参数的值需要根据csv文件的路径修改**.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T11:33:32+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h1>时空数据管道 &amp; ETL</h1>\n<p>本案例通过Glink扩展的SQL将CSV文件中的点数据导入到GeoMesa中.</p>\n<ol>\n<li>创建一个csv文件写入如下内容, 这里为演示方便只使用了4条记录.</li>\n</ol>\n<pre><code>1,2008-02-02 13:30:40,116.31412,70.89454\n2,2008-02-02 13:30:44,116.31412,39.89454\n3,2008-02-02 13:30:45,116.32674,39.89577\n4,2008-02-02 13:30:49,116.31412,39.89454\n</code></pre>\n<p>csv文件创建完成后, 通过如下语句定义<code>csv_table</code>作为source table, <strong>注意<code>path</code>参数的值需要根据csv文件的路径修改</strong>.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614222504719_46680993",
+      "id": "paragraph_1614222504719_46680993",
+      "dateCreated": "2021-02-25T11:08:24+0800",
+      "dateStarted": "2021-02-25T11:33:32+0800",
+      "dateFinished": "2021-02-25T11:33:32+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:351"
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE csv_table (\n    id STRING,\n    dtg TIMESTAMP(0),\n    lng DOUBLE,\n    lat DOUBLE\n) WITH (\n    'connector' = 'filesystem',\n    'path' = 'file:///home/liebing/input/glink/point.csv',\n    'format' = 'csv'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:05:51+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "editorHide": false,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "function": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "function",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": []
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614221785576_275247243",
+      "id": "paragraph_1614221785576_275247243",
+      "dateCreated": "2021-02-25T10:56:25+0800",
+      "dateStarted": "2021-02-25T16:05:51+0800",
+      "dateFinished": "2021-02-25T16:06:06+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:352"
+    },
+    {
+      "text": "%md\n`csv_table`创建完成后可通过如下语句查询文件中的所有记录, 同时验证schema定义是否正确.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T11:16:36+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p><code>csv_table</code>创建完成后可通过如下语句查询文件中的所有记录, 同时验证schema定义是否正确.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614222946190_823035757",
+      "id": "paragraph_1614222946190_823035757",
+      "dateCreated": "2021-02-25T11:15:46+0800",
+      "dateStarted": "2021-02-25T11:16:36+0800",
+      "dateFinished": "2021-02-25T11:16:36+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:353"
+    },
+    {
+      "text": "%flink.ssql(type=update)\nselect * from csv_table;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:06:30+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "editorHide": false,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "dtg": "string",
+                      "lng": "string",
+                      "lat": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                },
+                "multiBarChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                },
+                "stackedAreaChart": {
+                  "rotate": {
+                    "degree": "-45"
+                  },
+                  "xLabelStatus": "default"
+                }
+              },
+              "commonSetting": {},
+              "keys": [
+                {
+                  "name": "id",
+                  "index": 0,
+                  "aggr": "sum"
+                }
+              ],
+              "groups": [],
+              "values": [
+                {
+                  "name": "dtg",
+                  "index": 1,
+                  "aggr": "sum"
+                }
+              ]
+            },
+            "helium": {}
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tdtg\tlng\tlat\n1\t2008-02-02T13:30:40\t116.31412\t70.89454\n2\t2008-02-02T13:30:44\t116.31412\t39.89454\n3\t2008-02-02T13:30:45\t116.32674\t39.89577\n4\t2008-02-02T13:30:49\t116.31412\t39.89454\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/9ab3617e26571a26602fa5cf31dafa98",
+              "$$hashKey": "object:1133"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614221803385_1015091560",
+      "id": "paragraph_1614221803385_1015091560",
+      "dateCreated": "2021-02-25T10:56:43+0800",
+      "dateStarted": "2021-02-25T16:06:19+0800",
+      "dateFinished": "2021-02-25T16:06:24+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:354"
+    },
+    {
+      "text": "%md\n2. 创建`geomesa_table`作为sink table.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T11:18:54+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"2\">\n<li>创建<code>geomesa_table</code>作为sink table.</li>\n</ol>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614223043294_770718224",
+      "id": "paragraph_1614223043294_770718224",
+      "dateCreated": "2021-02-25T11:17:23+0800",
+      "dateStarted": "2021-02-25T11:18:54+0800",
+      "dateFinished": "2021-02-25T11:18:54+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:355"
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE geomesa_table (\n    id STRING,\n    dtg TIMESTAMP(0),\n    point STRING,\n    PRIMARY KEY (id) NOT ENFORCED\n) WITH (\n    'connector' = 'geomesa',\n    'geomesa.data.store' = 'hbase',\n    'geomesa.schema.name' = 'geomesa_table',\n    'geomesa.spatial.fields' = 'point:Point',\n    'hbase.catalog' = 'geomesa_table'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:06:33+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614222383948_857729019",
+      "id": "paragraph_1614222383948_857729019",
+      "dateCreated": "2021-02-25T11:06:23+0800",
+      "dateStarted": "2021-02-25T16:06:33+0800",
+      "dateFinished": "2021-02-25T16:06:33+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:356"
+    },
+    {
+      "text": "%md\n3. 通过如下语句即可将数据从csv文件导入到geomesa.\n\n导入完成后可通过geomesa命令行工具验证导入是否正确. 输入`geomesa-hbase export -c geomesa_table -f geomesa_table`, 得到如下输出即可确认导入成功.\n```\nINFO  Running export - please wait...\nid,id:String,dtg:Date,*point:Point:srid=4326\n2,2,2008-02-02T13:30:44.000Z,POINT (116.31412 39.89454)\n3,3,2008-02-02T13:30:45.000Z,POINT (116.32674 39.89577)\n4,4,2008-02-02T13:30:49.000Z,POINT (116.31412 39.89454)\n1,1,2008-02-02T13:30:40.000Z,POINT (116.31412 70.89454)\nINFO  Feature export complete to standard out in 3072ms for 4 features\n```",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T11:32:04+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"3\">\n<li>通过如下语句即可将数据从csv文件导入到geomesa.</li>\n</ol>\n<p>导入完成后可通过geomesa命令行工具验证导入是否正确. 输入<code>geomesa-hbase export -c geomesa_table -f geomesa_table</code>, 得到如下输出即可确认导入成功.</p>\n<pre><code>INFO  Running export - please wait...\nid,id:String,dtg:Date,*point:Point:srid=4326\n2,2,2008-02-02T13:30:44.000Z,POINT (116.31412 39.89454)\n3,3,2008-02-02T13:30:45.000Z,POINT (116.32674 39.89577)\n4,4,2008-02-02T13:30:49.000Z,POINT (116.31412 39.89454)\n1,1,2008-02-02T13:30:40.000Z,POINT (116.31412 70.89454)\nINFO  Feature export complete to standard out in 3072ms for 4 features\n</code></pre>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614223705059_899819077",
+      "id": "paragraph_1614223705059_899819077",
+      "dateCreated": "2021-02-25T11:28:25+0800",
+      "dateStarted": "2021-02-25T11:32:04+0800",
+      "dateFinished": "2021-02-25T11:32:04+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:357"
+    },
+    {
+      "text": "%flink.ssql\nINSERT INTO geomesa_table \n    SELECT id, dtg, ST_AsText(ST_Point(lng, lat)) FROM csv_table;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:06:37+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Insertion successfully.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/994a25eb5903e96e87ebd53c27c2c109",
+              "$$hashKey": "object:1299"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614223127800_2107779343",
+      "id": "paragraph_1614223127800_2107779343",
+      "dateCreated": "2021-02-25T11:18:47+0800",
+      "dateStarted": "2021-02-25T16:06:37+0800",
+      "dateFinished": "2021-02-25T16:06:40+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:358"
+    },
+    {
+      "text": "%md\n# Spatial Temporal Join\n## 相交/包含join\n我们通过地理围栏应用讲述如何在Glink中进行相交join或包含join. 在地理围栏应用中, 流表中的一条记录通常是行人或车辆的轨迹点, 包含一些非空间属性及轨迹点的经纬度坐标. 维表中的一条记录通常代表一块地理区域, 包含一些非空间属性及地理区域的空间范围(由多边形表示). 在本例中, 流表来自csv文件, 维表存储在GeoMesa中. 通过相交join或负相交join可以实现轨迹点与地理围栏的关联.\n\n1. 首先创建一个csv文件`tra_point.csv`, 在其中写入如下内容, 用于模拟轨迹流.\n```\n1,2008-02-02 13:30:40,11,11\n2,2008-02-02 13:30:44,16,14\n3,2008-02-02 13:30:45,30,5\n4,2008-02-02 13:30:49,35,15\n```\n通过如下语句定义`csv_point`作为流表.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:29:27+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h1>Spatial Temporal Join</h1>\n<h2>相交/包含join</h2>\n<p>我们通过地理围栏应用讲述如何在Glink中进行相交join或包含join. 在地理围栏应用中, 流表中的一条记录通常是行人或车辆的轨迹点, 包含一些非空间属性及轨迹点的经纬度坐标. 维表中的一条记录通常代表一块地理区域, 包含一些非空间属性及地理区域的空间范围(由多边形表示). 在本例中, 流表来自csv文件, 维表存储在GeoMesa中. 通过相交join或负相交join可以实现轨迹点与地理围栏的关联.</p>\n<ol>\n<li>首先创建一个csv文件<code>tra_point.csv</code>, 在其中写入如下内容, 用于模拟轨迹流.</li>\n</ol>\n<pre><code>1,2008-02-02 13:30:40,11,11\n2,2008-02-02 13:30:44,16,14\n3,2008-02-02 13:30:45,30,5\n4,2008-02-02 13:30:49,35,15\n</code></pre>\n<p>通过如下语句定义<code>csv_point</code>作为流表.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614223948264_284539874",
+      "id": "paragraph_1614223948264_284539874",
+      "dateCreated": "2021-02-25T11:32:28+0800",
+      "dateStarted": "2021-02-25T16:29:27+0800",
+      "dateFinished": "2021-02-25T16:29:27+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:359"
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE csv_point (\n    id STRING,\n    dtg TIMESTAMP(0),\n    lng DOUBLE,\n    lat DOUBLE,\n    proctime AS PROCTIME())\nWITH (\n    'connector' = 'filesystem',\n    'path' = 'file:///home/liebing/input/glink/traj_point.csv', \n    'format' = 'csv'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:50:06+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614223947254_1735235085",
+      "id": "paragraph_1614223947254_1735235085",
+      "dateCreated": "2021-02-25T11:32:27+0800",
+      "dateStarted": "2021-02-25T16:50:06+0800",
+      "dateFinished": "2021-02-25T16:50:06+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:360"
+    },
+    {
+      "text": "%md\n`csv_point`创建完成后可通过如下语句查询文件中的所有记录, 同时验证schema定义是否正确.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:07:45+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p><code>csv_point</code>创建完成后可通过如下语句查询文件中的所有记录, 同时验证schema定义是否正确.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614240424430_712021323",
+      "id": "paragraph_1614240424430_712021323",
+      "dateCreated": "2021-02-25T16:07:04+0800",
+      "dateStarted": "2021-02-25T16:07:45+0800",
+      "dateFinished": "2021-02-25T16:07:45+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:361"
+    },
+    {
+      "text": "%flink.ssql(type=update)\nselect * from csv_point;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:50:09+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "dtg": "string",
+                      "lng": "string",
+                      "lat": "string",
+                      "proctime": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tdtg\tlng\tlat\tproctime\n1\t2008-02-02T13:30:40\t11.0\t11.0\t2021-02-25 08:50:11.482\n2\t2008-02-02T13:30:44\t16.0\t14.0\t2021-02-25 08:50:11.471\n3\t2008-02-02T13:30:45\t30.0\t5.0\t2021-02-25 08:50:11.484\n4\t2008-02-02T13:30:49\t35.0\t15.0\t2021-02-25 08:50:11.469\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/5b4757871aea71769a323ee72f334175",
+              "$$hashKey": "object:1465"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614224690154_1492717563",
+      "id": "paragraph_1614224690154_1492717563",
+      "dateCreated": "2021-02-25T11:44:50+0800",
+      "dateStarted": "2021-02-25T16:50:09+0800",
+      "dateFinished": "2021-02-25T16:50:11+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:362"
+    },
+    {
+      "text": "%md\n2. 在GeoMesa中创建维表并导入数据.\n\n在实际应用中, GeoMesa维表的中数据一般是某个业务程序通过GeoMesa API写入的, 这里为了方便, 我们直接创建一个csv文件`polygon.csv`, 将其中的多边形记录通过Flink SQL导入GeoMesa, 作为后续的维表使用. csv文件中的内容如下.\n```\n1;2021-02-17 10:00:00;POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))\n2;2021-02-17 11:00:00;POLYGON ((15 5, 15 15, 25 15, 25 5, 15 5))\n3;2021-02-17 12:00:00;POLYGON ((30 10, 30 20, 40 20, 40 10, 30 10))\n```\n\n通过如下语句定义source table.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:29:54+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"2\">\n<li>在GeoMesa中创建维表并导入数据.</li>\n</ol>\n<p>在实际应用中, GeoMesa维表的中数据一般是某个业务程序通过GeoMesa API写入的, 这里为了方便, 我们直接创建一个csv文件<code>polygon.csv</code>, 将其中的多边形记录通过Flink SQL导入GeoMesa, 作为后续的维表使用. csv文件中的内容如下.</p>\n<pre><code>1;2021-02-17 10:00:00;POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))\n2;2021-02-17 11:00:00;POLYGON ((15 5, 15 15, 25 15, 25 5, 15 5))\n3;2021-02-17 12:00:00;POLYGON ((30 10, 30 20, 40 20, 40 10, 30 10))\n</code></pre>\n<p>通过如下语句定义source table.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614224253750_604373466",
+      "id": "paragraph_1614224253750_604373466",
+      "dateCreated": "2021-02-25T11:37:33+0800",
+      "dateStarted": "2021-02-25T16:29:54+0800",
+      "dateFinished": "2021-02-25T16:29:54+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:363"
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE csv_area (\n    id STRING,\n    dtg TIMESTAMP(0),\n    geom STRING)\nWITH (\n    'connector' = 'filesystem',\n    'path' = 'file:///home/liebing/input/glink/polygon.csv',\n    'format' = 'csv',\n    'csv.field-delimiter' = ';'\n)",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:30:46+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614240920493_225361719",
+      "id": "paragraph_1614240920493_225361719",
+      "dateCreated": "2021-02-25T16:15:20+0800",
+      "dateStarted": "2021-02-25T16:30:46+0800",
+      "dateFinished": "2021-02-25T16:30:46+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:364"
+    },
+    {
+      "text": "%md\n通过如下语句查询`polygon.csv`文件中的内容, 验证schema定义是否正确.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:30:30+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句查询<code>polygon.csv</code>文件中的内容, 验证schema定义是否正确.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614241186460_187455684",
+      "id": "paragraph_1614241186460_187455684",
+      "dateCreated": "2021-02-25T16:19:46+0800",
+      "dateStarted": "2021-02-25T16:30:30+0800",
+      "dateFinished": "2021-02-25T16:30:30+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:365"
+    },
+    {
+      "text": "%flink.ssql(type=update)\nselect * from csv_area;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:28:15+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "dtg": "string",
+                      "geom": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tdtg\tgeom\n1\t2021-02-17T10:00\tPOLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))\n2\t2021-02-17T11:00\tPOLYGON ((15 5, 15 15, 25 15, 25 5, 15 5))\n3\t2021-02-17T12:00\tPOLYGON ((30 10, 30 20, 40 20, 40 10, 30 10))\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/8f5597d8626e4126cf237daef2fc6f08",
+              "$$hashKey": "object:4295"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614241190555_1511661459",
+      "id": "paragraph_1614241190555_1511661459",
+      "dateCreated": "2021-02-25T16:19:50+0800",
+      "dateStarted": "2021-02-25T16:31:07+0800",
+      "dateFinished": "2021-02-25T16:31:12+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:366"
+    },
+    {
+      "text": "%md\n通过如下语句定义GeoMesa sink table.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:35:05+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句定义GeoMesa sink table.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242030586_1294152009",
+      "id": "paragraph_1614242030586_1294152009",
+      "dateCreated": "2021-02-25T16:33:50+0800",
+      "dateStarted": "2021-02-25T16:35:05+0800",
+      "dateFinished": "2021-02-25T16:35:05+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:367"
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE geomesa_area (\n    id STRING,\n    dtg TIMESTAMP(0),\n    geom STRING,\n    PRIMARY KEY (id) NOT ENFORCED)\nWITH (\n    'connector' = 'geomesa',\n    'geomesa.data.store' = 'hbase',\n    'geomesa.schema.name' = 'restricted_area',\n    'geomesa.spatial.fields' = 'geom:Polygon',\n    'geomesa.temporal.join.predict' = 'I',\n    'hbase.zookeepers' = 'localhost:2181',\n    'hbase.catalog' = 'restricted_area'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:41:20+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242107585_1911401648",
+      "id": "paragraph_1614242107585_1911401648",
+      "dateCreated": "2021-02-25T16:35:07+0800",
+      "dateStarted": "2021-02-25T16:41:20+0800",
+      "dateFinished": "2021-02-25T16:41:20+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:368"
+    },
+    {
+      "text": "%md\n通过如下语句将多边形导入GeoMesa.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:44:36+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句将多边形导入GeoMesa.</p>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242142893_1330325916",
+      "id": "paragraph_1614242142893_1330325916",
+      "dateCreated": "2021-02-25T16:35:42+0800",
+      "dateStarted": "2021-02-25T16:44:36+0800",
+      "dateFinished": "2021-02-25T16:44:36+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:369"
+    },
+    {
+      "text": "%flink.ssql\nINSERT INTO geomesa_area SELECT id, dtg, geom FROM csv_area;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:41:26+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "editorHide": false,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Insertion successfully.\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/0c81f33fe14c5699ca9bb9333d055522",
+              "$$hashKey": "object:1797"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242208173_1581832367",
+      "id": "paragraph_1614242208173_1581832367",
+      "dateCreated": "2021-02-25T16:36:48+0800",
+      "dateStarted": "2021-02-25T16:41:26+0800",
+      "dateFinished": "2021-02-25T16:41:36+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:370"
+    },
+    {
+      "text": "%md\n通过GeoMesa命令行工具验证导入是否成功. 输入`geomesa-hbase export -c restricted_area -f restricted_area`, 若得到以下输出则证明导入成功.\n```\nINFO  Running export - please wait...\nid,id:String,dtg:Date,*geom:Polygon:srid=4326\n1,1,2021-02-17T10:00:00.000Z,\"POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))\"\n2,2,2021-02-17T11:00:00.000Z,\"POLYGON ((15 5, 15 15, 25 15, 25 5, 15 5))\"\n3,3,2021-02-17T12:00:00.000Z,\"POLYGON ((30 10, 30 20, 40 20, 40 10, 30 10))\"\nINFO  Feature export complete to standard out in 3259ms for 3 features\n```",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:45:37+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过GeoMesa命令行工具验证导入是否成功. 输入<code>geomesa-hbase export -c restricted_area -f restricted_area</code>, 若得到以下输出则证明导入成功.</p>\n<pre><code>INFO  Running export - please wait...\nid,id:String,dtg:Date,*geom:Polygon:srid=4326\n1,1,2021-02-17T10:00:00.000Z,&quot;POLYGON ((10 10, 10 20, 20 20, 20 10, 10 10))&quot;\n2,2,2021-02-17T11:00:00.000Z,&quot;POLYGON ((15 5, 15 15, 25 15, 25 5, 15 5))&quot;\n3,3,2021-02-17T12:00:00.000Z,&quot;POLYGON ((30 10, 30 20, 40 20, 40 10, 30 10))&quot;\nINFO  Feature export complete to standard out in 3259ms for 3 features\n</code></pre>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242504980_1241950153",
+      "id": "paragraph_1614242504980_1241950153",
+      "dateCreated": "2021-02-25T16:41:44+0800",
+      "dateStarted": "2021-02-25T16:45:37+0800",
+      "dateFinished": "2021-02-25T16:45:37+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:371"
+    },
+    {
+      "text": "%md\n3. 执行spatial temporal join.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:46:28+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"3\">\n<li>执行spatial temporal join.</li>\n</ol>\n\n</div>"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242773451_1884569193",
+      "id": "paragraph_1614242773451_1884569193",
+      "dateCreated": "2021-02-25T16:46:13+0800",
+      "dateStarted": "2021-02-25T16:46:28+0800",
+      "dateFinished": "2021-02-25T16:46:28+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:372"
+    },
+    {
+      "text": "%flink.ssql(type=update)\nSELECT A.id AS point_id, A.dtg, ST_AsText(ST_Point(A.lng, A.lat)) AS point, B.id AS area_id\n    FROM csv_point AS A\n    LEFT JOIN geomesa_area FOR SYSTEM_TIME AS OF A.proctime AS B\n    ON ST_AsText(ST_Point(A.lng, A.lat)) = B.geom;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T16:51:24+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "point_id\tdtg\tpoint\tarea_id\n1\t2008-02-02T13:30:40\tPOINT (11 11)\t1\n2\t2008-02-02T13:30:44\tPOINT (16 14)\t2\n2\t2008-02-02T13:30:44\tPOINT (16 14)\t1\n3\t2008-02-02T13:30:45\tPOINT (30 5)\tnull\n4\t2008-02-02T13:30:49\tPOINT (35 15)\t3\n"
+          }
+        ]
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/726c87f9ec34e7539f60995a5979f1ce",
+              "$$hashKey": "object:1923"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614240488395_1240134657",
+      "id": "paragraph_1614240488395_1240134657",
+      "dateCreated": "2021-02-25T16:08:08+0800",
+      "dateStarted": "2021-02-25T16:51:24+0800",
+      "dateFinished": "2021-02-25T16:51:26+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:373"
+    },
+    {
+      "text": "%md\n## 距离join\n我们通过订单调度应用讲述如何在Glink中进行距离join. 在订单调度应用中, 流表中每条记录都表示一个订单, 包含相关的非空间属性及订单送达目的地的经纬度坐标; 维表存储在GeoMesa中, 每条记录都是由经纬度点表示的仓库位置. 在订单调度应用中, 通常需要为每个订单关联某个距离范围内的仓库, 用于订单的分发调度. 这可以通过Glink的距离join实现.\n\n1. 首先创建一个csv文件`order.csv`, 在文件中写入如下内容, 用于模拟订单流.\n```\n1,2021-02-22 18:00:00,7,7\n2,2021-02-22 19:00:00,8,8\n```\n\n通过如下语句定义`csv_order`作为流表.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:42:34+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614256346934_1781814562",
+      "id": "paragraph_1614256346934_1781814562",
+      "dateCreated": "2021-02-25T20:32:26+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:4309",
+      "dateFinished": "2021-02-25T20:42:34+0800",
+      "dateStarted": "2021-02-25T20:42:34+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<h2>距离join</h2>\n<p>我们通过订单调度应用讲述如何在Glink中进行距离join. 在订单调度应用中, 流表中每条记录都表示一个订单, 包含相关的非空间属性及订单送达目的地的经纬度坐标; 维表存储在GeoMesa中, 每条记录都是由经纬度点表示的仓库位置. 在订单调度应用中, 通常需要为每个订单关联某个距离范围内的仓库, 用于订单的分发调度. 这可以通过Glink的距离join实现.</p>\n<ol>\n<li>首先创建一个csv文件<code>order.csv</code>, 在文件中写入如下内容, 用于模拟订单流.</li>\n</ol>\n<pre><code>1,2021-02-22 18:00:00,7,7\n2,2021-02-22 19:00:00,8,8\n</code></pre>\n<p>通过如下语句定义<code>csv_order</code>作为流表.</p>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE csv_order (\n    id STRING,\n    dtg TIMESTAMP(0),\n    lng DOUBLE,\n    lat DOUBLE,\n    proctime AS PROCTIME())\nWITH (\n    'connector' = 'filesystem',\n    'path' = 'file:///home/liebing/input/glink/order.csv',\n    'format' = 'csv'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:46:24+0800",
+      "progress": 0,
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614242981547_2144705738",
+      "id": "paragraph_1614242981547_2144705738",
+      "dateCreated": "2021-02-25T16:49:41+0800",
+      "status": "FINISHED",
+      "$$hashKey": "object:374",
+      "dateFinished": "2021-02-25T20:46:24+0800",
+      "dateStarted": "2021-02-25T20:46:24+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n通过如下语句查询`csv_order`中的数据, 同时验证schema的正确性.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:50:16+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614257223490_972298695",
+      "id": "paragraph_1614257223490_972298695",
+      "dateCreated": "2021-02-25T20:47:03+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:5802",
+      "dateFinished": "2021-02-25T20:50:16+0800",
+      "dateStarted": "2021-02-25T20:50:16+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句查询<code>csv_order</code>中的数据, 同时验证schema的正确性.</p>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql(type=update)\nselect * from csv_order;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:46:43+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300,
+              "optionOpen": false,
+              "setting": {
+                "table": {
+                  "tableGridState": {},
+                  "tableColumnTypeState": {
+                    "names": {
+                      "id": "string",
+                      "dtg": "string",
+                      "lng": "string",
+                      "lat": "string",
+                      "proctime": "string"
+                    },
+                    "updated": false
+                  },
+                  "tableOptionSpecHash": "[{\"name\":\"useFilter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable filter for columns\"},{\"name\":\"showPagination\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable pagination for better navigation\"},{\"name\":\"showAggregationFooter\",\"valueType\":\"boolean\",\"defaultValue\":false,\"widget\":\"checkbox\",\"description\":\"Enable a footer for displaying aggregated values\"}]",
+                  "tableOptionValue": {
+                    "useFilter": false,
+                    "showPagination": false,
+                    "showAggregationFooter": false
+                  },
+                  "updated": false,
+                  "initialized": false
+                }
+              },
+              "commonSetting": {}
+            }
+          }
+        },
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/8c2e7446bb38ca96a1ea758fecb0238b",
+              "$$hashKey": "object:5605"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614257139195_425968778",
+      "id": "paragraph_1614257139195_425968778",
+      "dateCreated": "2021-02-25T20:45:39+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:4432",
+      "dateFinished": "2021-02-25T20:46:42+0800",
+      "dateStarted": "2021-02-25T20:46:33+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tdtg\tlng\tlat\tproctime\n1\t2021-02-22T18:00\t7.0\t7.0\t2021-02-25 12:46:41.056\n2\t2021-02-22T19:00\t8.0\t8.0\t2021-02-25 12:46:41.056\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n2. 创建GeoMesa维表并导入数据\n\n这里我们创建一个csv文件`warehouse.csv`并通过Flink SQL导入GeoMesa. 同样需要说明的是, 这里我们使用Flink在维表中写入数据是方便起见, 在实际应用中维表可能是由其他程序写入的. `warehouse.csv`文件中的内容如下.\n```\n1,2020-02-21 19:00:00,10,10\n```\n\n通过如下语句定义source table.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T20:57:18+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614257162218_404519787",
+      "id": "paragraph_1614257162218_404519787",
+      "dateCreated": "2021-02-25T20:46:02+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:4526",
+      "dateFinished": "2021-02-25T20:57:18+0800",
+      "dateStarted": "2021-02-25T20:57:18+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"2\">\n<li>创建GeoMesa维表并导入数据</li>\n</ol>\n<p>这里我们创建一个csv文件<code>warehouse.csv</code>并通过Flink SQL导入GeoMesa. 同样需要说明的是, 这里我们使用Flink在维表中写入数据是方便起见, 在实际应用中维表可能是由其他程序写入的. <code>warehouse.csv</code>文件中的内容如下.</p>\n<pre><code>1,2020-02-21 19:00:00,10,10\n</code></pre>\n<p>通过如下语句定义source table.</p>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE csv_warehouse (\n    id STRING,\n    dtg TIMESTAMP(0),\n    lng DOUBLE,\n    lat DOUBLE)\nWITH (\n    'connector' = 'filesystem',\n    'path' = 'file:///home/liebing/input/glink/warehouse.csv',\n    'format' = 'csv'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:03:27+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614257560762_40330298",
+      "id": "paragraph_1614257560762_40330298",
+      "dateCreated": "2021-02-25T20:52:40+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:5892",
+      "dateFinished": "2021-02-25T21:03:27+0800",
+      "dateStarted": "2021-02-25T21:03:27+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql(type=update)\nselect * from csv_warehouse;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:03:42+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/826ccc69b1b07740058667c2807f7ccf",
+              "$$hashKey": "object:6579"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258191479_1790257025",
+      "id": "paragraph_1614258191479_1790257025",
+      "dateCreated": "2021-02-25T21:03:11+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:5979",
+      "dateFinished": "2021-02-25T21:03:44+0800",
+      "dateStarted": "2021-02-25T21:03:42+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "id\tdtg\tlng\tlat\n1\t2020-02-21T19:00\t10.0\t10.0\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n通过如下语句定义GeoMesa维表.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:05:20+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258276243_1348629897",
+      "id": "paragraph_1614258276243_1348629897",
+      "dateCreated": "2021-02-25T21:04:36+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:6653",
+      "dateFinished": "2021-02-25T21:05:20+0800",
+      "dateStarted": "2021-02-25T21:05:20+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句定义GeoMesa维表.</p>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql\nCREATE TABLE geomesa_warehouse (\n    id STRING,\n    geom STRING,\n    PRIMARY KEY (id) NOT ENFORCED)\nWITH (\n    'connector' = 'geomesa',\n    'geomesa.data.store' = 'hbase',\n    'geomesa.schema.name' = 'warehouse_point',\n    'geomesa.spatial.fields' = 'geom:Point',\n    'geomesa.temporal.join.predict' = 'R:400000',\n    'hbase.zookeepers' = 'localhost:2181',\n    'hbase.catalog' = 'warehouse_point'\n);",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:05:48+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258214649_149996532",
+      "id": "paragraph_1614258214649_149996532",
+      "dateCreated": "2021-02-25T21:03:34+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:6097",
+      "dateFinished": "2021-02-25T21:05:49+0800",
+      "dateStarted": "2021-02-25T21:05:49+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Table has been created.\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n通过如下语句将数据从csv导入GeoMesa.",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:07:20+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258411089_1655324737",
+      "id": "paragraph_1614258411089_1655324737",
+      "dateCreated": "2021-02-25T21:06:51+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:6963",
+      "dateFinished": "2021-02-25T21:07:20+0800",
+      "dateStarted": "2021-02-25T21:07:20+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>通过如下语句将数据从csv导入GeoMesa.</p>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql\nINSERT INTO geomesa_warehouse SELECT id, ST_AsText(ST_Point(lng, lat)) FROM csv_warehouse;",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:06:03+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/2a173b9b84a79dbdbb5b8253c5ad44ba",
+              "$$hashKey": "object:6958"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258325753_1289869121",
+      "id": "paragraph_1614258325753_1289869121",
+      "dateCreated": "2021-02-25T21:05:25+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:6740",
+      "dateFinished": "2021-02-25T21:06:17+0800",
+      "dateStarted": "2021-02-25T21:06:03+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "Insertion successfully.\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n使用GeoMesa命令行工具验证导入是否成功, 输入`geomesa-hbase export -f warehouse_point -c warehouse_point`, 得到如下输出即导入成功.\n```\nINFO  Running export - please wait...\nid,id:String,*geom:Point:srid=4326\n1,1,POINT (10 10)\nINFO  Feature export complete to standard out in 3193ms for 1 features\n```",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:10:05+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258363106_1535072931",
+      "id": "paragraph_1614258363106_1535072931",
+      "dateCreated": "2021-02-25T21:06:03+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:6858",
+      "dateFinished": "2021-02-25T21:10:05+0800",
+      "dateStarted": "2021-02-25T21:10:05+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<p>使用GeoMesa命令行工具验证导入是否成功, 输入<code>geomesa-hbase export -f warehouse_point -c warehouse_point</code>, 得到如下输出即导入成功.</p>\n<pre><code>INFO  Running export - please wait...\nid,id:String,*geom:Point:srid=4326\n1,1,POINT (10 10)\nINFO  Feature export complete to standard out in 3193ms for 1 features\n</code></pre>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%md\n3. 执行spatial temporal join",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:10:34+0800",
+      "progress": 0,
+      "config": {
+        "tableHide": false,
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true,
+          "completionKey": "TAB",
+          "completionSupport": false
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/markdown",
+        "fontSize": 9,
+        "editorHide": true,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258494138_966112780",
+      "id": "paragraph_1614258494138_966112780",
+      "dateCreated": "2021-02-25T21:08:14+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:7056",
+      "dateFinished": "2021-02-25T21:10:34+0800",
+      "dateStarted": "2021-02-25T21:10:34+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "HTML",
+            "data": "<div class=\"markdown-body\">\n<ol start=\"3\">\n<li>执行spatial temporal join</li>\n</ol>\n\n</div>"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%flink.ssql(type=update)\nSELECT A.id AS order_id, A.dtg, ST_AsText(ST_Point(A.lng, A.lat)) AS order_point, B.id AS warehouse_id\n    FROM csv_order AS A\n    LEFT JOIN geomesa_warehouse FOR SYSTEM_TIME AS OF A.proctime AS B\n    ON ST_AsText(ST_Point(A.lng, A.lat)) = B.geom",
+      "user": "anonymous",
+      "dateUpdated": "2021-02-25T21:13:45+0800",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "sql",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/sql",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "FLINK JOB",
+          "tooltip": "View in Flink web UI",
+          "group": "flink",
+          "values": [
+            {
+              "jobUrl": "http://localhost:8081#/job/5fd97a4d1810ed289900377e3d2122cb",
+              "$$hashKey": "object:7747"
+            }
+          ],
+          "interpreterSettingId": "flink"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1614258634720_1031563963",
+      "id": "paragraph_1614258634720_1031563963",
+      "dateCreated": "2021-02-25T21:10:34+0800",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:7166",
+      "dateFinished": "2021-02-25T21:13:51+0800",
+      "dateStarted": "2021-02-25T21:13:45+0800",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "order_id\tdtg\torder_point\twarehouse_id\n1\t2021-02-22T18:00\tPOINT (7 7)\tnull\n2\t2021-02-22T19:00\tPOINT (8 8)\t1\n"
+          }
+        ]
+      }
+    }
+  ],
+  "name": "glink-geomesa",
+  "id": "2FZDXAF8Q",
+  "defaultInterpreterGroup": "flink",
+  "version": "0.9.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/glink-geomesa"
+}
