@@ -28,6 +28,8 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
     String line;
     while ((line = bufferedReader.readLine()) != null) {
       T geoObject = parseLine(line);
+      if (geoObject == null)
+        continue;
       sourceContext.collect(geoObject);
     }
   }

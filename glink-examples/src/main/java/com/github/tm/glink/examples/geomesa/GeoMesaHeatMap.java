@@ -49,18 +49,17 @@ public class GeoMesaHeatMap {
                         "WITH (\n" +
                         "  'connector' = 'geomesa',\n" +
                         "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = 'geomesa-tile-test1',\n" +
+                        "  'geomesa.schema.name' = 'Xiamen-heatmap-test-1',\n" +
                         "  'hbase.zookeepers' = 'localhost:2181',\n" +
 //                        "  'hbase.zookeepers' = 'u0:2181',\n" +
                         "  'geomesa.indices.enabled' = 'attr:level:tile_id:start_time',\n" +
-                        "  'hbase.catalog' = 'Xiamen-heatmap-test-1'\n" +
+                        "  'hbase.catalog' = 'Xiamen-heatmap-test-3'\n" +
                         ")");
 
         // 将TileStream转换为表，并写入GeoMesa
         Table tileTable = tableEnv.fromDataStream(tileStream);
         tileTable.executeInsert("Geomesa_HeatMap_Test");
         env.execute("heatmap-generating");
-
     }
 
 }

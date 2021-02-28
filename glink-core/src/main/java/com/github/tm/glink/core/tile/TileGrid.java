@@ -59,7 +59,7 @@ public class TileGrid {
     int pixelNo = pixelX + pixelY * 256;
     return new Pixel(tile, pixelNo);
   }
-
+  // TODO: 现在的瓦片分隔方式太粗暴，后续要改成适配前端的分隔方式。
   private static double[] getDoubleTileXY(double lat, double lng, double level) {
     double n = Math.pow(2, level);
     double tileX = ((lng + 180) / 360) * n;

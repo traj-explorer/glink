@@ -56,7 +56,7 @@ public class HeatMap {
             }
         });
         return  pixelResultDataStream.keyBy(r -> r.getPixel().getTile())
-                .window(TumblingEventTimeWindows.of(Time.seconds(2)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(10)))
                 .aggregate(new CountAggregator(), new AddTimeInfoProcess())
                 .map(new MapFunction<Tuple2<TileResult, String>, Tuple5<String, Integer, Long, String, String>>() {
                     @Override
@@ -113,6 +113,7 @@ public class HeatMap {
         public void process(Tile tile, Context context, Iterable<TileResult> elements, Collector<Tuple2<TileResult, String>> out) throws Exception {
             long time = context.window().getEnd();
             String date_info = sdf.format(new Date(time));
+            System.out.println(date_info);
             out.collect(new Tuple2<>(elements.iterator().next(), date_info));
         }
     }
