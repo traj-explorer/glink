@@ -1,37 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.tm</groupId>
     <artifactId>glink</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <modules>
         <module>glink-core</module>
         <module>glink-kafka</module>
         <module>glink-features</module>
         <module>glink-examples</module>
+        <module>glink-mapmatching</module>
+        <module>glink-hbase</module>
+        <module>glink-utils</module>
+        <module>glink-visualization</module>
+        <module>glink-traffic</module>
+        <module>glink-sql</module>
+        <module>glink-connector</module>
+        <module>glink-dist</module>
     </modules>
 
     <properties>
-        <flink.version>1.10.0</flink.version>
-        <kafka.version>2.5.0</kafka.version>
-        <avro.version>1.10.0</avro.version>
+        <flink.version>1.12.0</flink.version>
+        <kafka.version>2.4.1</kafka.version>
+        <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
-        <scala.binary.version>2.12</scala.binary.version>
+        <scala.binary.version>2.11</scala.binary.version>
+        <scala.version>2.11.7</scala.version>
         <log4j.version>2.12.1</log4j.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <jackson.version>2.10.1</jackson.version>
         <flink.shaded.version>10.0</flink.shaded.version>
         <h3.version>3.6.3</h3.version>
         <geodesy.version>1.1.3</geodesy.version>
+        <stindex.version>0.1.0</stindex.version>
+        <spatial4j.version>0.8</spatial4j.version>
+        <geotools.version>23.3</geotools.version>
+        <jts.version>1.16.1</jts.version>
+        <geomesa.version>3.1.0</geomesa.version>
     </properties>
+
+    <scm>
+        <url>https://github.com/traj-explorer/glink</url>
+        <connection>https://github.com/traj-explorer/glink.git</connection>
+        <developerConnection>scm:git:https://github.com/traj-explorer/glink.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Glink dependencies -->
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-features</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-kafka</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-hbase</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-mapmatching</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-traffic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-sql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-connector-geomesa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Flink dependencies -->
             <dependency>
@@ -60,32 +121,75 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
+                <artifactId>flink-sql-connector-hbase-1.4_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
                 <artifactId>flink-avro</artifactId>
                 <version>${flink.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!-- Glink dependencies -->
             <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-core</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- Table ecosystem -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-api-java-bridge_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+                <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-features</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-api-scala-bridge_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-kafka</artifactId>
-                <version>${project.version}</version>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-planner_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-api</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-csv</artifactId>
+                <version>${flink.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- Kafka dependency -->
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_${scala.binary.version}</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
                 <version>${kafka.version}</version>
             </dependency>
 
@@ -106,11 +210,85 @@
                 <version>${bijection.version}</version>
             </dependency>
 
+            <!-- Geomesa dependencies -->
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-utils_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-index-api_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-feature-avro_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-datastore_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-rpc_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-server_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-server-hbase2_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-server-hbase1_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-distributed-runtime-hbase1_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-distributed-runtime-hbase2_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-jobs_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.geomesa</groupId>
+                <artifactId>geomesa-hbase-tools_${scala.binary.version}</artifactId>
+                <version>${geomesa.version}</version>
+<!--                <scope>provided</scope>-->
+            </dependency>
+
             <!-- Geographical things dependencies -->
             <dependency>
                 <groupId>org.locationtech.jts</groupId>
                 <artifactId>jts-core</artifactId>
-                <version>1.16.1</version>
+                <version>${jts.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.gavaghan</groupId>
@@ -121,6 +299,72 @@
                 <groupId>com.uber</groupId>
                 <artifactId>h3</artifactId>
                 <version>${h3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>stindex</artifactId>
+                <version>${stindex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.spatial4j</groupId>
+                <artifactId>spatial4j</artifactId>
+                <version>${spatial4j.version}</version>
+            </dependency>
+
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-epsg-hsql</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-epsg-extension</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-main</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.vividsolutions</groupId>
+                        <artifactId>jts</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!--The following GeoTools dependencies use GNU Lesser General Public License and thus are excluded from the binary distribution-->
+            <!-- Users have to include them by themselves manually -->
+            <!-- See https://www.apache.org/legal/resolved.html#category-x -->
+            <!-- See https://github.com/geotools/geotools#license -->
+            <!--for CRS transformation-->
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-referencing</artifactId>
+                <version>${geotools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Junit dependency -->
@@ -169,30 +413,54 @@
                 </configuration>
             </plugin>
 
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
-                <!--<version>3.1.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>validate</id>-->
-                        <!--<phase>validate</phase>-->
-                        <!--<configuration>-->
-                            <!--<configLocation>./config/checkStyle.xml</configLocation>-->
-                            <!--<encoding>UTF-8</encoding>-->
-                            <!--<consoleOutput>true</consoleOutput>-->
-                            <!--<failsOnError>true</failsOnError>-->
-                            <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
-                        <!--</configuration>-->
-                        <!--<goals>-->
-                            <!--<goal>check</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--                <version>3.1.1</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>validate</id>-->
+<!--                        <phase>validate</phase>-->
+<!--                        <configuration>-->
+<!--                            <configLocation>./config/checkstyle.xml</configLocation>-->
+<!--                            <encoding>UTF-8</encoding>-->
+<!--                            <consoleOutput>true</consoleOutput>-->
+<!--                            <failsOnError>true</failsOnError>-->
+<!--                            <includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+<!--                        </configuration>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
 
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
 
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/repositories/central/</url>
+        </repository>
+        <repository>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots><enabled>false</enabled></snapshots>
+            <releases><enabled>true</enabled></releases>
+        </repository>
+    </repositories>
 
 </project>

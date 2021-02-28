@@ -26,5 +26,9 @@ hs_err_pid*
 .idea
 *.iml
 target
-META-INF
 .ipynb_checkpoints
+
+# maven release
+*.releaseBackup
+release.properties
+dependency-reduced-pom.xml

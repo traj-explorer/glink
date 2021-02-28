@@ -1,31 +1,38 @@
 package com.github.tm.glink.features.avro;
 
 import com.github.tm.glink.features.Point;
-import com.twitter.bijection.Injection;
-import com.twitter.bijection.avro.GenericAvroCodecs;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
+
+import java.util.Properties;
 
 /**
  * @author Yu Liebing
  * */
 public class AvroPoint extends AvroGeoObject<Point> {
 
+  @SuppressWarnings("checkstyle:OperatorWrap")
   public static final String SCHEMA = "{" +
           "\"type\": \"record\"," +
           "\"name\": \"Point\"," +
           "\"fields\": [" +
-              "{\"name\": \"id\", \"type\": \"string\"}," +
+              "{\"name\": \"id\", \"type\": [\"string\", \"null\"]}," +
               "{\"name\": \"lat\", \"type\": \"double\"}, " +
               "{\"name\": \"lng\", \"type\": \"double\"}," +
-              "{\"name\": \"timestamp\", \"type\": \"long\"}," +
-              "{\"name\": \"index\", \"type\": \"long\"}" +
-            "]" +
+              "{\"name\": \"timestamp\", \"type\": [\"long\", \"null\"]}," +
+              "{\"name\": \"index\", \"type\": [\"long\", \"null\"]}" +
+              "%s" + // attributes schema
+          "]" +
           "}";
-  private final Schema schema = new Schema.Parser().parse(SCHEMA);
-  private final GenericRecord genericRecord = new GenericData.Record(schema);
-  private final Injection<GenericRecord, byte[]> injection = GenericAvroCodecs.toBinary(schema);
+
+  public AvroPoint() {
+    String schema = String.format(SCHEMA, "");
+    init(schema);
+  }
+
+  public AvroPoint(String attributesSchema) {
+    String schema = toAvroSchema(SCHEMA, attributesSchema);
+    init(schema);
+  }
 
   @Override
   public byte[] serialize(Point point) {
@@ -34,12 +41,22 @@ public class AvroPoint extends AvroGeoObject<Point> {
     genericRecord.put("lng", point.getLng());
     genericRecord.put("timestamp", point.getTimestamp());
     genericRecord.put("index", point.getIndex());
+    if (point.getAttributes() != null) {
+      serializeAttributes(genericRecord, point.getAttributes());
+    }
     return injection.apply(genericRecord);
   }
 
   @Override
   public Point deserialize(byte[] data) {
     GenericRecord record = injection.invert(data).get();
+    Properties attributes = deserializeAttributes(record);
+    Point point = genericToPoint(record);
+    point.setAttributes(attributes);
+    return point;
+  }
+
+  public static Point genericToPoint(GenericRecord record) {
     String id = record.get("id").toString();
     double lat = (double) record.get("lat");
     double lng = (double) record.get("lng");

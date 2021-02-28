@@ -5,7 +5,18 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 
+import java.util.Map;
+import java.util.Properties;
+
 public class PointTest {
+
+  @Test
+  public void pointTest() {
+    Point p = new Point(30.674977620000002, 104.11740999999999);
+    System.out.println(p.getLat());
+    System.out.println(p.getLng());
+    System.out.println(p);
+  }
 
   @Test
   public void getEnvelopeTest() {
@@ -26,5 +37,25 @@ public class PointTest {
     System.out.println(rightDis);
     System.out.println(upperDis);
     System.out.println(bottomDis);
+  }
+
+  @Test
+  public void hashTest() {
+    Point p1 = new Point("1", 11.28, 119.67000011, 123456, 10000);
+    Point p2 = new Point("1", 11.28, 119.67000012, 123456, 10000);
+    System.out.println(p1.hashCode());
+    System.out.println(p2.hashCode());
+    System.out.println(p1.equals(p2));
+  }
+
+  @Test
+  public void test() {
+    Properties p = new Properties();
+    p.put("a", 1);
+
+    for (Map.Entry<Object, Object> entry : p.entrySet()) {
+      System.out.println(entry.getKey());
+      System.out.println(entry.getValue());
+    }
   }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "barefoot-monitor",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "description": "simple barefoot monitor application",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.4",
+    "zmq": "^2.14.0",
+    "kafka-node": "4.1.3"
+  }
+}

@@ -24,7 +24,7 @@ public class GeoUtil {
     return computeGeoDistance(c1, c2);
   }
 
-  public static double computeGeoDistance(Point p1, Point p2) {
+  public static <T extends Point> double computeGeoDistance(T p1, T p2) {
     GlobalCoordinates c1 = new GlobalCoordinates(p1.getLat(), p1.getLng());
     GlobalCoordinates c2 = new GlobalCoordinates(p2.getLat(), p2.getLng());
     return computeGeoDistance(c1, c2);
