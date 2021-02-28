@@ -27,9 +27,8 @@ public class GeoMesaHeatMap {
         env.getConfig().setAutoWatermarkInterval(1000L);
         // 设置hdfs环境与文件路径
         String path = "/XiamenTraj/taxiGps20190606.csv";
-        String hdfsurl = "hdfs://u0:9000";
-//        String path = "/XiamenTraj/taxiGps20200624.csv";
-//        String hdfsurl = "hdfs://localhost:9000";
+//        String hdfsurl = "hdfs://u0:9000";
+        String hdfsurl = "hdfs://localhost:9000";
         // 生成流，执行热力图计算
         DataStream<Point> pointDataStream = env.addSource(new XiamenOriginHDFSDataSource(path, hdfsurl))
                 .assignTimestampsAndWatermarks(new KNNQueryJob.EventTimeAssigner(1000));
@@ -51,8 +50,8 @@ public class GeoMesaHeatMap {
                         "  'connector' = 'geomesa',\n" +
                         "  'geomesa.data.store' = 'hbase',\n" +
                         "  'geomesa.schema.name' = 'geomesa-tile-test1',\n" +
-//                        "  'hbase.zookeepers' = 'localhost:2181',\n" +
-                        "  'hbase.zookeepers' = 'u0:2181',\n" +
+                        "  'hbase.zookeepers' = 'localhost:2181',\n" +
+//                        "  'hbase.zookeepers' = 'u0:2181',\n" +
                         "  'geomesa.indices.enabled' = 'attr:level:tile_id:start_time',\n" +
                         "  'hbase.catalog' = 'Xiamen-heatmap-test-1'\n" +
                         ")");

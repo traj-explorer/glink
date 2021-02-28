@@ -6,7 +6,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import com.github.tm.glink.examples.query.KNNQueryJob;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.operator.DBSCAN;
+import com.github.tm.glink.CSVGeoObjectSource.DBSCAN;
 import com.github.tm.glink.source.DidiCSVPointSource;
 
 import java.io.File;
