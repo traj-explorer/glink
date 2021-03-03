@@ -1,6 +1,7 @@
 package com.github.tm.glink.core.operator;
 
 import com.github.tm.glink.core.tile.*;
+import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -46,13 +47,13 @@ public class HeatMap {
      * ,start_time(时间窗口的开始时间,String),tile_result(Tile内的具体数据,String)
      */
     public static DataStream<Tuple5<String, Integer, Long, String, String>> GetHeatMap(
-            DataStream<Point> geoDataStream,
+            DataStream<TrajectoryPoint> geoDataStream,
             int... level) {
         tileGrid = new TileGrid(10);
-        DataStream<PixelResult<Point>> pixelResultDataStream = geoDataStream.map(new MapFunction<Point, PixelResult<Point>>() {
+        DataStream<PixelResult<TrajectoryPoint>> pixelResultDataStream = geoDataStream.map(new MapFunction<TrajectoryPoint, PixelResult<TrajectoryPoint>>() {
             @Override
-            public PixelResult<Point> map(Point r) throws Exception {
-                return new PixelResult<Point>(tileGrid.getPixel(r.getLat(),r.getLng(),10),r);
+            public PixelResult<TrajectoryPoint> map(TrajectoryPoint r) throws Exception {
+                return new PixelResult<TrajectoryPoint>(tileGrid.getPixel(r.getLat(),r.getLng(),10),r);
             }
         });
         return  pixelResultDataStream.keyBy(r -> r.getPixel().getTile())
@@ -72,14 +73,14 @@ public class HeatMap {
     }
 
     public static class CountAggregator
-            implements AggregateFunction<PixelResult<Point>, Map<Pixel, Integer>, TileResult>{
+            implements AggregateFunction<PixelResult<TrajectoryPoint>, Map<Pixel, Integer>, TileResult>{
 
         @Override
         public Map<Pixel, Integer> createAccumulator() {
             return new HashMap<>();
         }
         @Override
-        public Map<Pixel, Integer> add(PixelResult<Point> pointPixelResult, Map<Pixel, Integer> pixelIntegerMap) {
+        public Map<Pixel, Integer> add(PixelResult<TrajectoryPoint> pointPixelResult, Map<Pixel, Integer> pixelIntegerMap) {
             Pixel pixel = pointPixelResult.getPixel();
             if(pixelIntegerMap.containsKey(pixel)) {
                 Integer new_val =  pixelIntegerMap.get(pixel) + 1;

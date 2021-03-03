@@ -23,11 +23,10 @@ import java.time.format.DateTimeFormatter;
  * @date 2021/2/7 - 11:07 下午
  */
 public class XiamenOriginHDFSDataSource extends CSVGeoObjectSource<Point>{
-    private DateTimeFormatter formatter;
     private String hdfsUrl;
 
     public XiamenOriginHDFSDataSource(String path, String hdfsurl) throws IOException {
-        this.filePath = path;
+        super(path);
         this.hdfsUrl = hdfsurl;
     }
 
@@ -47,8 +46,7 @@ public class XiamenOriginHDFSDataSource extends CSVGeoObjectSource<Point>{
             String carNo = items[6];
             Double lat = Double.parseDouble(items[5]);
             Double lng = Double.parseDouble(items[4]);
-            String formattedTime = addZeroPrefix(items[3],"-"," ",":");
-            long timestamp = LocalDateTime.parse(formattedTime, formatter).toInstant(ZoneOffset.ofHours(8)).toEpochMilli();
+            long timestamp = Long.parseLong(items[3]);
             return new Point(carNo, lat, lng, timestamp);
         } catch (Exception e) {
             System.out.println("该行格式错误： " + line);
@@ -56,35 +54,4 @@ public class XiamenOriginHDFSDataSource extends CSVGeoObjectSource<Point>{
         }
     }
 
-    private static String addZeroPrefix(String input, String dateSpliter, String dateTimeSpliter, String timeSpliter) {
-        String[] dateAndTime = input.split(dateTimeSpliter);
-        // for date:
-        String[] dateInfo = dateAndTime[0].split("/");
-        if (dateInfo[1].length() == 1)
-            dateInfo[1] = '0' + dateInfo[1];
-        if (dateInfo[2].length() == 1)
-            dateInfo[2] = '0' + dateInfo[2];
-
-        // for time
-        String[] timeInfo = dateAndTime[1].split(timeSpliter);
-        StringBuilder timeBuilder = new StringBuilder();
-        for (int i=0; i<3; i++) {
-            if (timeInfo[i].length() == 1) {
-                if(i == 0) {
-                    timeBuilder.append('0'+timeInfo[i]);
-                } else {
-                    timeBuilder.append(timeSpliter+'0'+timeInfo[i]);
-                }
-            } else {
-                if(i == 0) {
-                    timeBuilder.append(timeInfo[i]);
-                } else {
-                    timeBuilder.append(timeSpliter+timeInfo[i]);
-                }
-            }
-        }
-        return dateInfo[0] + dateSpliter + dateInfo[1] + dateSpliter + dateInfo[2]
-                + dateTimeSpliter
-                + timeBuilder.toString();
-    }
 }

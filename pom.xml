@@ -20,6 +20,7 @@
         <module>glink-sql</module>
         <module>glink-connector</module>
         <module>glink-dist</module>
+        <module>glink-test</module>
     </modules>
 
     <properties>

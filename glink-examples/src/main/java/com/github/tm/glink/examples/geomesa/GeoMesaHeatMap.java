@@ -3,8 +3,11 @@ package com.github.tm.glink.examples.geomesa;
 import com.github.tm.glink.core.operator.HeatMap;
 import com.github.tm.glink.core.source.CSVGeoObjectSource;
 import com.github.tm.glink.examples.query.KNNQueryJob;
+import com.github.tm.glink.examples.source.CSVXiamenTrajectorySource;
 import com.github.tm.glink.examples.source.XiamenOriginHDFSDataSource;
 import com.github.tm.glink.features.Point;
+import com.github.tm.glink.features.TrajectoryPoint;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple5;
 
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -16,6 +19,7 @@ import org.apache.hadoop.fs.Path;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -25,14 +29,15 @@ public class GeoMesaHeatMap {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().setAutoWatermarkInterval(1000L);
-        // 设置hdfs环境与文件路径
-        String path = "/XiamenTraj/taxiGps20190606.csv";
-//        String hdfsurl = "hdfs://u0:9000";
-        String hdfsurl = "hdfs://localhost:9000";
+        // 从Resources路径下获取文件路径
+        String path = GeoMesaHeatMap.class.getClassLoader().getResource("XiamenTrajDataCleaned.csv").getPath();
+
         // 生成流，执行热力图计算
-        DataStream<Point> pointDataStream = env.addSource(new XiamenOriginHDFSDataSource(path, hdfsurl))
-                .assignTimestampsAndWatermarks(new KNNQueryJob.EventTimeAssigner(1000));
-        DataStream<Tuple5<String,Integer, Long, String, String>> tileStream = HeatMap.GetHeatMap(pointDataStream, 10);
+        DataStream<TrajectoryPoint> trajDataStream = env.addSource(new CSVXiamenTrajectorySource(path, 100))
+                .assignTimestampsAndWatermarks(WatermarkStrategy
+                        .<TrajectoryPoint>forBoundedOutOfOrderness(Duration.ofSeconds(3))
+                        .withTimestampAssigner((event, timestamp)->event.getTimestamp()));;
+        DataStream<Tuple5<String,Integer, Long, String, String>> tileStream = HeatMap.GetHeatMap(trajDataStream, 10);
 
         // 创建GeoMesa中用于存储HeatMap的表
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
@@ -49,11 +54,11 @@ public class GeoMesaHeatMap {
                         "WITH (\n" +
                         "  'connector' = 'geomesa',\n" +
                         "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = 'Xiamen-heatmap-test-1',\n" +
+                        "  'geomesa.schema.name' = 'Xiamen-heatmap',\n" +
                         "  'hbase.zookeepers' = 'localhost:2181',\n" +
 //                        "  'hbase.zookeepers' = 'u0:2181',\n" +
                         "  'geomesa.indices.enabled' = 'attr:level:tile_id:start_time',\n" +
-                        "  'hbase.catalog' = 'Xiamen-heatmap-test-3'\n" +
+                        "  'hbase.catalog' = 'Xiamen-heatmap-test-1'\n" +
                         ")");
 
         // 将TileStream转换为表，并写入GeoMesa
