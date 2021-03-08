@@ -5,8 +5,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
-import static org.junit.Assert.*;
-
 public class TileGridTest {
 
   TileGrid tileGrid = new TileGrid(2);
@@ -48,13 +46,13 @@ public class TileGridTest {
 
     @Test
   public void test1() {
-    int zoom = 3;
-    double lat = 79;
-    double lon = 90.1;
+    int zoom = 15;
+    double lat = 23.0581857;
+    double lon = 113.3964152;
 
     double n = Math.pow(2, zoom);
-    double tileX = ((lon + 180) / 360) * n;
-    double tileY = (1 - (Math.log(Math.tan(Math.toRadians(lat)) + (1 / Math.cos(Math.toRadians(lat)))) / Math.PI)) / 2 * n;
+    int  tileX = (int)Math.floor((lon + 180)/360 * n);
+    int  tileY = (int)((1 - (Math.log(Math.tan(Math.toRadians(lat)) + (1 / Math.cos(Math.toRadians(lat)))) / Math.PI)) / 2 * n);
     System.out.println((int) tileX);
     System.out.println((int) tileY);
   }
@@ -70,5 +68,19 @@ public class TileGridTest {
     double pixelY = ((1 - (Math.log(Math.tan(Math.toRadians(lat)) + (1 / Math.cos(Math.toRadians(lat)))) / Math.PI)) / 2 * n) * 256 % 256;
     System.out.println((int) pixelX);
     System.out.println((int) pixelY);
+  }
+
+  @Test
+  public void initTileGrids() {
+    int hlevel = 15;
+    int llevel = 10;
+    int length = hlevel-llevel+1;
+    TileGrid[] tileGrids = new TileGrid[length];
+    int i = length;
+    int j = hlevel;
+    while (i > 0) {
+      tileGrids[i-1] = new TileGrid(j);
+      i--; j--;
+    }
   }
 }

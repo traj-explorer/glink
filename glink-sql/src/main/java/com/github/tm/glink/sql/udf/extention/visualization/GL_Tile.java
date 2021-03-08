@@ -7,6 +7,7 @@ import org.apache.flink.table.functions.ScalarFunction;
 public class GL_Tile extends ScalarFunction {
 
   public long eval(double lat, double lng, int level) {
-    return TileGrid.getTile(lat, lng, level).toLong();
+    TileGrid tileGrid = new TileGrid(level);
+    return tileGrid.getTile(lat, lng).toLong();
   }
 }

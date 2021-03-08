@@ -3,23 +3,20 @@ package com.github.tm.glink.core.operator;
 import com.github.tm.glink.core.tile.*;
 import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.functions.windowing.AggregateApplyWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-import com.github.tm.glink.features.Point;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +25,9 @@ import java.util.Map;
  * @author Wang Haocheng
  */
 public class HeatMap {
-    private static int level;
-    private DataStream<Point> pointDataStream;
-    private static SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(),4326);
-    private static TileGrid tileGrid;
+    private static TileGrid[] tileGrids;
+    private static final Logger LOG = LoggerFactory.getLogger(HeatMap.class);
+
 
     /**
      * 以像素空间范围内数据出现频次为主题的热力图生成方法。
@@ -41,47 +36,66 @@ public class HeatMap {
      * 2. 将PixelResult以Tile为单位分流
      * 3. 分配窗口 —— 根据每张热力图涉及的时间段长度设置WindowAssigner
      * 4. 进行聚合，聚合结果为TileResult。
-     * @param geoDataStream
-     * @param level
-     * @return Tuple5中各项含义以此为：TileId-time(主键,string), level(等级,int), tile-id(tile编号,long)
-     * ,start_time(时间窗口的开始时间,String),tile_result(Tile内的具体数据,String)
+     * @param geoDataStream 输入
+     * @param h_level 所需要热力图的最深层级
+     * @param l_level  所需要热力图的最浅层级, 默认为0级
+     * @return Tuple4中各项含义以此为：TileId-time(主键,string), tile-id(tile编号,long)
+     * ,end_time(时间窗口的结束时间戳,Timestamp),tile_result(Tile内的具体数据,String)
      */
-    public static DataStream<Tuple5<String, Integer, Long, String, String>> GetHeatMap(
+    public static DataStream<Tuple4<String, Long, Timestamp, String>> GetHeatMap(
             DataStream<TrajectoryPoint> geoDataStream,
-            int... level) {
-        tileGrid = new TileGrid(10);
-        DataStream<PixelResult<TrajectoryPoint>> pixelResultDataStream = geoDataStream.map(new MapFunction<TrajectoryPoint, PixelResult<TrajectoryPoint>>() {
-            @Override
-            public PixelResult<TrajectoryPoint> map(TrajectoryPoint r) throws Exception {
-                return new PixelResult<TrajectoryPoint>(tileGrid.getPixel(r.getLat(),r.getLng(),10),r);
-            }
-        });
-        return  pixelResultDataStream.keyBy(r -> r.getPixel().getTile())
-                .window(TumblingEventTimeWindows.of(Time.minutes(10)))
-                .aggregate(new CountAggregator(), new AddTimeInfoProcess())
-                .map(new MapFunction<Tuple2<TileResult, String>, Tuple5<String, Integer, Long, String, String>>() {
+            int h_level,
+            int l_level,
+            Time time_len) {
+        // init TileGrids of all levels;
+        if (l_level < 0) {
+            l_level = 0;
+            LOG.warn("The given lower level:" + l_level +" is lower than 0, has been set to 0");
+        }
+        if (h_level > 18) {
+            h_level = 18;
+            LOG.warn("The given higher level:" + h_level +" is higher than 18, has been set to 18");
+        }
+        int finalH_level = h_level;
+        int finalL_level = l_level;
+        initTileGrids(finalH_level, finalL_level);
+
+        // Get a data stream mixed by pixels in different levels.
+        DataStream<PixelResult<Integer>> pixelResultDataStream = geoDataStream
+                .flatMap(new FlatMapFunction<TrajectoryPoint, PixelResult<Integer>>() {
                     @Override
-                    public Tuple5<String, Integer, Long, String, String> map(Tuple2<TileResult, String> r) throws Exception {
-                        return new Tuple5<String, Integer, Long, String, String>(
-                                GetPrimaryString(r),
-                                r.f0.getTile().getLevel(),
-                                r.f0.getTile().toLong(),
-                                r.f1,
-                                r.f0.toString());
+                    public void flatMap(TrajectoryPoint value, Collector<PixelResult<Integer>> out) throws Exception {
+                        int i = finalH_level +1- finalL_level;
+                        while (i > 0) {
+                            out.collect(new PixelResult<Integer>(tileGrids[i-1].getPixel(value.getLat(), value.getLng()), 1));
+                            i--; }
                     }
                 });
+        return  pixelResultDataStream.keyBy(r -> r.getPixel().getTile())
+                .window(TumblingEventTimeWindows.of(time_len))
+                .aggregate(new CountAggregator(), new AddTimeInfoProcess())
+                .map(new MapFunction<Tuple2<TileResult<Integer>, Timestamp>, Tuple4<String, Long, Timestamp, String>>() {
+                    @Override
+                    public Tuple4<String, Long, Timestamp, String> map(Tuple2<TileResult<Integer>, Timestamp> value) throws Exception {
+                        return new Tuple4<String, Long, Timestamp, String>(
+                                GetPrimaryString(value), value.f0.getTile().toLong(), value.f1, value.f0.toString());
+                    }});
     }
 
-    public static class CountAggregator
-            implements AggregateFunction<PixelResult<TrajectoryPoint>, Map<Pixel, Integer>, TileResult>{
+    public static DataStream<Tuple4<String, Long,  Timestamp, String>> GetHeatMap(DataStream<TrajectoryPoint> geoDataStream, int level, Time time_len) {
+        return GetHeatMap(geoDataStream, level, 0, time_len);
+    }
 
+    private static class CountAggregator
+            implements AggregateFunction<PixelResult<Integer>, Map<Pixel, Integer>, TileResult<Integer>>{
         @Override
         public Map<Pixel, Integer> createAccumulator() {
             return new HashMap<>();
         }
+
         @Override
-        public Map<Pixel, Integer> add(PixelResult<TrajectoryPoint> pointPixelResult, Map<Pixel, Integer> pixelIntegerMap) {
-            Pixel pixel = pointPixelResult.getPixel();
+        public Map<Pixel, Integer> add(PixelResult<Integer> TrajectoryPointPixelResult, Map<Pixel, Integer> pixelIntegerMap) {
+            Pixel pixel = TrajectoryPointPixelResult.getPixel();
             if(pixelIntegerMap.containsKey(pixel)) {
                 Integer new_val =  pixelIntegerMap.get(pixel) + 1;
                 pixelIntegerMap.put(pixel, new_val);
@@ -91,8 +105,9 @@ public class HeatMap {
             }
             return pixelIntegerMap;
         }
+
         @Override
-        public TileResult getResult(Map<Pixel, Integer> pixelIntegerMap) {
+        public TileResult<Integer> getResult(Map<Pixel, Integer> pixelIntegerMap) {
             TileResult<Integer> ret = new TileResult<>();
             ret.setTile(pixelIntegerMap.keySet().iterator().next().getTile());
             for (Map.Entry<Pixel,Integer> entry : pixelIntegerMap.entrySet()) {
@@ -108,21 +123,32 @@ public class HeatMap {
         }
     }
 
-    public static class AddTimeInfoProcess extends
-            ProcessWindowFunction<TileResult, Tuple2<TileResult, String>, Tile, TimeWindow> {
+    private static class AddTimeInfoProcess extends
+            ProcessWindowFunction<TileResult<Integer>, Tuple2<TileResult<Integer>, Timestamp>, Tile, TimeWindow> {
         @Override
-        public void process(Tile tile, Context context, Iterable<TileResult> elements, Collector<Tuple2<TileResult, String>> out) throws Exception {
+        public void process(Tile tile, Context context, Iterable<TileResult<Integer>> elements, Collector<Tuple2<TileResult<Integer>, Timestamp>> out) throws Exception {
             long time = context.window().getEnd();
-            String date_info = sdf.format(new Date(time));
-            System.out.println(date_info);
-            out.collect(new Tuple2<>(elements.iterator().next(), date_info));
+            Timestamp timestamp = new Timestamp(time);
+            out.collect(new Tuple2<>(elements.iterator().next(), timestamp));
         }
     }
 
-    private static String GetPrimaryString (Tuple2<TileResult, String> inputTileResult) {
+    private static String GetPrimaryString (Tuple2<TileResult<Integer>, Timestamp> inputTileResult) {
         StringBuilder builder = new StringBuilder();
         builder.append(inputTileResult.f0.getTile().toLong());
-        builder.append(inputTileResult.f1);
+        builder.append(inputTileResult.f1.toString());
         return builder.toString();
+    }
+
+    private static void initTileGrids (int hlevel, int llevel) {
+        int length = hlevel-llevel+1;
+        tileGrids = new TileGrid[length];
+        int i = length;
+        int j = hlevel;
+        while (i > 0) {
+            tileGrids[i-1] = new TileGrid(j);
+            i--;
+            j--;
+        }
     }
 }
