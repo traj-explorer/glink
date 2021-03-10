@@ -1,5 +1,6 @@
 package com.github.tm.glink.sql;
 
+import com.github.tm.glink.sql.udf.ParseTimestamp;
 import com.github.tm.glink.sql.udf.TestFunc;
 import com.github.tm.glink.sql.udf.extention.output.GL_PointToCSV;
 import com.github.tm.glink.sql.udf.extention.visualization.GL_Heatmap;
@@ -57,5 +58,6 @@ public class GlinkSQLRegister {
     tEnv.registerFunction("GL_Headmap", new GL_Heatmap());
 
     tEnv.registerFunction("TestFunc", new TestFunc());
+    tEnv.registerFunction("ParseTimestamp", new ParseTimestamp());
   }
 }

@@ -9,6 +9,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Properties;
 
 /**
  * Data example:
@@ -36,10 +37,17 @@ public class CSVXiamenTrajectorySource extends CSVGeoObjectSource<TrajectoryPoin
     try {
       String[] items = line.split(",");
       String carNo = items[6];
+      int pid = Integer.parseInt(items[7]);
       double lat = Double.parseDouble(items[5]);
       double lng = Double.parseDouble(items[4]);
       long timestamp = Long.parseLong(items[3]);
-      return new TrajectoryPoint(carNo, 0, lat, lng, timestamp);
+      Properties properties = new Properties();
+      properties.put("speed",Double.parseDouble(items[1]));
+      properties.put("azimuth",Double.parseDouble(items[2]));
+      properties.put("OperatingStatus",Integer.parseInt(items[0]));
+      TrajectoryPoint r  = new TrajectoryPoint(carNo, pid, lat, lng, timestamp);
+      r.setAttributes(properties);
+      return r;
     } catch (Exception e) {
       System.out.println(e);
       return null;
