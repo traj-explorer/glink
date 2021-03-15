@@ -29,7 +29,6 @@ public class Pixel {
   public void setPixelNo(int pixelNo) {
     this.pixelNo = pixelNo;
   }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

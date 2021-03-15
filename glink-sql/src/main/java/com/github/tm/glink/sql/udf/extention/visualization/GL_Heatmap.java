@@ -19,6 +19,7 @@ public class GL_Heatmap extends AggregateFunction<TileResult<Integer>, TileResul
   }
 
   public void accumulate(Integer acc, double lat, double lng, int level) {
-    Pixel pixel = TileGrid.getPixel(lat, lng, level);
+    TileGrid tileGrid = new TileGrid(level);
+    Pixel pixel = tileGrid.getPixel(lat, lng);
   }
 }

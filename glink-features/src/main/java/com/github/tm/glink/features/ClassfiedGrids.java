@@ -28,7 +28,7 @@ public  class ClassfiedGrids {
     return toCheckIndexes;
   }
   public void toCheckIndexesAdd(Long in) {
-    toCheckIndexes.add(in);
+      toCheckIndexes.add(in);
   }
 
   public void confirmedIndexesAdd(Long in) {

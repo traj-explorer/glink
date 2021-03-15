@@ -11,7 +11,9 @@ public class TileResult<V> {
   private Tile tile;
   private List<PixelResult<V>> result;
 
-  public TileResult() { }
+  public TileResult() {
+    this.result = new ArrayList<>();
+  }
 
   public TileResult(Tile tile) {
     this.tile = tile;

@@ -2,10 +2,12 @@ package com.github.tm.glink.examples.query;
 
 import com.github.tm.glink.core.operator.AllRangeJoin;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.source.CSVPointSource;
+import com.github.tm.glink.examples.source.CSVPointSource;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -19,7 +21,9 @@ public class AllRangeJoinJob {
 
     String path = args[0];
     DataStream<Point> pointDataStream = env.addSource(new CSVPointSource(path))
-            .assignTimestampsAndWatermarks(new KNNQueryJob.EventTimeAssigner(100));
+            .assignTimestampsAndWatermarks(WatermarkStrategy
+                    .<Point>forBoundedOutOfOrderness(Duration.ofSeconds(3))
+                    .withTimestampAssigner((event, timestamp)->event.getTimestamp()));
 
     DataStream<List<Point>> allRangeJoinStream = AllRangeJoin.allRangeJoin(
             pointDataStream, 1, 10000.d, 0.3);

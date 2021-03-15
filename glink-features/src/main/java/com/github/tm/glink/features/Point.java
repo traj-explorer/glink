@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * @author Yu Liebing
  */
-public class Point extends GeoObject {
+public class Point extends GeoObject implements TemporalObject {
 
   private static final int MAX_PRECISION = 10000000;
 
@@ -66,14 +66,15 @@ public class Point extends GeoObject {
     this.lng = getIntLatLng(lng);
   }
 
+  @Override
   public long getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
+  @Override
+  public long setTimestamp(long timestamp) {
+    return this.timestamp;
   }
-
   public long getIndex() {
     return index;
   }

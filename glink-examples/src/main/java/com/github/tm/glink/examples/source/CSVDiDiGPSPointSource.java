@@ -8,10 +8,9 @@ import com.github.tm.glink.core.source.CSVGeoObjectSource;
  */
 public class CSVDiDiGPSPointSource extends CSVGeoObjectSource<Point> {
 
-  public CSVDiDiGPSPointSource(String filePath) {
-    this.filePath = filePath;
+  public CSVDiDiGPSPointSource(String path) {
+    super(path);
   }
-
   @Override
   public Point parseLine(String line) {
     String[] items = line.split(",");
