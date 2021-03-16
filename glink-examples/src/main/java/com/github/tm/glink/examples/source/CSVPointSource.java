@@ -43,15 +43,4 @@ public class CSVPointSource extends CSVGeoObjectSource<Point> {
             timestamp);
   }
 
-  @Override
-  protected void checkTimeAndWait(Point geoObject) throws InterruptedException {
-    if (curMaxTimestamp == 0) {
-      curMaxTimestamp = geoObject.getTimestamp();
-      return;
-    }
-    long time2wait = geoObject.getTimestamp() - curMaxTimestamp;
-    if (time2wait > 0) {
-      wait(time2wait/speed_factor);
-    }
-  }
 }

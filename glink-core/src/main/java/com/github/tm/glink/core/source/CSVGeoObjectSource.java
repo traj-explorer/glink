@@ -7,6 +7,7 @@ import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -17,14 +18,15 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
   protected String filePath;
   protected BufferedReader bufferedReader;
 
-  // Variables for speed up the simulative stream.
-  protected Integer speed_factor;
-  protected long curMaxTimestamp;
+  // Variables for speed up the simulated stream.
+  private Integer speed_factor;
+  private long startTime;
+  private long startEventTime = -1;
+  private long preEventTime;
+  private int syncCounter;
   protected DateTimeFormatter formatter;
 
   public abstract T parseLine(String line);
-
-  public CSVGeoObjectSource() { }
 
   public CSVGeoObjectSource(String filePath) {
     this(filePath, 0);
@@ -33,23 +35,35 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
   public CSVGeoObjectSource(String filePath, int speed_factor) {
     this.filePath = filePath;
     this.speed_factor = speed_factor;
+    this.startTime = Instant.now().toEpochMilli();
   }
+
 
   protected void checkTimeAndWait(T geoObject) throws InterruptedException {
     if (!(geoObject instanceof TemporalObject)) {
       return;
     }
     TemporalObject temporalObject = (TemporalObject) geoObject;
-    if (curMaxTimestamp == 0) {
-      curMaxTimestamp = temporalObject.getTimestamp();
-      return;
-    }
-    long time2wait = temporalObject.getTimestamp() - curMaxTimestamp;
-    // 10s触发一次等待
-    if (time2wait > 10000) {
-      synchronized (this){
-        wait(time2wait/speed_factor);
-        curMaxTimestamp = temporalObject.getTimestamp();
+    long thisEventTime = temporalObject.getTimestamp();
+    if(startEventTime<0) {
+      startEventTime = thisEventTime;
+      preEventTime = thisEventTime;
+    } else {
+      long gapTime = (thisEventTime - preEventTime)/speed_factor;
+      if(gapTime>0 || syncCounter > 1000) {
+        long currentTime = System.currentTimeMillis();
+        long targetEmitTime = (long)((thisEventTime-startEventTime)/speed_factor) + startTime;
+        long waitTime = targetEmitTime - currentTime;
+        if (waitTime>0) {
+          try {
+            Thread.sleep(waitTime);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        }
+        syncCounter = 0;
+      } else {
+        syncCounter++;
       }
     }
   }

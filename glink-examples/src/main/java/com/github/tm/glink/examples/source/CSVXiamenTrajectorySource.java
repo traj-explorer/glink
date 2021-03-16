@@ -16,7 +16,7 @@ import java.util.Properties;
  * 6[OPERATING_STATUS],
  * 15.00[SPEED],
  * 33, (DRIVING_DIRECTION)
- * 2019/6/6, (DATETIME)
+ * 1559805482000, (TIMESTAMP)
  * 118.148850, (LONGITUDE)
  * 24.532240, (LATITUDE)
  * 6577840df8d4caf980c065aeb70f165d(CAR ID)
@@ -58,13 +58,11 @@ public class CSVXiamenTrajectorySource extends CSVGeoObjectSource<TrajectoryPoin
     Long start = LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(8));
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     env.getConfig().setAutoWatermarkInterval(1000L);
-    // 设置hdfs环境与文件路径
     String path = CSVXiamenTrajectorySource.class.getClassLoader().getResource("XiamenTrajDataCleaned.csv").getPath();
-    // 生成流，执行热力图计算
-    DataStream<TrajectoryPoint> pointDataStream = env.addSource(new CSVXiamenTrajectorySource(path,10));
+    DataStream<TrajectoryPoint> pointDataStream = env.addSource(new CSVXiamenTrajectorySource(path,100));
     pointDataStream.print();
     env.execute();
     Long end = LocalDateTime.now().toEpochSecond(ZoneOffset.ofHours(8));
-    System.out.println("Time used: " + (end - start));
+    System.out.println("Time used: " + (end - start) + " seconds.");
   }
 }

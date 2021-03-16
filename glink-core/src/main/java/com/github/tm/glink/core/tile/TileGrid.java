@@ -64,7 +64,7 @@ public class TileGrid {
   // 第一项为瓦片的列号（x），第二项为瓦片的行号（y）
   private double[] getTileXYDouble(double lat, double lng) {
     double n = Math.pow(2, level);
-    double  tileX = Math.floor((lng + 180)/360 * n);
+    double  tileX = (lng + 180)/360 * n;
     double  tileY = ((1 - (Math.log(Math.tan(Math.toRadians(lat)) + (1 / Math.cos(Math.toRadians(lat)))) / Math.PI)) / 2 * n);
     return new double[] {tileX, tileY};
   }
