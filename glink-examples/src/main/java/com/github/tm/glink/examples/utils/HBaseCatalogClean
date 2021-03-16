@@ -1,0 +1,3 @@
+#!/bin/bash
+echo  "disable_all '$1.*' \ny" | hbase shell -n
+echo  "drop_all '$1.*'  \ny" | hbase shell -n

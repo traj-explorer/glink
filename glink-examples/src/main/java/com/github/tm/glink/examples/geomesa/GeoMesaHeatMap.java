@@ -2,6 +2,7 @@ package com.github.tm.glink.examples.geomesa;
 
 import com.github.tm.glink.core.operator.HeatMap;
 import com.github.tm.glink.examples.source.CSVXiamenTrajectorySource;
+import com.github.tm.glink.examples.utils.HBaseCatalogCleaner;
 import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple4;
@@ -26,6 +27,9 @@ public class GeoMesaHeatMap {
         String zookeepers = "localhost:2181"; // 管理HBase的Zookeeper地址
         String file_path = Objects.requireNonNull(GeoMesaHeatMap.class.getClassLoader()
                 .getResource("XiamenTrajDataCleaned.csv")).getPath(); // 默认从Resources中获取
+
+        // Drop Heatmap tables in HBase
+        HBaseCatalogCleaner.clean("XiamXiamen_HeatMap");
 
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().setAutoWatermarkInterval(1000L);
