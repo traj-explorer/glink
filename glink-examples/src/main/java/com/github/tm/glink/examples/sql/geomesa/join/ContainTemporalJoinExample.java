@@ -26,17 +26,17 @@ public class ContainTemporalJoinExample {
                     "proctime AS PROCTIME())\n" +
                     "WITH (\n" +
                     "  'connector' = 'filesystem',\n" +
-                    "  'path' = '/home/liebing/Code/javaworkspace/glink/glink-examples/src/main/resources/join/point.txt',\n" +
+                    "  'path' = '/Users/haocheng/Code/glink/glink-examples/src/main/resources/join/point.txt',\n" +
                     "  'format' = 'csv'\n" +
                     ")");
 
     // register a table in the catalog
     tEnv.executeSql(
             "CREATE TABLE Geomesa_Area (\n" +
-                    "pid STRING,\n" +
+                    "id STRING,\n" +
                     "dtg TIMESTAMP(0),\n" +
                     "geom STRING,\n" +
-                    "PRIMARY KEY (pid) NOT ENFORCED)\n" +
+                    "PRIMARY KEY (id) NOT ENFORCED)\n" +
                     "WITH (\n" +
                     "  'connector' = 'geomesa',\n" +
                     "  'geomesa.data.store' = 'hbase',\n" +
@@ -47,7 +47,7 @@ public class ContainTemporalJoinExample {
                     "  'hbase.catalog' = 'restricted_area'\n" +
                     ")");
 
-    Table result = tEnv.sqlQuery("SELECT A.pid, A.dtg, B.pid " +
+    Table result = tEnv.sqlQuery("SELECT A.pid, A.dtg, B.id " +
             "FROM CSV_Point AS A " +
             "LEFT JOIN Geomesa_Area FOR SYSTEM_TIME AS OF A.proctime AS B " +
             "ON ST_AsText(ST_Point(A.lng, A.lat)) = B.geom");
