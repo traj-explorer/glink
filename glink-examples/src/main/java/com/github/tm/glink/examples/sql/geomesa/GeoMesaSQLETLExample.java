@@ -39,9 +39,9 @@ public class GeoMesaSQLETLExample {
                     "  'connector' = 'geomesa',\n" +
                     "  'geomesa.data.store' = 'hbase',\n" +
                     "  'geomesa.schema.name' = 'geomesa-test',\n" +
-//                    "  'geomesa.spatial.fields' = 'point2:Point',\n" +
+                    "  'geomesa.spatial.fields' = 'point2:Point',\n" +
                     "  'hbase.zookeepers' = 'localhost:2181',\n" +
-                    "  'hbase.catalog' = 'test-sql'\n" +
+                    "  'hbase.catalog' = 'geomesa-test'\n" +
                     ")");
 
     // define a dynamic aggregating query
