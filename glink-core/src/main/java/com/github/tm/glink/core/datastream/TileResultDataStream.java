@@ -11,6 +11,7 @@ import java.util.Properties;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class TileResultDataStream<V> {
 
   private DataStream<TileResult<V>> tileResultDataStream;

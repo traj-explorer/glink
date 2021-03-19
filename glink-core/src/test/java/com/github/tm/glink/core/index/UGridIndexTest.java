@@ -1,29 +1,32 @@
 package com.github.tm.glink.core.index;
 
+import com.github.tm.glink.core.util.GeoUtils;
 import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.*;
 
 import java.util.List;
 
 public class UGridIndexTest {
 
-  private GridIndex gridIndex = new UGridIndex(90.d);
+  private final UGridIndex gridIndex = new UGridIndex(17);
 
   @Test
   public void getIndexTest() {
-    long index = gridIndex.getIndex(1, 1);
-    System.out.println(index);
-    System.out.println(index >> 30);
+    long index = gridIndex.getIndex(45, 90);
+    long[] xy = gridIndex.getXY(index);
+    System.out.println("[" + xy[0] + ", " + xy[1] + "]");
   }
 
   @Test
   public void getRangeIndexTest() {
-    List<Long> indexes = gridIndex.getRangeIndex(0, 0, 500, false);
-    for (long index : indexes) {
-      System.out.println(index);
-    }
+    GeometryFactory geometryFactory = new GeometryFactory();
+    Point point = geometryFactory.createPoint(new Coordinate(114, 34));
+    Envelope envelope = GeoUtils.calcBoxByDist(point, 1);
+    List<Long> index = gridIndex.getIndex(point);
+    System.out.println(index);
+
+    List<Long> rangeIndex = gridIndex.getRangeIndex(envelope.getMinY(), envelope.getMinX(), envelope.getMaxY(), envelope.getMaxX());
+    System.out.println(rangeIndex);
   }
 
   @Test

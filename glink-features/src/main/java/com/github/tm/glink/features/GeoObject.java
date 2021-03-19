@@ -9,6 +9,7 @@ import java.util.Properties;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public abstract class GeoObject {
 
   // non-geo attributions of a geo object

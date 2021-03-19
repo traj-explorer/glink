@@ -46,7 +46,17 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public List<Long> getIndex(Geometry geom) {
+    return null;
+  }
+
+  @Override
   public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getRangeIndex(double minLat, double minLng, double maxLat, double maxLng) {
     return null;
   }
 

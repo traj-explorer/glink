@@ -41,15 +41,15 @@ public class TileExample {
               }
             }));
 
-    TileResultDataStream<Integer> gridDataStream = pointDataStream
-            .grid(2).gridSum(TumblingEventTimeWindows.of(Time.seconds(1)));
+//    TileResultDataStream<Integer> gridDataStream = pointDataStream
+//            .grid(2).gridSum(TumblingEventTimeWindows.of(Time.seconds(1)));
 
 //    gridDataStream.print();
 
-    Properties props = new Properties();
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
-    gridDataStream.sinkToKafka("tile-test", props);
+//    Properties props = new Properties();
+//    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+//    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+//    gridDataStream.sinkToKafka("tile-test", props);
 
     env.execute();
   }

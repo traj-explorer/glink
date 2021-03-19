@@ -11,6 +11,7 @@ import java.util.Objects;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class Point extends GeoObject implements TemporalObject {
 
   private static final int MAX_PRECISION = 10000000;

@@ -10,9 +10,11 @@ import java.util.List;
  */
 public abstract class TreeIndex<T extends Geometry> {
 
-  public abstract void insert(List<T> geoms);
+  public abstract void insert(List<T> geometries);
 
   public abstract void insert(T geom);
 
   public abstract List<T> query(Envelope envelope);
+
+  public abstract List<T> query(Geometry geom, double distance);
 }

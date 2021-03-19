@@ -2,9 +2,11 @@ package com.github.tm.glink.core.index;
 
 import com.github.tm.glink.features.ClassfiedGrids;
 import com.github.tm.glink.features.utils.GeoUtil;
+import org.apache.flink.annotation.VisibleForTesting;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,17 @@ public class UGridIndex extends GridIndex {
 
   private static final int MAX_BITS = 30;
 
+  private double latWidth;
+  private double lngWidth;
   private double gridWidth;
+
+  public UGridIndex(int res) {
+    if (res < 0 || res > MAX_BITS)
+      throw new IllegalArgumentException("Resolution of UGridIndex must between [0, 30]");
+    this.res = res;
+    this.latWidth = 180.d / Math.pow(2, res);
+    this.lngWidth = 360.d / Math.pow(2, res);
+  }
 
   public UGridIndex(double gridWidth) {
     this.gridWidth = gridWidth;
@@ -29,29 +41,24 @@ public class UGridIndex extends GridIndex {
 
   @Override
   public long getIndex(double lat, double lng) {
-    long x = (long) ((lat + 90.d) / gridWidth);
-    long y = (long) ((lng + 180.d) / gridWidth);
+    long x = (long) ((lat + 90.d) / latWidth);
+    long y = (long) ((lng + 180.d) / lngWidth);
     return combineXY(x, y);
   }
 
   @Override
-  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
-//    Coordinate upper = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 0, distance);
-//    Coordinate right = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 90, distance);
-//    Coordinate bottom = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 180, distance);
-//    Coordinate left = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 270, distance);
-//    long minX = fullMode ? (long) ((bottom.getX() + 90.d) / gridWidth) : (long) ((lat + 90.d) / gridWidth);
-//    long maxX = (long) ((upper.getX() + 90.d) / gridWidth);
-//    long minY = (long) ((left.getY() + 180.d) / gridWidth);
-//    long maxY = (long) ((right.getY() + 180.d) / gridWidth);
-//    List<Long> res = new ArrayList<>();
-//    for (long x = minX; x <= maxX; ++x) {
-//      for (long y = minY; y <= maxY; ++y) {
-//        res.add(combineXY(x, y));
-//      }
-//    }
-//    return res;
+  public List<Long> getIndex(Geometry geom) {
+    if (geom instanceof Point) {
+      Point p = (Point) geom;
+      long index = getIndex(p.getY(), p.getX());
+      return new ArrayList<Long>() {{ add(index); }};
+    } else {
+      return getIntersectIndex(geom);
+    }
+  }
 
+  @Override
+  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
     Coordinate upper = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 0, distance);
     Coordinate right = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 90, distance);
     Coordinate bottom = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 180, distance);
@@ -89,6 +96,22 @@ public class UGridIndex extends GridIndex {
         return res;
       }
     }
+  }
+
+  @Override
+  public List<Long> getRangeIndex(double minLat, double minLng, double maxLat, double maxLng) {
+    long minX = (long) ((minLat + 90.d) / latWidth);
+    long maxX = (long) ((maxLat + 90.d) / latWidth);
+    long minY = (long) ((minLng + 180.d) / lngWidth);
+    long maxY = (long) ((maxLng + 180.d) / lngWidth);
+    int n = (int) ((maxX - minX + 1) * (maxY - minY + 1));
+    List<Long> res = new ArrayList<>(n);
+    for (long i = minX; i <= maxX; ++i) {
+      for (long j = minY; j <= maxY; ++j) {
+        res.add(combineXY(i, j));
+      }
+    }
+    return res;
   }
 
   @Override
@@ -144,5 +167,12 @@ public class UGridIndex extends GridIndex {
 
   private long combineXY(long x, long y) {
     return x << MAX_BITS | y;
+  }
+
+  @VisibleForTesting
+  public long[] getXY(long index) {
+    long y = index & 0x3fffffff;
+    long x = index >> MAX_BITS;
+    return new long[] {x, y};
   }
 }

@@ -34,6 +34,10 @@
             <version>5.5.1-ccs</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

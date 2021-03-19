@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class IndexedSpatialDataStream<T extends Geometry> extends SpatialDataStream<T> {
 
   private DataStream<T> indexedDataStream;

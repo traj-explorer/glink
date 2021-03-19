@@ -20,7 +20,6 @@
         <module>glink-sql</module>
         <module>glink-connector</module>
         <module>glink-dist</module>
-        <module>glink-test</module>
     </modules>
 
     <properties>
@@ -366,6 +365,12 @@
                         <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.davidmoten</groupId>
+                <artifactId>rtree</artifactId>
+                <version>0.8.7</version>
             </dependency>
 
             <!-- Junit dependency -->

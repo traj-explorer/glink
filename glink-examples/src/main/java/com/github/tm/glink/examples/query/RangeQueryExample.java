@@ -32,8 +32,8 @@ public class RangeQueryExample {
     List<Polygon> queryPolygons = new ArrayList<>();
     queryPolygons.add(queryPolygon1);
 
-    SpatialDataStream<Point> s = pointSpatialDataStream.index().rangeQuery(queryPolygons);
-    s.print();
+//    SpatialDataStream<Point> s = pointSpatialDataStream.index().rangeQuery(queryPolygons);
+//    s.print();
 
     env.execute();
   }
