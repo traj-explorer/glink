@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.Geometry;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class TileSpatialDataStream<T extends Geometry> extends SpatialDataStream<T> {
 
   private DataStream<T> gridDataStream;

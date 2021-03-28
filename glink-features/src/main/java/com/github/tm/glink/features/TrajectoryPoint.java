@@ -3,6 +3,7 @@ package com.github.tm.glink.features;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class TrajectoryPoint extends Point {
 
   private int pid;

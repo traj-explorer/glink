@@ -367,6 +367,12 @@
                 </exclusions>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.davidmoten</groupId>
+                <artifactId>rtree</artifactId>
+                <version>0.8.7</version>
+            </dependency>
+
             <!-- Junit dependency -->
             <dependency>
                 <groupId>junit</groupId>

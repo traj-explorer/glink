@@ -7,6 +7,7 @@ import org.locationtech.jts.index.quadtree.Quadtree;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class QuadTreeIndex<T extends GeoObject> extends SpatialTreeIndex<T> {
 
   private Quadtree quadtree;

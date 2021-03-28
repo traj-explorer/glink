@@ -1,8 +1,10 @@
 package com.github.tm.glink.core.serialize;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.runtime.kryo.JavaSerializer;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKBReader;
@@ -18,34 +20,42 @@ public class PointKryoSerializer extends JavaSerializer<Point> {
 
   @Override
   public void write(Kryo kryo, Output output, Point point) {
-    System.out.println("+++++++++");
     byte[] geometryData = wkbWriter.write(point);
     output.writeInt(geometryData.length);
     output.write(geometryData);
-    if (point.getUserData() == null) {
-      output.writeString("");
-    } else {
-      String userData = point.getUserData().toString();
-      output.writeString(userData);
-    }
+    writeUserData(kryo, output, point);
   }
 
   @Override
   public Point read(Kryo kryo, Input input, Class aClass) {
-    System.out.println("-----------------");
     try {
       int geometryLen = input.readInt();
       byte[] data = new byte[geometryLen];
       input.readBytes(data);
       Point p = (Point) wkbReader.read(data);
-      String userData = input.readString();
-      if (!userData.equals("")) {
-        p.setUserData(userData);
-      }
+      Object userData = readUserData(kryo, input);
+      p.setUserData(userData);
       return p;
     } catch (Exception e) {
       e.printStackTrace();
     }
     return null;
+  }
+
+  private void writeUserData(Kryo kryo, Output out, Point point) {
+    out.writeBoolean(point.getUserData() != null);
+    if (point.getUserData() != null) {
+      kryo.writeClass(out, point.getUserData().getClass());
+      kryo.writeObject(out, point.getUserData());
+    }
+  }
+
+  private Object readUserData(Kryo kryo, Input input) {
+    Object userData = null;
+    if (input.readBoolean()) {
+      Registration clazz = kryo.readClass(input);
+      userData = kryo.readObject(input, clazz.getType());
+    }
+    return userData;
   }
 }

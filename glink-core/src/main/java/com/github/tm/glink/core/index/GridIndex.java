@@ -11,11 +11,16 @@ import java.util.List;
  */
 public abstract class GridIndex implements Serializable {
 
+  /**
+   * Resolution of grids.
+   * */
   protected int res;
 
   public abstract int getRes();
 
   public abstract long getIndex(double lat, double lng);
+
+  public abstract List<Long> getIndex(Geometry geom);
 
   /**
    * Get a list of grid indexes that may generate neighbor pairs with the input point.
@@ -26,6 +31,8 @@ public abstract class GridIndex implements Serializable {
    * @return The grid indexes related to the input point.
    */
   public abstract List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode);
+
+  public abstract List<Long> getRangeIndex(double minLat, double minLng, double maxLat, double maxLng);
 
   /**
    * Get the indexes intersecting with the boundary of the input geometry.

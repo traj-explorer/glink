@@ -11,6 +11,7 @@ import java.util.List;
  * is initialized.
  * @author Yu Liebing
  */
+@Deprecated
 public class RTreeIndex<T extends GeoObject> extends SpatialTreeIndex<T> {
 
   private STRtree stRtree;
