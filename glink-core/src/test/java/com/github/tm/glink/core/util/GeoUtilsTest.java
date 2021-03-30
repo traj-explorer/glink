@@ -30,15 +30,22 @@ public class GeoUtilsTest {
   }
 
   @Test
+  public void generateRandomDataForRangeJoin() {
+    Point p1 = factory.createPoint(new Coordinate(114, 34));
+
+  }
+
+  @Test
   public void generateRandomDataForDistanceJoin() {
     Point p1 = factory.createPoint(new Coordinate(114, 34));
     Envelope envelope = GeoUtils.calcBoxByDist(p1, 1);
+    System.out.println(envelope);
     double lngStep = envelope.getMaxX() - envelope.getMinX();
     double latStep = envelope.getMaxY() - envelope.getMinY();
     Random random = new Random();
     for (int i = 1; i <= 5; ++i) {
       double lat = envelope.getMinY() + random.nextDouble() * latStep;
-      double lng = envelope.getMinX() + random.nextDouble() * latStep;
+      double lng = envelope.getMinX() + random.nextDouble() * lngStep;
       Point point = factory.createPoint(new Coordinate(lng, lat));
       if (GeoUtils.calcDistance(point, p1) > 1) continue;
       System.out.println(lat + "," + lng);

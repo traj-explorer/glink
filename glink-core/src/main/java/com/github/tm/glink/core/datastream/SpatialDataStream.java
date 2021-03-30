@@ -1,32 +1,29 @@
 package com.github.tm.glink.core.datastream;
 
+import com.github.tm.glink.core.ditance.DistanceCalculator;
+import com.github.tm.glink.core.ditance.GeometricDistanceCalculator;
 import com.github.tm.glink.core.enums.GeometryType;
-import com.github.tm.glink.core.enums.SpatialJoinType;
+import com.github.tm.glink.core.enums.TopologyType;
 import com.github.tm.glink.core.enums.TextFileSplitter;
 import com.github.tm.glink.core.format.TextFormatMap;
-import com.github.tm.glink.core.index.GridIndex;
-import com.github.tm.glink.core.index.STRTreeIndex;
-import com.github.tm.glink.core.index.TreeIndex;
-import com.github.tm.glink.core.index.UGridIndex;
+import com.github.tm.glink.core.index.*;
+import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
 import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import com.github.tm.glink.core.util.GeoUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.state.BroadcastState;
+import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
-import org.apache.flink.streaming.api.datastream.CoGroupedStreams;
-import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
+import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.Window;
 import org.apache.flink.util.Collector;
 import org.geotools.geometry.jts.JTS;
@@ -38,6 +35,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -58,18 +56,20 @@ public class SpatialDataStream<T extends Geometry> {
    *
    * In the {@link SpatialDataStream}, generic type {@link T} is a subclass of {@link Geometry}.
    * If it has non-spatial attributes, it can be obtained through {@link Geometry#getUserData}.
-   * It is a flink tuple type.
+   * It is a flink {@link org.apache.flink.api.java.tuple.Tuple} type.
    * */
   private DataStream<T> spatialDataStream;
 
-  protected SpatialDataStream() { }
+  private DataStream<Tuple2<Long, T>> gridDataStream;
+
+  private GridIndex gridIndex;
 
   /**
-   * Init a {@link SpatialDataStream} from an origin flink {@link DataStream}.
+   * Distance calculator, default is {@link GeometricDistanceCalculator}.
    * */
-  public SpatialDataStream(final DataStream<T> dataStream) {
-    this.spatialDataStream = dataStream;
-  }
+  public static DistanceCalculator distanceCalculator = new GeometricDistanceCalculator();
+
+  protected SpatialDataStream() { }
 
   public SpatialDataStream(final StreamExecutionEnvironment env,
                            final int geometryStartOffset,
@@ -131,19 +131,44 @@ public class SpatialDataStream<T extends Geometry> {
             .addSource(sourceFunction);
   }
 
+  /**
+   * Init a {@link SpatialDataStream} from socket.
+   * */
   public SpatialDataStream(final StreamExecutionEnvironment env,
                            final String host,
                            final int port,
-                           MapFunction<String, T> mapFunction) {
+                           final String delimiter,
+                           final MapFunction<String, T> mapFunction) {
     GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     spatialDataStream = env
-            .socketTextStream(host, port)
+            .socketTextStream(host, port, delimiter)
             .map(mapFunction);
+  }
+
+  /**
+   * Init a {@link SpatialDataStream} from socket.
+   * */
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final String host,
+                           final int port,
+                           final MapFunction<String, T> mapFunction) {
+    this(env, host, port, "\n", mapFunction);
   }
 
   public SpatialDataStream<T> assignTimestampsAndWatermarks(WatermarkStrategy<T> watermarkStrategy) {
     spatialDataStream = spatialDataStream.assignTimestampsAndWatermarks(watermarkStrategy);
+    return this;
+  }
+
+  public SpatialDataStream<T> assignBoundedOutOfOrdernessWatermarks(Duration maxOutOfOrderness, int field) {
+    spatialDataStream = spatialDataStream
+            .assignTimestampsAndWatermarks(WatermarkStrategy
+                    .<T>forBoundedOutOfOrderness(maxOutOfOrderness)
+                    .withTimestampAssigner((event, time) -> {
+                      Tuple t = (Tuple) event.getUserData();
+                      return t.getField(field);
+                    }));
     return this;
   }
 
@@ -155,28 +180,37 @@ public class SpatialDataStream<T extends Geometry> {
    * @param lenient consider the difference of the geodetic datum between the two coordinate systems,
    *                if {@code true}, never throw an exception "Bursa-Wolf Parameters Required", but not
    *                recommended for careful analysis work
-   *
-   * @return true, if successful
    */
-  @SuppressWarnings("checkstyle:MethodName")
-  public boolean CRSTransform(String sourceEpsgCRSCode, String targetEpsgCRSCode, boolean lenient) {
+  public SpatialDataStream<T> crsTransform(String sourceEpsgCRSCode, String targetEpsgCRSCode, boolean lenient) {
     try {
       CoordinateReferenceSystem sourceCRS = CRS.decode(sourceEpsgCRSCode);
       CoordinateReferenceSystem targetCRS = CRS.decode(targetEpsgCRSCode);
       final MathTransform transform = CRS.findMathTransform(sourceCRS, targetCRS, lenient);
       spatialDataStream = spatialDataStream.map(r -> (T) JTS.transform(r, transform));
-      return true;
+      return this;
     } catch (FactoryException e) {
       e.printStackTrace();
-      return false;
     }
+    return null;
   }
 
-  public <T2 extends Geometry> SpatialDataStream<T> spatialDimensionJoin(
+  /**
+   * Spatial dimension join with external storage systems, such as geomesa.
+   * */
+  public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin() {
+    return null;
+  }
+
+  /**
+   * Spatial dimension join with a broadcast stream.
+   * @param joinStream another {@link SpatialDataStream} to join with, will be treated as broadcast stream
+   * @param broadcastJoinFunction function to perform broadcast join
+   * @param returnType the return type of join
+   * */
+  public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin(
           SpatialDataStream<T2> joinStream,
-          SpatialJoinType joinType,
-          JoinFunction<T, T2, Object> joinFunction,
-          double distance) {
+          BroadcastJoinFunction<T, T2, OUT> broadcastJoinFunction,
+          TypeHint<OUT> returnType) {
     DataStream<T> dataStream1 = spatialDataStream;
     DataStream<T2> dataStream2 = joinStream.spatialDataStream;
     final MapStateDescriptor<Integer, TreeIndex<T2>> broadcastDesc = new MapStateDescriptor<>(
@@ -184,28 +218,16 @@ public class SpatialDataStream<T extends Geometry> {
             TypeInformation.of(Integer.class),
             TypeInformation.of(new TypeHint<TreeIndex<T2>>() { }));
     BroadcastStream<T2> broadcastStream = dataStream2.broadcast(broadcastDesc);
-    dataStream1.connect(broadcastStream).process(new BroadcastProcessFunction<T, T2, Tuple2<T, String>>() {
-
-      @Override
-      public void processElement(T t, ReadOnlyContext readOnlyContext, Collector<Tuple2<T, String>> collector) throws Exception {
-        System.out.println(t);
-      }
-
-      @Override
-      public void processBroadcastElement(T2 t2, Context context, Collector<Tuple2<T, String>> collector) throws Exception {
-        BroadcastState<Integer, TreeIndex<T2>> state = context.getBroadcastState(broadcastDesc);
-        if (!state.contains(0)) {
-          state.put(0, new STRTreeIndex<>(2));
-        }
-        System.out.println(t2);
-      }
-    });
-    return this;
+    broadcastJoinFunction.setBroadcastDesc(broadcastDesc);
+    return dataStream1
+            .connect(broadcastStream)
+            .process(broadcastJoinFunction)
+            .returns(returnType);
   }
 
   public <T2 extends Geometry, W extends Window> DataStream<Object> spatialWindowJoin(
           SpatialDataStream<T2> joinStream,
-          SpatialJoinType joinType,
+          TopologyType joinType,
           WindowAssigner<? super CoGroupedStreams.TaggedUnion<Tuple2<T, Long>, Tuple2<T2, Long>>, W> assigner,
           JoinFunction<T, T2, Object> joinFunction,
           double... distance) {
@@ -227,7 +249,7 @@ public class SpatialDataStream<T extends Geometry> {
     DataStream<Tuple2<T2, Long>> indexedStream2 = dataStream2.flatMap(new FlatMapFunction<T2, Tuple2<T2, Long>>() {
       @Override
       public void flatMap(T2 geom, Collector<Tuple2<T2, Long>> collector) throws Exception {
-        if (joinType == SpatialJoinType.DISTANCE) {
+        if (joinType == TopologyType.WITHIN_DISTANCE) {
           Point p = geom.getCentroid();
           Envelope box = GeoUtils.calcBoxByDist(p, distance[0]);
           List<Long> indices = gridIndex.getRangeIndex(box.getMinY(), box.getMinX(), box.getMaxY(), box.getMaxX());
@@ -260,9 +282,33 @@ public class SpatialDataStream<T extends Geometry> {
             });
   }
 
-  public DataStream<Object> spatialMonitoring(
-          SpatialDataStream<T> monitoringStream) {
-    return null;
+  public <T2 extends Geometry, W extends Window> DataStream<Object> spatialIntervalJoin(
+          SpatialDataStream<T2> joinStream,
+          TopologyType joinType,
+          Time lowerBound,
+          Time upperBound,
+          JoinFunction<T, T2, Object> joinFunction,
+          double... distance) {
+    if (this.gridDataStream == null || joinStream.gridDataStream == null)
+      throw new RuntimeException("Please assign grid index before executing spatial interval join.");
+
+    DataStream<Tuple2<Long, T>> gridDataStream1 = this.gridDataStream;
+    DataStream<Tuple2<Long, T2>> gridDataStream2 = joinStream.gridDataStream;
+    return gridDataStream1
+            .keyBy(t -> t.f0)
+            .intervalJoin(gridDataStream2.keyBy(t -> t.f0))
+            .between(lowerBound, upperBound)
+            .process(new ProcessJoinFunction<Tuple2<Long, T>, Tuple2<Long, T2>, Object>() {
+
+              @Override
+              public void processElement(Tuple2<Long, T> t1,
+                                         Tuple2<Long, T2> t2,
+                                         Context context, Collector<Object> collector) throws Exception {
+                if (distanceCalculator.calcDistance(t1.f1, t2.f1) <= distance[0]) {
+                  collector.collect(joinFunction.join(t1.f1, t2.f1));
+                }
+              }
+            });
   }
 
   public DataStream<Object> spatialHeatmap() {
@@ -281,6 +327,54 @@ public class SpatialDataStream<T extends Geometry> {
     spatialDataStream
             .map(r -> r + " " + r.getUserData())
             .print();
+  }
+
+  public SpatialDataStream<T> assignGrids(GridIndex gridIndex) {
+    gridDataStream = spatialDataStream
+            .flatMap(new RichFlatMapFunction<T, Tuple2<Long, T>>() {
+
+              private GridIndex gridIndex;
+
+              @Override
+              public void open(Configuration parameters) throws Exception {
+                this.gridIndex = new UGridIndex(5);
+              }
+
+              @Override
+              public void flatMap(T geom, Collector<Tuple2<Long, T>> collector) throws Exception {
+                List<Long> indices = gridIndex.getIndex(geom);
+                indices.forEach(index -> {
+                  System.out.println("in 1: " + new Tuple2<>(index, geom));
+                  collector.collect(new Tuple2<>(index, geom));
+                });
+              }
+            });
+    return this;
+  }
+
+  public SpatialDataStream<T> assignGridAndDistributeByDistance(GridIndex gridIndex, final double distance) {
+    gridDataStream = spatialDataStream
+            .flatMap(new RichFlatMapFunction<T, Tuple2<Long, T>>() {
+
+              private GridIndex gridIndex;
+
+              @Override
+              public void open(Configuration parameters) throws Exception {
+                gridIndex = new UGridIndex(5);
+              }
+
+              @Override
+              public void flatMap(T geom, Collector<Tuple2<Long, T>> collector) throws Exception {
+                System.out.println(geom);
+                Envelope box = distanceCalculator.calcBoxByDist(geom, distance);
+                List<Long> indices = gridIndex.getRangeIndex(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
+                indices.forEach(index -> {
+                  System.out.println("in 2: " + new Tuple2<>(index, geom));
+                  collector.collect(new Tuple2<>(index, geom));
+                });
+              }
+            });
+    return this;
   }
 
 }

@@ -49,7 +49,7 @@ public class TRTreeIndex<T extends Geometry> extends TreeIndex<T> {
             .toBlocking()
             .toIterable()
             .forEach(item -> {
-              if (GeoUtils.calcDistance(geom, item.value()) < distance)
+              if (GeoUtils.calcDistance(geom, item.value()) <= distance)
                 result.add(item.value());
             });
     return result;
