@@ -37,7 +37,7 @@ public class CSVXiamenTrajectorySource extends CSVGeoObjectSource<TrajectoryPoin
     try {
       String[] items = line.split(",");
       String carNo = items[6];
-      int pid = Integer.parseInt(items[7]);
+//      int pid = Integer.parseInt(items[7]);
       double lat = Double.parseDouble(items[5]);
       double lng = Double.parseDouble(items[4]);
       long timestamp = Long.parseLong(items[3]);
@@ -45,7 +45,7 @@ public class CSVXiamenTrajectorySource extends CSVGeoObjectSource<TrajectoryPoin
       properties.put("speed",Double.parseDouble(items[1]));
       properties.put("azimuth",Double.parseDouble(items[2]));
       properties.put("OperatingStatus",Integer.parseInt(items[0]));
-      TrajectoryPoint r  = new TrajectoryPoint(carNo, pid, lat, lng, timestamp);
+      TrajectoryPoint r  = new TrajectoryPoint(carNo, 0, lat, lng, timestamp);
       r.setAttributes(properties);
       return r;
     } catch (Exception e) {
