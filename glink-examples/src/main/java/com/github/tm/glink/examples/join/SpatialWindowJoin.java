@@ -2,7 +2,9 @@ package com.github.tm.glink.examples.join;
 
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
+import com.github.tm.glink.examples.common.SpatialFlatMapFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -28,22 +30,10 @@ public class SpatialWindowJoin {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     env.setParallelism(2);
 
-    GeometryFactory factory = new GeometryFactory();
-    WKTReader wktReader = new WKTReader();
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    // point: id, wkt, time, name
-    MapFunction<String, Geometry> mapFunction = text -> {
-      String[] list = text.split(",");
-      Geometry geometry = wktReader.read(list[1]);
-      Date date = sdf.parse(list[2]);
-      Tuple3<String, Long, String> t = new Tuple3<>(list[0], date.getTime(), list[3]);
-      geometry.setUserData(t);
-      return geometry;
-    };
+    FlatMapFunction<String, Geometry> flatMapFunction = new SpatialFlatMapFunction();
 
     SpatialDataStream<Geometry> pointSpatialDataStream1 =
-            new SpatialDataStream<>(env, "localhost", 9000, mapFunction)
+            new SpatialDataStream<>(env, "localhost", 9000, flatMapFunction)
                     .assignTimestampsAndWatermarks(WatermarkStrategy
                             .<Geometry>forBoundedOutOfOrderness(Duration.ZERO)
                             .withTimestampAssigner(
@@ -52,7 +42,7 @@ public class SpatialWindowJoin {
                                       return ((Tuple3<String, Long, String>) event.getUserData()).f1;
                                     }));
     SpatialDataStream<Geometry> pointSpatialDataStream2 =
-            new SpatialDataStream<>(env, "localhost", 9001, mapFunction)
+            new SpatialDataStream<>(env, "localhost", 9001, flatMapFunction)
                     .assignTimestampsAndWatermarks(WatermarkStrategy
                             .<Geometry>forBoundedOutOfOrderness(Duration.ZERO)
                             .withTimestampAssigner(

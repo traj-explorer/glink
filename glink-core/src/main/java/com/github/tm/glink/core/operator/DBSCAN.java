@@ -1,7 +1,7 @@
 package com.github.tm.glink.core.operator;
 
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.index.UGridIndex;
+import com.github.tm.glink.core.index.GeographicalGridIndex;
 import com.github.tm.glink.core.operator.cluster.WindowAllDBSCAN;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -17,7 +17,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
  */
 public class DBSCAN {
   /**
-   * Process DBSCAN on a point data stream based on a tumbling time window, now using {@link UGridIndex}
+   * Process DBSCAN on a point data stream based on a tumbling time window, now using {@link GeographicalGridIndex}
    * @param geoDataStream The input point data stream.
    * @param windowSize The window size(seconds).
    * @param distance Distance(meters) value to search for neighbors.

@@ -1,4 +1,4 @@
-package com.github.tm.glink.core.ditance;
+package com.github.tm.glink.core.distance;
 
 import org.junit.Assert;
 import org.junit.Test;

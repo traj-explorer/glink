@@ -20,10 +20,8 @@ public class STRTreeIndex<T extends Geometry> extends TreeIndex<T> {
   }
 
   @Override
-  public void insert(List<T> geoms) {
-    for (T geom : geoms) {
-      stRtree.insert(geom.getEnvelopeInternal(), geom);
-    }
+  public void insert(List<T> geometries) {
+    geometries.forEach(geom -> stRtree.insert(geom.getEnvelopeInternal(), geom));
   }
 
   @Override
@@ -38,10 +36,15 @@ public class STRTreeIndex<T extends Geometry> extends TreeIndex<T> {
 
   @Override
   public List<T> query(Geometry geometry, double distance) {
-    Point point = geometry.getCentroid();
+    Point point = geometry instanceof Point ? (Point) geometry : geometry.getCentroid();
     Envelope envelope = GeoUtils.calcBoxByDist(point, distance);
     List<T> result = stRtree.query(envelope);
     result.removeIf(geom -> GeoUtils.calcDistance(point, geom) > distance);
     return result;
+  }
+
+  @Override
+  public void remove(Geometry geom) {
+
   }
 }

@@ -1,7 +1,7 @@
 package com.github.tm.glink.core.operator;
 
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.index.UGridIndex;
+import com.github.tm.glink.core.index.GeographicalGridIndex;
 import com.github.tm.glink.core.operator.process.PairIndexRangeJoinProcess;
 import com.github.tm.glink.core.operator.process.RangeJoinIndexAssigner;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,7 +27,7 @@ public class PairRangeJoin {
    * @param geoDataStream The input point data stream to process DBSCAN
    * @param windowSize The size of a tumbling time window, which is based on event time.
    * @param distance Distance(meters) value to search for neighbors.
-   * @param gridWidth The width of grids to define {@link UGridIndex}.
+   * @param gridWidth The width of grids to define {@link GeographicalGridIndex}.
    * @return A neighbor stream.
    */
   public static DataStream<Tuple2<Point, Point>> pairRangeJoin(

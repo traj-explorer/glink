@@ -55,6 +55,11 @@ public class TRTreeIndex<T extends Geometry> extends TreeIndex<T> {
     return result;
   }
 
+  @Override
+  public void remove(Geometry geom) {
+
+  }
+
   private void insertGeom(T geom) {
     Envelope box = geom.getEnvelopeInternal();
     rTree = rTree.add(geom, Geometries.rectangle(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY()));

@@ -1,4 +1,4 @@
-package com.github.tm.glink.core.ditance;
+package com.github.tm.glink.core.distance;
 
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;

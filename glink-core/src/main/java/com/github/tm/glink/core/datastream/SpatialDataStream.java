@@ -1,13 +1,15 @@
 package com.github.tm.glink.core.datastream;
 
-import com.github.tm.glink.core.ditance.DistanceCalculator;
-import com.github.tm.glink.core.ditance.GeometricDistanceCalculator;
+import com.github.tm.glink.core.distance.DistanceCalculator;
+import com.github.tm.glink.core.distance.GeographicalDistanceCalculator;
+import com.github.tm.glink.core.distance.GeometricDistanceCalculator;
 import com.github.tm.glink.core.enums.GeometryType;
 import com.github.tm.glink.core.enums.TopologyType;
 import com.github.tm.glink.core.enums.TextFileSplitter;
 import com.github.tm.glink.core.format.TextFormatMap;
 import com.github.tm.glink.core.index.*;
 import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
+import com.github.tm.glink.core.operator.join.JoinWithTopologyType;
 import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import com.github.tm.glink.core.util.GeoUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -17,7 +19,6 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
@@ -62,12 +63,15 @@ public class SpatialDataStream<T extends Geometry> {
 
   private DataStream<Tuple2<Long, T>> gridDataStream;
 
-  private GridIndex gridIndex;
+  /**
+   * Grid index, default is {@link GeographicalGridIndex}
+   * */
+  private GridIndex gridIndex = new GeographicalGridIndex(15);
 
   /**
    * Distance calculator, default is {@link GeometricDistanceCalculator}.
    * */
-  public static DistanceCalculator distanceCalculator = new GeometricDistanceCalculator();
+  public static DistanceCalculator distanceCalculator = new GeographicalDistanceCalculator();
 
   protected SpatialDataStream() { }
 
@@ -132,18 +136,16 @@ public class SpatialDataStream<T extends Geometry> {
   }
 
   /**
-   * Init a {@link SpatialDataStream} from socket.
+   * Init a {@link SpatialDataStream} from a text file.
    * */
   public SpatialDataStream(final StreamExecutionEnvironment env,
-                           final String host,
-                           final int port,
-                           final String delimiter,
-                           final MapFunction<String, T> mapFunction) {
+                           final String path,
+                           final FlatMapFunction<String, T> flatMapFunction) {
     GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     spatialDataStream = env
-            .socketTextStream(host, port, delimiter)
-            .map(mapFunction);
+            .readTextFile(path)
+            .flatMap(flatMapFunction);
   }
 
   /**
@@ -152,8 +154,23 @@ public class SpatialDataStream<T extends Geometry> {
   public SpatialDataStream(final StreamExecutionEnvironment env,
                            final String host,
                            final int port,
-                           final MapFunction<String, T> mapFunction) {
-    this(env, host, port, "\n", mapFunction);
+                           final String delimiter,
+                           final FlatMapFunction<String, T> flatMapFunction) {
+    GlinkSerializerRegister.registerSerializer(env);
+    this.env = env;
+    spatialDataStream = env
+            .socketTextStream(host, port, delimiter)
+            .flatMap(flatMapFunction);
+  }
+
+  /**
+   * Init a {@link SpatialDataStream} from socket.
+   * */
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final String host,
+                           final int port,
+                           final FlatMapFunction<String, T> flatMapFunction) {
+    this(env, host, port, "\n", flatMapFunction);
   }
 
   public SpatialDataStream<T> assignTimestampsAndWatermarks(WatermarkStrategy<T> watermarkStrategy) {
@@ -169,6 +186,11 @@ public class SpatialDataStream<T extends Geometry> {
                       Tuple t = (Tuple) event.getUserData();
                       return t.getField(field);
                     }));
+    return this;
+  }
+
+  public SpatialDataStream<T> assignGrids(GridIndex gridIndex) {
+    this.gridIndex = gridIndex;
     return this;
   }
 
@@ -204,20 +226,21 @@ public class SpatialDataStream<T extends Geometry> {
   /**
    * Spatial dimension join with a broadcast stream.
    * @param joinStream another {@link SpatialDataStream} to join with, will be treated as broadcast stream
-   * @param broadcastJoinFunction function to perform broadcast join
    * @param returnType the return type of join
    * */
   public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin(
-          SpatialDataStream<T2> joinStream,
-          BroadcastJoinFunction<T, T2, OUT> broadcastJoinFunction,
+          BroadcastSpatialDataStream<T2> joinStream,
+          TopologyType joinType,
+          JoinFunction<T, T2, OUT> joinFunction,
           TypeHint<OUT> returnType) {
     DataStream<T> dataStream1 = spatialDataStream;
-    DataStream<T2> dataStream2 = joinStream.spatialDataStream;
+    DataStream<Tuple2<Boolean, T2>> dataStream2 = joinStream.getDataStream();
     final MapStateDescriptor<Integer, TreeIndex<T2>> broadcastDesc = new MapStateDescriptor<>(
             "broadcast-state-for-dim-join",
             TypeInformation.of(Integer.class),
             TypeInformation.of(new TypeHint<TreeIndex<T2>>() { }));
-    BroadcastStream<T2> broadcastStream = dataStream2.broadcast(broadcastDesc);
+    BroadcastStream<Tuple2<Boolean, T2>> broadcastStream = dataStream2.broadcast(broadcastDesc);
+    BroadcastJoinFunction<T, T2, OUT> broadcastJoinFunction = new BroadcastJoinFunction<>(joinType, joinFunction);
     broadcastJoinFunction.setBroadcastDesc(broadcastDesc);
     return dataStream1
             .connect(broadcastStream)
@@ -232,7 +255,7 @@ public class SpatialDataStream<T extends Geometry> {
           JoinFunction<T, T2, Object> joinFunction,
           double... distance) {
     // create grid index
-    final GridIndex gridIndex = new UGridIndex(17);
+    final GridIndex gridIndex = new GeographicalGridIndex(17);
     DataStream<T> dataStream1 = spatialDataStream;
     DataStream<T2> dataStream2 = joinStream.spatialDataStream;
 
@@ -282,15 +305,21 @@ public class SpatialDataStream<T extends Geometry> {
             });
   }
 
-  public <T2 extends Geometry, W extends Window> DataStream<Object> spatialIntervalJoin(
+  /**
+   * Spatial interval join for two streams. Currently only support:
+   * point stream with point stream,
+   * point stream with any kind of geometry stream,
+   * any kind of geometry stream with point stream.
+   * */
+  public <T2 extends Geometry, OUT> DataStream<OUT> spatialIntervalJoin(
           SpatialDataStream<T2> joinStream,
           TopologyType joinType,
           Time lowerBound,
           Time upperBound,
-          JoinFunction<T, T2, Object> joinFunction,
-          double... distance) {
-    if (this.gridDataStream == null || joinStream.gridDataStream == null)
-      throw new RuntimeException("Please assign grid index before executing spatial interval join.");
+          JoinFunction<T, T2, OUT> joinFunction,
+          TypeHint<OUT> returnType) {
+    this.assignGridsInternal(gridIndex);
+    joinStream.assignGridsAndDistribute(gridIndex, joinType);
 
     DataStream<Tuple2<Long, T>> gridDataStream1 = this.gridDataStream;
     DataStream<Tuple2<Long, T2>> gridDataStream2 = joinStream.gridDataStream;
@@ -298,17 +327,18 @@ public class SpatialDataStream<T extends Geometry> {
             .keyBy(t -> t.f0)
             .intervalJoin(gridDataStream2.keyBy(t -> t.f0))
             .between(lowerBound, upperBound)
-            .process(new ProcessJoinFunction<Tuple2<Long, T>, Tuple2<Long, T2>, Object>() {
+            .process(new ProcessJoinFunction<Tuple2<Long, T>, Tuple2<Long, T2>, OUT>() {
 
               @Override
               public void processElement(Tuple2<Long, T> t1,
                                          Tuple2<Long, T2> t2,
-                                         Context context, Collector<Object> collector) throws Exception {
-                if (distanceCalculator.calcDistance(t1.f1, t2.f1) <= distance[0]) {
-                  collector.collect(joinFunction.join(t1.f1, t2.f1));
-                }
+                                         Context context, Collector<OUT> collector) throws Exception {
+                JoinWithTopologyType
+                        .join(t1.f1, t2.f1, joinType, joinFunction, distanceCalculator)
+                        .ifPresent(collector::collect);
               }
-            });
+            })
+            .returns(returnType);
   }
 
   public DataStream<Object> spatialHeatmap() {
@@ -329,49 +359,32 @@ public class SpatialDataStream<T extends Geometry> {
             .print();
   }
 
-  public SpatialDataStream<T> assignGrids(GridIndex gridIndex) {
+  private SpatialDataStream<T> assignGridsInternal(GridIndex gridIndex) {
     gridDataStream = spatialDataStream
-            .flatMap(new RichFlatMapFunction<T, Tuple2<Long, T>>() {
-
-              private GridIndex gridIndex;
-
-              @Override
-              public void open(Configuration parameters) throws Exception {
-                this.gridIndex = new UGridIndex(5);
-              }
-
+            .flatMap(new FlatMapFunction<T, Tuple2<Long, T>>() {
               @Override
               public void flatMap(T geom, Collector<Tuple2<Long, T>> collector) throws Exception {
                 List<Long> indices = gridIndex.getIndex(geom);
-                indices.forEach(index -> {
-                  System.out.println("in 1: " + new Tuple2<>(index, geom));
-                  collector.collect(new Tuple2<>(index, geom));
-                });
+                indices.forEach(index -> collector.collect(new Tuple2<>(index, geom)));
               }
             });
     return this;
   }
 
-  public SpatialDataStream<T> assignGridAndDistributeByDistance(GridIndex gridIndex, final double distance) {
+  private SpatialDataStream<T> assignGridsAndDistribute(GridIndex gridIndex, TopologyType type) {
     gridDataStream = spatialDataStream
-            .flatMap(new RichFlatMapFunction<T, Tuple2<Long, T>>() {
-
-              private GridIndex gridIndex;
-
-              @Override
-              public void open(Configuration parameters) throws Exception {
-                gridIndex = new UGridIndex(5);
-              }
-
+            .flatMap(new FlatMapFunction<T, Tuple2<Long, T>>() {
               @Override
               public void flatMap(T geom, Collector<Tuple2<Long, T>> collector) throws Exception {
-                System.out.println(geom);
-                Envelope box = distanceCalculator.calcBoxByDist(geom, distance);
-                List<Long> indices = gridIndex.getRangeIndex(box.getMinX(), box.getMinY(), box.getMaxX(), box.getMaxY());
-                indices.forEach(index -> {
-                  System.out.println("in 2: " + new Tuple2<>(index, geom));
-                  collector.collect(new Tuple2<>(index, geom));
-                });
+                List<Long> indices;
+                if (type == TopologyType.WITHIN_DISTANCE) {
+                  Envelope box = distanceCalculator.calcBoxByDist(geom, type.getDistance());
+                  indices = gridIndex.getRangeIndex(box.getMinY(), box.getMinX(), box.getMaxY(), box.getMaxX());
+                } else {
+                  indices = gridIndex.getIndex(geom);
+                }
+                System.out.println("Distribute grids: " + indices.size());
+                indices.forEach(index -> collector.collect(new Tuple2<>(index, geom)));
               }
             });
     return this;

@@ -1,4 +1,4 @@
-package com.github.tm.glink.core.ditance;
+package com.github.tm.glink.core.distance;
 
 import com.github.tm.glink.core.util.GeoUtils;
 import org.locationtech.jts.geom.Envelope;
@@ -11,7 +11,6 @@ public class GeographicalDistanceCalculator implements DistanceCalculator {
 
   @Override
   public double calcDistance(Geometry geom1, Geometry geom2) {
-
     return GeoUtils.calcDistance(geom1, geom2);
   }
 
