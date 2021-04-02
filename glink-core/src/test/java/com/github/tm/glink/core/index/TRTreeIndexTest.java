@@ -51,20 +51,4 @@ public class TRTreeIndexTest {
 
   }
 
-  @Test
-  public void test() {
-    GeometryFactory factory = new GeometryFactory();
-    Point p1 = factory.createPoint(new Coordinate(1, 2));
-    Point p2 = factory.createPoint(new Coordinate(3, 4));
-
-    RTree<org.locationtech.jts.geom.Geometry, Geometry> tree = RTree.create();
-    tree = tree
-            .add(p1, Geometries.point(1, 2))
-            .add(p2, Geometries.point(3, 4));
-    Observable<Entry<org.locationtech.jts.geom.Geometry, Geometry>> entries = tree.search(Geometries.point(5, 5), 10);
-    for (Entry<org.locationtech.jts.geom.Geometry, Geometry> e : entries.toBlocking().toIterable()) {
-      System.out.println(e.value());
-    }
-  }
-
 }
