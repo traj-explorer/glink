@@ -46,9 +46,9 @@ public class TileGridTest {
 
     @Test
   public void test1() {
-    int zoom = 15;
-    double lat = 23.0581857;
-    double lon = 113.3964152;
+      int zoom = 13;
+      double lat = 24;
+      double lon = 116;
 
     double n = Math.pow(2, zoom);
     int  tileX = (int)Math.floor((lon + 180)/360 * n);
@@ -59,9 +59,9 @@ public class TileGridTest {
 
   @Test
   public void latLng2Pixel() {
-    int zoom = 3;
-    double lat = 79;
-    double lon = 90.1;
+    int zoom = 13;
+    double lat = 136.0546875;
+    double lon = 79.36770077764092;
 
     double n = Math.pow(2, zoom);
     double pixelX = ((lon + 180) / 360) * n * 256 % 256;
@@ -69,18 +69,16 @@ public class TileGridTest {
     System.out.println((int) pixelX);
     System.out.println((int) pixelY);
   }
-
   @Test
-  public void initTileGrids() {
-    int hlevel = 15;
-    int llevel = 10;
-    int length = hlevel-llevel+1;
-    TileGrid[] tileGrids = new TileGrid[length];
-    int i = length;
-    int j = hlevel;
-    while (i > 0) {
-      tileGrids[i-1] = new TileGrid(j);
-      i--; j--;
-    }
+  public void TilePixelToLatLng () {
+    int zoom = 13;
+    int tileX = 6735;
+    int tileY = 3535;
+    int pixelX = 0;
+    int pixelY = 1;
+    double lng = (tileX + pixelX/256)/Math.pow(2,zoom) * 360 - 180;
+    double lat = Math.atan(Math.sinh(Math.PI - 2 * Math.PI * (tileY + pixelY/256.0) / Math.pow(2, zoom))) * 180 / Math.PI;
+    System.out.println(lng);
+    System.out.println(lat);
   }
 }

@@ -4,15 +4,13 @@ import com.github.tm.glink.core.tile.*;
 import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.MapStateDescriptor;
-import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.streaming.api.datastream.BroadcastStream;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -36,54 +34,56 @@ public class HeatMap {
      * 3. 分配窗口 —— 根据每张热力图涉及的时间段长度设置WindowAssigner
      * 4. 进行聚合，聚合结果为TileResult。
      * @param geoDataStream 输入
-     * @param h_level 所需要热力图的最深层级
-     * @param l_level  所需要热力图的最浅层级, 默认为0级
+     * @param h_Level 所需要热力图的最深层级
+     * @param l_Level  所需要热力图的最浅层级, 默认为0级
      * @return Tuple4中各项含义以此为：TileId-time(主键,string), tile-id(tile编号,long)
      * ,end_time(时间窗口的结束时间戳,Timestamp),tile_result(Tile内的具体数据,String)
      */
     public static DataStream<Tuple4<String, Long, Timestamp, String>> GetHeatMap(
             DataStream<TrajectoryPoint> geoDataStream,
-            int h_level,
-            int l_level,
-            Time time_len,
-            BroadcastStream<TileGrid[]> broadcastStream) {
+            int h_Level,
+            int l_Level,
+            Time time_Len) {
         // init TileGrids of all levels;
-        if (l_level < 0) {
-            l_level = 0;
+        if (l_Level < 0) {
+            l_Level = 0;
         }
-        if (h_level > 18) {
-            h_level = 18;
+        if (h_Level > 18) {
+            h_Level = 18;
         }
-        int finalH_level = h_level;
-        int finalL_level = l_level;
-        int length = finalH_level-finalL_level+1;
+        int finalH_Level = h_Level;
+        int finalL_Level = l_Level;
+        int length = finalH_Level-finalL_Level+1;
 
 
         // Get a data stream mixed by pixels in different levels.
-        DataStream<Tuple2<PixelResult<Integer>, TrajectoryPoint>> pixelResultDataStream = geoDataStream
-                .connect(broadcastStream)
-                .process(new BroadcastProcessFunction<TrajectoryPoint, TileGrid[], Tuple2<PixelResult<Integer>, TrajectoryPoint>>() {
-                    private final MapStateDescriptor<String,TileGrid[]> tileGridsDescriptor = new MapStateDescriptor<String ,TileGrid[]>("TileGridsDescriptor",BasicTypeInfo.STRING_TYPE_INFO,TypeInformation.of(TileGrid[].class));
+        DataStream<Tuple2<PixelResult<Integer>, TrajectoryPoint>> pixelResultDataStream =
+                geoDataStream.flatMap(new RichFlatMapFunction<TrajectoryPoint, Tuple2<PixelResult<Integer>, TrajectoryPoint>>() {
+            private transient TileGrid[] tileGrids;
+            @Override
+            public void open(Configuration conf) {
+                int length = finalH_Level-finalL_Level+1;
+                tileGrids = new TileGrid[length];
+                int i = length;
+                int j = finalH_Level;
+                while (i > 0) {
+                    tileGrids[i-1] = new TileGrid(j);
+                    i--;
+                    j--;
+                }
+            }
+            @Override
+            public void flatMap(TrajectoryPoint value, Collector<Tuple2<PixelResult<Integer>, TrajectoryPoint>> out) throws Exception {
+                int i = length;
+                while (i > 0) {
+                    out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getLat(), value.getLng()), 1), value));
+                    i = i - 1;
+                }
+            }
+        });
 
-                    @Override
-                    public void processElement(TrajectoryPoint value, ReadOnlyContext ctx, Collector<Tuple2<PixelResult<Integer>, TrajectoryPoint>> out) throws Exception {
-                        final ReadOnlyBroadcastState<String, TileGrid[]> tileGridsMap = ctx.getBroadcastState(tileGridsDescriptor);
-                        if (tileGridsMap.contains("TileGrids")) {
-                            TileGrid[] tileGrids = tileGridsMap.get("TileGrids");
-                            int i = length;
-                            while (i>0) {
-                                out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i-1].getPixel(value.getLat(), value.getLng()), 1), value));
-                                i = i-1;
-                            }
-                        }
-                    }
-                    @Override
-                    public void processBroadcastElement(TileGrid[] value, Context ctx, Collector<Tuple2<PixelResult<Integer>, TrajectoryPoint>> out) throws Exception {
-                        ctx.getBroadcastState(tileGridsDescriptor).put("TileGrids",value);
-                    }
-                });
         return  pixelResultDataStream.keyBy(r -> r.f0.getPixel().getTile())
-                .window(TumblingEventTimeWindows.of(time_len))
+                .window(TumblingEventTimeWindows.of(time_Len))
                 .aggregate(new CountAggregator(), new AddTimeInfoProcess())
                 .map(new MapFunction<Tuple2<TileResult<Integer>, Timestamp>, Tuple4<String, Long, Timestamp, String>>() {
                     @Override
@@ -94,46 +94,54 @@ public class HeatMap {
     }
 
 
-    private static class CountAggregator
-            implements AggregateFunction<Tuple2<PixelResult<Integer>, TrajectoryPoint>, Map<Pixel, Integer>, TileResult<Integer>>{
+    private static class CountAggregator implements AggregateFunction<Tuple2<PixelResult<Integer>, TrajectoryPoint>, Map<Pixel, Tuple2<Integer, HashSet<String>>>, TileResult<Integer>> {
 
-        private HashMap<Pixel, HashSet<String>> pixel2CarNos = new HashMap<>();
         @Override
-        public Map<Pixel, Integer> createAccumulator() {
+        public Map<Pixel, Tuple2<Integer, HashSet<String>>> createAccumulator() {
             return new HashMap<>();
         }
 
         @Override
-        public Map<Pixel, Integer> add(Tuple2<PixelResult<Integer>, TrajectoryPoint> TrajectoryPointPixelResult, Map<Pixel, Integer> pixelIntegerMap) {
-            Pixel pixel = TrajectoryPointPixelResult.f0.getPixel();
-            String carNo = TrajectoryPointPixelResult.f1.getId();
-            if(pixelIntegerMap.containsKey(pixel) && !pixel2CarNos.get(pixel).contains(carNo)) {
-                pixel2CarNos.get(pixel).add(carNo);
-                Integer new_val =  pixelIntegerMap.get(pixel) + 1;
-                pixelIntegerMap.put(pixel, new_val);
-            }
-            else {
-                pixelIntegerMap.put(pixel, 1);
-                pixel2CarNos.put(pixel, new HashSet<>());
-                pixel2CarNos.get(pixel).add(carNo);
+        public Map<Pixel, Tuple2<Integer, HashSet<String>>> add(Tuple2<PixelResult<Integer>, TrajectoryPoint> inPiexl, Map<Pixel, Tuple2<Integer, HashSet<String>>> pixelIntegerMap) {
+            Pixel pixel = inPiexl.f0.getPixel();
+            String carNo = inPiexl.f1.getId();
+
+            try {
+                if (!pixelIntegerMap.containsKey(pixel)) {
+                    HashSet<String> carNos = new HashSet<>();
+                    carNos.add(carNo);
+                    pixelIntegerMap.put(pixel, new Tuple2<>(1,carNos));
+                } // 该像素第一次出现，进行像素中信息的初始化
+                else if(!pixelIntegerMap.get(pixel).f1.contains(carNo)) {
+                        pixelIntegerMap.get(pixel).f1.add(carNo);
+                        pixelIntegerMap.get(pixel).f0 = pixelIntegerMap.get(pixel).f0  + 1;
+                } // 该像素已经出现过，但是车辆尚未在其中出现过。
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             return pixelIntegerMap;
         }
 
         @Override
-        public TileResult<Integer> getResult(Map<Pixel, Integer> pixelIntegerMap) {
+        public TileResult<Integer> getResult(Map<Pixel, Tuple2<Integer, HashSet<String>>> pixelIntegerMap) {
             TileResult<Integer> ret = new TileResult<>();
             ret.setTile(pixelIntegerMap.keySet().iterator().next().getTile());
-            for (Map.Entry<Pixel,Integer> entry : pixelIntegerMap.entrySet()) {
-                ret.addPixelResult(new PixelResult<>(entry.getKey(), entry.getValue()));
+            for (Map.Entry<Pixel,Tuple2<Integer, HashSet<String>>> entry : pixelIntegerMap.entrySet()) {
+                ret.addPixelResult(new PixelResult<>(entry.getKey(), entry.getValue().f0));
             }
             return ret;
         }
 
         @Override
-        public Map<Pixel, Integer> merge(Map<Pixel, Integer> acc0, Map<Pixel, Integer> acc1) {
-            acc1.forEach((key, value)->acc1.merge(key, value, Integer::sum));
+        public Map<Pixel, Tuple2<Integer, HashSet<String>>> merge(Map<Pixel, Tuple2<Integer, HashSet<String>>> acc0, Map<Pixel, Tuple2<Integer, HashSet<String>>> acc1) {
+            Map<Pixel, Tuple2<Integer, HashSet<String>>> acc2 = new HashMap<>(acc0);
+            acc1.forEach((key, value) -> acc2.merge(key, value, (v1,v2) -> new Tuple2<>(v1.f0+v1.f0, combineSets(v1.f1,v2.f1))));
             return acc1;
+        }
+
+        private HashSet<String> combineSets (HashSet<String> v1, HashSet<String> v2) {
+            v1.addAll(v2);
+            return v1;
         }
     }
 
