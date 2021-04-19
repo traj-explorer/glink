@@ -1,7 +1,8 @@
 package com.github.tm.glink.core.tile;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -52,5 +53,32 @@ public class TileResult<V> {
     data.setLength(data.length() - 1);
     return String.format("{\"zoom_level\": %d, \"x\": %d, \"y\": %d, \"data\": {%s}}",
             tile.getLevel(), getTile().getX(), getTile().getY(), data);
+  }
+
+  public byte[] toBytes() throws IOException {
+    return new AvroTileResult<V>(this).serialize();
+  }
+
+  public boolean equals(TileResult compare) {
+    boolean a = compare.tile.toLong() == this.tile.toLong();
+    boolean b = true;
+    Iterator list1 = this.getGridResult().iterator();
+    Iterator list2 = compare.getGridResult().iterator();
+    while (list1.hasNext()) {
+      if (!list2.hasNext()){
+        b = false;
+        break;
+      }
+      String val1 = ((PixelResult<V>)list1.next()).getResult().toString();
+      String val2 = ((PixelResult<V>)list2.next()).getResult().toString();
+      if (!val1.equals(val2)) {
+        b = false;
+        break;
+      }
+    }
+    if (list2.hasNext()) {
+      b = false;
+    }
+    return a && b;
   }
 }

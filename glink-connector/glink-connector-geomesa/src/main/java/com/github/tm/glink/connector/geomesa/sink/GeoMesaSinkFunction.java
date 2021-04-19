@@ -4,7 +4,6 @@ import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam
 import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.dropwizard.metrics.DropwizardMeterWrapper;
 import org.apache.flink.metrics.Meter;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
@@ -63,6 +62,7 @@ public class GeoMesaSinkFunction<T>
     if (sft == null) {
       LOG.info("Creating schema: " + DataUtilities.encodeType(tableSft));
       tableSft.getUserData().put("override.reserved.words", true);
+      tableSft.getUserData().put("geomesa.indices.enabled", schema.getIndicesInfo());
       dataStore.createSchema(tableSft);
     } else {
       String providedSchema = DataUtilities.encodeType(tableSft);
@@ -89,12 +89,6 @@ public class GeoMesaSinkFunction<T>
     Long start = System.currentTimeMillis();
     featureWriter.write();
     Long end = System.currentTimeMillis();
-    if (end - start> 0L){
-      System.out.println("Time " + toWrite.getAttribute("windowEndTime")
-              + " ByteLength " + toWrite.getAttribute("tile_result").toString().getBytes().length
-              + " TileId " + toWrite.getAttribute("tile_id")
-              + " InsertCosts " + (end-start) + " ms");
-    };
 
   }
 
@@ -116,6 +110,5 @@ public class GeoMesaSinkFunction<T>
     if (dataStore != null) {
       dataStore.dispose();
     }
-    System.out.println("total tiles " + count);
   }
 }

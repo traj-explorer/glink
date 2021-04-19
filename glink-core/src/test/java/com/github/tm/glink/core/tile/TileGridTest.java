@@ -46,9 +46,10 @@ public class TileGridTest {
 
     @Test
   public void test1() {
-      int zoom = 13;
-      double lat = 24;
-      double lon = 116;
+    int zoom = 13;
+    double lat = 23.966175871265037;
+//      double lat = 24.006326198751132;
+      double lon = 115.9716796875;
 
     double n = Math.pow(2, zoom);
     int  tileX = (int)Math.floor((lon + 180)/360 * n);
@@ -76,7 +77,7 @@ public class TileGridTest {
     int tileY = 3535;
     int pixelX = 0;
     int pixelY = 1;
-    double lng = (tileX + pixelX/256)/Math.pow(2,zoom) * 360 - 180;
+    double lng = (tileX + pixelX/256.0)/Math.pow(2,zoom) * 360 - 180;
     double lat = Math.atan(Math.sinh(Math.PI - 2 * Math.PI * (tileY + pixelY/256.0) / Math.pow(2, zoom))) * 180 / Math.PI;
     System.out.println(lng);
     System.out.println(lat);
