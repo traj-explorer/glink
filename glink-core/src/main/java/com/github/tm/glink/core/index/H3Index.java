@@ -66,6 +66,11 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public List<Long> getContainsIndex(Geometry geom) {
+    return null;
+  }
+
+  @Override
   public void getGeoBoundary(long index) {
     List<GeoCoord> boundary = h3Core.h3ToGeoBoundary(index);
     GeoCoord pre = null;

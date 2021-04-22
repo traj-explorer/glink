@@ -68,6 +68,11 @@ public class GeometricGridIndex extends GridIndex {
   }
 
   @Override
+  public List<Long> getContainsIndex(Geometry geom) {
+    return null;
+  }
+
+  @Override
   public void getGeoBoundary(long index) {
 
   }

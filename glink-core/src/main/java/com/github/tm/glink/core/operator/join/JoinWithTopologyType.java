@@ -7,6 +7,9 @@ import org.locationtech.jts.geom.Geometry;
 
 import java.util.Optional;
 
+/**
+ * @author Yu Liebing
+ * */
 public class JoinWithTopologyType {
 
   public static <IN1 extends Geometry, IN2 extends Geometry, OUT> Optional<OUT> join(

@@ -6,6 +6,7 @@ import com.github.tm.glink.examples.common.SpatialFlatMapFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -48,12 +49,12 @@ public class SpatialWindowJoin {
                             .withTimestampAssigner(
                                     (event, time) -> ((Tuple3<String, Long, String>) event.getUserData()).f1));
 
-    DataStream<Object> dataStream = pointSpatialDataStream1.spatialWindowJoin(
+    DataStream<String> dataStream = pointSpatialDataStream1.spatialWindowJoin(
             pointSpatialDataStream2,
-            TopologyType.WITHIN_DISTANCE,
+            TopologyType.WITHIN_DISTANCE.distance(1),
             TumblingEventTimeWindows.of(Time.seconds(5)),
             (point, point2) -> point + ", " + point2,
-            1);
+            new TypeHint<String>() { });
     dataStream.print();
     pointSpatialDataStream1.print();
 

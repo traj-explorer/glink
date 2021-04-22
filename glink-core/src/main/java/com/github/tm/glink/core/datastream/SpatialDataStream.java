@@ -11,7 +11,6 @@ import com.github.tm.glink.core.index.*;
 import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
 import com.github.tm.glink.core.operator.join.JoinWithTopologyType;
 import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
-import com.github.tm.glink.core.util.GeoUtils;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.common.state.MapStateDescriptor;
@@ -31,7 +30,6 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -83,7 +81,6 @@ public class SpatialDataStream<T extends Geometry> {
                            final boolean carryAttributes,
                            final Class<?>[] types,
                            final String... elements) {
-    GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     this.geometryType = geometryType;
     TextFormatMap<T> textFormatMap = new TextFormatMap<>(
@@ -109,7 +106,6 @@ public class SpatialDataStream<T extends Geometry> {
                            final boolean carryAttributes,
                            final Class<?>[] types,
                            final String csvPath) {
-    GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     this.geometryType = geometryType;
     TextFormatMap<T> textFormatMap = new TextFormatMap<>(
@@ -129,7 +125,6 @@ public class SpatialDataStream<T extends Geometry> {
 
   public SpatialDataStream(final StreamExecutionEnvironment env,
                            final SourceFunction<T> sourceFunction) {
-    GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     spatialDataStream = env
             .addSource(sourceFunction);
@@ -141,7 +136,6 @@ public class SpatialDataStream<T extends Geometry> {
   public SpatialDataStream(final StreamExecutionEnvironment env,
                            final String path,
                            final FlatMapFunction<String, T> flatMapFunction) {
-    GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     spatialDataStream = env
             .readTextFile(path)
@@ -156,7 +150,6 @@ public class SpatialDataStream<T extends Geometry> {
                            final int port,
                            final String delimiter,
                            final FlatMapFunction<String, T> flatMapFunction) {
-    GlinkSerializerRegister.registerSerializer(env);
     this.env = env;
     spatialDataStream = env
             .socketTextStream(host, port, delimiter)
@@ -248,61 +241,43 @@ public class SpatialDataStream<T extends Geometry> {
             .returns(returnType);
   }
 
-  public <T2 extends Geometry, W extends Window> DataStream<Object> spatialWindowJoin(
+  public <T2 extends Geometry, W extends Window, OUT> DataStream<OUT> spatialWindowJoin(
           SpatialDataStream<T2> joinStream,
           TopologyType joinType,
-          WindowAssigner<? super CoGroupedStreams.TaggedUnion<Tuple2<T, Long>, Tuple2<T2, Long>>, W> assigner,
-          JoinFunction<T, T2, Object> joinFunction,
-          double... distance) {
-    // create grid index
-    final GridIndex gridIndex = new GeographicalGridIndex(17);
-    DataStream<T> dataStream1 = spatialDataStream;
-    DataStream<T2> dataStream2 = joinStream.spatialDataStream;
+          WindowAssigner<? super CoGroupedStreams.TaggedUnion<Tuple2<Long, T>, Tuple2<Long, T2>>, W> assigner,
+          JoinFunction<T, T2, OUT> joinFunction,
+          TypeHint<OUT> returnType) {
+    this.assignGridsInternal(gridIndex);
+    joinStream.assignGridsAndDistribute(gridIndex, joinType);
 
-    DataStream<Tuple2<T, Long>> indexedStream1 = dataStream1.flatMap(new FlatMapFunction<T, Tuple2<T, Long>>() {
-      @Override
-      public void flatMap(T geom, Collector<Tuple2<T, Long>> collector) throws Exception {
-        List<Long> indices = gridIndex.getIndex(geom);
-        for (long index : indices) {
-          collector.collect(new Tuple2<>(geom, index));
-        }
-      }
-    });
-
-    DataStream<Tuple2<T2, Long>> indexedStream2 = dataStream2.flatMap(new FlatMapFunction<T2, Tuple2<T2, Long>>() {
-      @Override
-      public void flatMap(T2 geom, Collector<Tuple2<T2, Long>> collector) throws Exception {
-        if (joinType == TopologyType.WITHIN_DISTANCE) {
-          Point p = geom.getCentroid();
-          Envelope box = GeoUtils.calcBoxByDist(p, distance[0]);
-          List<Long> indices = gridIndex.getRangeIndex(box.getMinY(), box.getMinX(), box.getMaxY(), box.getMaxX());
-          for (long index : indices) {
-            collector.collect(new Tuple2<>(geom, index));
-          }
-        }
-      }
-    });
+    DataStream<Tuple2<Long, T>> indexedStream1 = this.gridDataStream;
+    DataStream<Tuple2<Long, T2>> indexedStream2 = joinStream.gridDataStream;
 
     return indexedStream1.coGroup(indexedStream2)
-            .where(t -> t.f1).equalTo(t -> t.f1)
+            .where(t -> t.f0).equalTo(t -> t.f0)
             .window(assigner)
-            .apply(new CoGroupFunction<Tuple2<T, Long>, Tuple2<T2, Long>, Object>() {
+            .apply(new CoGroupFunction<Tuple2<Long, T>, Tuple2<Long, T2>, Object>() {
               @Override
-              public void coGroup(Iterable<Tuple2<T, Long>> stream1,
-                                  Iterable<Tuple2<T2, Long>> stream2,
+              public void coGroup(Iterable<Tuple2<Long, T>> stream1,
+                                  Iterable<Tuple2<Long, T2>> stream2,
                                   Collector<Object> collector) throws Exception {
                 TreeIndex<T2> treeIndex = new STRTreeIndex<>(2);
-                for (Tuple2<T2, Long> t2 : stream2) {
-                  treeIndex.insert(t2.f0);
-                }
-                for (Tuple2<T, Long> t1 : stream1) {
-                  List<T2> result = treeIndex.query(t1.f0, distance[0]);
+                stream2.forEach(t2 -> treeIndex.insert(t2.f1));
+                for (Tuple2<Long, T> t1 : stream1) {
+                  List<T2> result = treeIndex.query(t1.f1, joinType.getDistance());
                   for (T2 r : result) {
-                    collector.collect(joinFunction.join(t1.f0, r));
+                    collector.collect(joinFunction.join(t1.f1, r));
                   }
                 }
               }
-            });
+            })
+            .map(new MapFunction<Object, OUT>() {
+              @Override
+              public OUT map(Object out) throws Exception {
+                return (OUT) out;
+              }
+            })
+            .returns(returnType);
   }
 
   /**

@@ -132,6 +132,22 @@ public class GeographicalGridIndex extends GridIndex {
   }
 
   @Override
+  public List<Long> getContainsIndex(Geometry geom) {
+    Envelope envelope = geom.getEnvelopeInternal();
+    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
+    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
+    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
+    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
+    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
+    for (long x = minX; x <= maxX; ++x) {
+      for (long y = minY; y <= maxY; ++y) {
+        long index = combineXY(x, y);
+      }
+    }
+    return indexes;
+  }
+
+  @Override
   public void getGeoBoundary(long index) {
 
   }
