@@ -27,7 +27,7 @@ import static org.apache.flink.table.api.Expressions.call;
  * @date 2021/3/11 - 9:10 下午
  */
 public class XiamenGeoFenceJoin {
-    public static final String ZK_QUORUM= "localhost:2181";
+    public static final String ZK_QUORUM = "localhost:2181";
     public static final String CATALOG_NAME = "Xiamen";
     public static final String POINTS_SCHEMA_NAME = "TrajectoryPoints";
     public static final String FILEPATH = "/Users/haocheng/Code/glink/glink-examples/src/main/resources/XiamenTrajDataCleaned.csv";
@@ -51,25 +51,25 @@ public class XiamenGeoFenceJoin {
         registRelatedTables(tEnv);
 
         SpatialDataStream<Point> trajDataStream = new SpatialDataStream<Point>(
-                env, new CSVStringSourceSimulation(FILEPATH,SPEED_UP, TIMEFIELDINDEX, SPLITTER, true),
+                env, new CSVStringSourceSimulation(FILEPATH, SPEED_UP, TIMEFIELDINDEX, SPLITTER, true),
                 4, 5, TextFileSplitter.CSV, GeometryType.POINT, true,
-                Schema.types(Integer.class, Double.class,Integer.class,Long.class,String.class,String.class))
+                Schema.types(Integer.class, Double.class, Integer.class, Long.class, String.class, String.class))
                 .assignTimestampsAndWatermarks((WatermarkStrategy.<Point>forBoundedOutOfOrderness(Duration.ofSeconds(3))
-                .withTimestampAssigner((event,timestamp)->((Tuple)event.getUserData()).getField(TIMEFIELDINDEX))));
+                .withTimestampAssigner((event, timestamp) -> ((Tuple) event.getUserData()).getField(TIMEFIELDINDEX))));
         Table rawDataTable = Adapter.toTable(tEnv, trajDataStream,
-                Schema.names(true,"point","status","speed","azimuth","rawtime","tid","pid"),
-                Schema.types(Point.class, Integer.class, Double.class,Integer.class,Long.class,String.class,String.class));
+                Schema.names(true, "point", "status", "speed", "azimuth", "rawtime", "tid", "pid"),
+                Schema.types(Point.class, Integer.class, Double.class, Integer.class, Long.class, String.class, String.class));
         // 设置处理时间
-        TemporalTableFunction function = rawDataTable.createTemporalTableFunction($("rawtime"),$("pid"));
+        TemporalTableFunction function = rawDataTable.createTemporalTableFunction($("rawtime"), $("pid"));
 
         // 点-面Join
-        Table res = tEnv.sqlQuery("SELECT * " +
-                "FROM "+ rawDataTable + " AS A " +
-                "LEFT JOIN GeoFence FOR SYSTEM_TIME AS OF A.pt  AS B " +
-                "ON ST_AsText(A.point) = B.geom");
-        tEnv.executeSql("INSERT INTO PointAfterJoin " +
-                "SELECT ST_AsText(point), status, speed, azimuth, ParseTimestamp(rawtime), tid, pid, pt, id " +
-                "FROM " + res);
+        Table res = tEnv.sqlQuery("SELECT * "
+                + "FROM " + rawDataTable + " AS A "
+                + "LEFT JOIN GeoFence FOR SYSTEM_TIME AS OF A.pt  AS B "
+                + "ON ST_AsText(A.point) = B.geom");
+        tEnv.executeSql("INSERT INTO PointAfterJoin "
+                + "SELECT ST_AsText(point), status, speed, azimuth, ParseTimestamp(rawtime), tid, pid, pt, id "
+                + "FROM " + res);
 
         env.execute();
     }
@@ -82,43 +82,43 @@ public class XiamenGeoFenceJoin {
     private static void registRelatedTables(StreamTableEnvironment tEnv) {
 
         tEnv.executeSql(
-                "CREATE TABLE GeoFence (\n" +
-                        "id STRING,\n" +
-                        "dtg TIMESTAMP(0),\n" +
-                        "geom STRING,\n" +
-                        "name STRING,\n" +
-                        "PRIMARY KEY (id) NOT ENFORCED)\n" +
-                        "WITH (\n" +
-                        "  'connector' = 'geomesa',\n" +
-                        "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = '" + XiamenGeoFenceInport.GEOFENCE_SCHEMA_NAME + "',\n" +
-                        "  'geomesa.spatial.fields' = 'geom:Polygon',\n" +
-                        "  'geomesa.temporal.join.predict' = 'I',\n" +
-                        "  'hbase.zookeepers' = '" + ZK_QUORUM + "',\n" +
-                        "  'hbase.catalog' = '" + CATALOG_NAME + "'\n" +
-                        ")");
+                "CREATE TABLE GeoFence (\n"
+                        + "id STRING,\n"
+                        + "dtg TIMESTAMP(0),\n"
+                        + "geom STRING,\n"
+                        + "name STRING,\n"
+                        + "PRIMARY KEY (id) NOT ENFORCED)\n"
+                        + "WITH (\n"
+                        + "  'connector' = 'geomesa',\n"
+                        + "  'geomesa.data.store' = 'hbase',\n"
+                        + "  'geomesa.schema.name' = '" + XiamenGeoFenceInport.GEOFENCE_SCHEMA_NAME + "',\n"
+                        + "  'geomesa.spatial.fields' = 'geom:Polygon',\n"
+                        + "  'geomesa.temporal.join.predict' = 'I',\n"
+                        + "  'hbase.zookeepers' = '" + ZK_QUORUM + "',\n"
+                        + "  'hbase.catalog' = '" + CATALOG_NAME + "'\n"
+                        + ")");
 
 
         tEnv.executeSql(
-                "CREATE TABLE PointAfterJoin" +
-                        " (\n" +
-                        "point2 STRING,\n" +
-                        "status INTEGER,\n" +
-                        "speed DOUBLE,\n" +
-                        "azimuth INTEGER,\n" +
-                        "ts TIMESTAMP(0),\n" +
-                        " tid STRING,\n" +
-                        " pid STRING,\n" +
-                        " pt TIMESTAMP(0),\n" +
-                        " fid  String,\n" +
-                        " PRIMARY KEY (pid) NOT ENFORCED)\n" +
-                        "WITH (\n" +
-                        "  'connector' = 'geomesa',\n" +
-                        "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = '" + POINTS_SCHEMA_NAME + "',\n" +
-                        "  'geomesa.spatial.fields' = 'point2:Point',\n" +
-                        "  'hbase.zookeepers' = '"+ ZK_QUORUM +"',\n" +
-                        "  'hbase.catalog' = '"+ CATALOG_NAME + "'\n" +
-                        ")");
+                "CREATE TABLE PointAfterJoin"
+                        + " (\n"
+                        + "point2 STRING,\n"
+                        + "status INTEGER,\n"
+                        + "speed DOUBLE,\n"
+                        + "azimuth INTEGER,\n"
+                        + "ts TIMESTAMP(0),\n"
+                        + " tid STRING,\n"
+                        + " pid STRING,\n"
+                        + " pt TIMESTAMP(0),\n"
+                        + " fid  String,\n"
+                        + " PRIMARY KEY (pid) NOT ENFORCED)\n"
+                        + "WITH (\n"
+                        + "  'connector' = 'geomesa',\n"
+                        + "  'geomesa.data.store' = 'hbase',\n"
+                        + "  'geomesa.schema.name' = '" + POINTS_SCHEMA_NAME + "',\n"
+                        + "  'geomesa.spatial.fields' = 'point2:Point',\n"
+                        + "  'hbase.zookeepers' = '" + ZK_QUORUM + "',\n"
+                        + "  'hbase.catalog' = '" + CATALOG_NAME + "'\n"
+                        + ")");
     }
 }

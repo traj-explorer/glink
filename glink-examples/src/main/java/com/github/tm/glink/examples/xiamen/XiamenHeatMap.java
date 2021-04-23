@@ -50,7 +50,7 @@ public class XiamenHeatMap {
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<TrajectoryPoint>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner((event, timestamp) -> event.getTimestamp())).setParallelism(1).rebalance();
-        HeatMap.GetHeatMap(env, CATALOG_NAME, SCHEMA_NAME, ZOOKEEPERS,trajDataStream, H_LEVEL, L_LEVEL, windowLength, new CountAggregator(), new AddTimeInfoProcess());
+        HeatMap.GetHeatMap(env, CATALOG_NAME, SCHEMA_NAME, ZOOKEEPERS, trajDataStream, H_LEVEL, L_LEVEL, windowLength, new CountAggregator(), new AddTimeInfoProcess());
     }
 
     private static class CountAggregator implements AggregateFunction<Tuple2<PixelResult<Integer>, TrajectoryPoint>, Map<Pixel, Tuple2<Integer, HashSet<String>>>, TileResult<Integer>> {
@@ -69,9 +69,8 @@ public class XiamenHeatMap {
                 if (!pixelIntegerMap.containsKey(pixel)) {
                     HashSet<String> carNos = new HashSet<>();
                     carNos.add(carNo);
-                    pixelIntegerMap.put(pixel, new Tuple2<>(1,carNos));
-                } // 该像素第一次出现，进行像素中信息的初始化
-                else if(!pixelIntegerMap.get(pixel).f1.contains(carNo)) {
+                    pixelIntegerMap.put(pixel, new Tuple2<>(1, carNos));
+                } else if (!pixelIntegerMap.get(pixel).f1.contains(carNo)) {
                     pixelIntegerMap.get(pixel).f1.add(carNo);
                     pixelIntegerMap.get(pixel).f0 = pixelIntegerMap.get(pixel).f0  + 1;
                 } // 该像素已经出现过，但是车辆尚未在其中出现过。
@@ -85,7 +84,7 @@ public class XiamenHeatMap {
         public TileResult<Integer> getResult(Map<Pixel, Tuple2<Integer, HashSet<String>>> pixelIntegerMap) {
             TileResult<Integer> ret = new TileResult<>();
             ret.setTile(pixelIntegerMap.keySet().iterator().next().getTile());
-            for (Map.Entry<Pixel,Tuple2<Integer, HashSet<String>>> entry : pixelIntegerMap.entrySet()) {
+            for (Map.Entry<Pixel, Tuple2<Integer, HashSet<String>>> entry : pixelIntegerMap.entrySet()) {
                 ret.addPixelResult(new PixelResult<>(entry.getKey(), entry.getValue().f0));
             }
             return ret;
@@ -94,11 +93,11 @@ public class XiamenHeatMap {
         @Override
         public Map<Pixel, Tuple2<Integer, HashSet<String>>> merge(Map<Pixel, Tuple2<Integer, HashSet<String>>> acc0, Map<Pixel, Tuple2<Integer, HashSet<String>>> acc1) {
             Map<Pixel, Tuple2<Integer, HashSet<String>>> acc2 = new HashMap<>(acc0);
-            acc1.forEach((key, value) -> acc2.merge(key, value, (v1,v2) -> new Tuple2<>(v1.f0+v1.f0, combineSets(v1.f1,v2.f1))));
+            acc1.forEach((key, value) -> acc2.merge(key, value, (v1, v2) -> new Tuple2<>(v1.f0 + v1.f0, combineSets(v1.f1, v2.f1))));
             return acc1;
         }
 
-        private HashSet<String> combineSets (HashSet<String> v1, HashSet<String> v2) {
+        private HashSet<String> combineSets(HashSet<String> v1, HashSet<String> v2) {
             v1.addAll(v2);
             return v1;
         }

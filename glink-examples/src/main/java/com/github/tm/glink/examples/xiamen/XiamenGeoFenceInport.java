@@ -34,7 +34,7 @@ public class XiamenGeoFenceInport {
                         "name STRING)\n" +
                         "WITH (\n" +
                         "  'connector' = 'filesystem',\n" +
-                        "  'path' = '" +FILEPATH + "',\n" +
+                        "  'path' = '" + FILEPATH + "',\n" +
                         "  'format' = 'csv',\n" +
                         "  'csv.field-delimiter' = ';'\n" +
                         ")");
