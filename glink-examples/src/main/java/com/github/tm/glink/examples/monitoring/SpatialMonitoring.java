@@ -1,11 +1,12 @@
 package com.github.tm.glink.examples.monitoring;
 
+import com.github.tm.glink.core.datastream.BroadcastSpatialDataStream;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
-import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
-import com.github.tm.glink.examples.common.SpatialMapFunction;
+import com.github.tm.glink.examples.common.BroadcastFlatMapFunction;
+import com.github.tm.glink.examples.common.SpatialFlatMapFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -29,15 +30,17 @@ public class SpatialMonitoring {
 
     // map function to parse the socket text
     // text format: id,wkt,time
-    MapFunction<String, Geometry> mapFunction = new SpatialMapFunction();
+    FlatMapFunction<String, Geometry> flatMapFunction = new SpatialFlatMapFunction();
+    FlatMapFunction<String, Tuple2<Boolean, Geometry>> broadcastFlatMapFunction = new BroadcastFlatMapFunction();
 
-    SpatialDataStream<Geometry> spatialDataStream1 = new SpatialDataStream<>(env, "localhost", 9000, mapFunction);
-    SpatialDataStream<Geometry> spatialDataStream2 = new SpatialDataStream<>(env, "localhost", 9001, mapFunction);
+    SpatialDataStream<Geometry> spatialDataStream1 = new SpatialDataStream<>(env, "localhost", 8888, flatMapFunction);
+    BroadcastSpatialDataStream<Geometry> spatialDataStream2 = new BroadcastSpatialDataStream<>(env, "localhost", 9999, broadcastFlatMapFunction);
 
     // 1. do join
     DataStream<Tuple2<Geometry, Geometry>> joinedStream = spatialDataStream1.spatialDimensionJoin(
             spatialDataStream2,
-            new BroadcastJoinFunction<>(TopologyType.WITHIN_DISTANCE, Tuple2::new, 1),
+            TopologyType.WITHIN_DISTANCE.distance(1),
+            Tuple2::new,
             new TypeHint<Tuple2<Geometry, Geometry>>() {
             });
     // 2. do monitoring

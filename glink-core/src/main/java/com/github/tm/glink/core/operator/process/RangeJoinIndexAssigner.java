@@ -2,7 +2,7 @@ package com.github.tm.glink.core.operator.process;
 
 import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.index.GridIndex;
-import com.github.tm.glink.core.index.UGridIndex;
+import com.github.tm.glink.core.index.GeographicalGridIndex;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Assign one or more indexes for points. When the point locates near the edges of grid it located at, it will also be
- * assigned with a index of the neighbor grid. As for exact data broadcast mechanism, see {@link UGridIndex}.
+ * assigned with a index of the neighbor grid. As for exact data broadcast mechanism, see {@link GeographicalGridIndex}.
  * @author Yu Liebing
  */
 public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Boolean, Long, Point>> {
@@ -23,7 +23,7 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Bo
   private transient GridIndex gridIndex;
 
   /**
-   * Init a pair range join index assigner based on {@link UGridIndex}
+   * Init a pair range join index assigner based on {@link GeographicalGridIndex}
    * @param distance The distance(meters) from 2 points to be regarded as a pair.
    * @param gridWidth The original width of grids.
    * @param fullMode 暂时没用.
@@ -36,7 +36,7 @@ public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Bo
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    gridIndex = new UGridIndex(gridWidth);
+    gridIndex = new GeographicalGridIndex(gridWidth);
   }
 
   /**

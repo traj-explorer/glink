@@ -41,6 +41,8 @@ public abstract class GridIndex implements Serializable {
    */
   public abstract List<Long> getIntersectIndex(Geometry geoObject);
 
+  public abstract List<Long> getContainsIndex(Geometry geom);
+
   /**
    * Get the boundary of the area indicated by the input index.
    * @param index The boundary.

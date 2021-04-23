@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author Yu Liebing
  */
-public class UGridIndex extends GridIndex {
+public class GeographicalGridIndex extends GridIndex {
 
   private static final int MAX_BITS = 30;
 
@@ -22,15 +22,16 @@ public class UGridIndex extends GridIndex {
   private double lngWidth;
   private double gridWidth;
 
-  public UGridIndex(int res) {
+  public GeographicalGridIndex(int res) {
     if (res < 0 || res > MAX_BITS)
-      throw new IllegalArgumentException("Resolution of UGridIndex must between [0, 30]");
+      throw new IllegalArgumentException("Resolution of GridIndex must between [0, 30]");
     this.res = res;
-    this.latWidth = 180.d / Math.pow(2, res);
-    this.lngWidth = 360.d / Math.pow(2, res);
+    double splits = Math.pow(2, res);
+    this.latWidth = 180.d / splits;
+    this.lngWidth = 360.d / splits;
   }
 
-  public UGridIndex(double gridWidth) {
+  public GeographicalGridIndex(double gridWidth) {
     this.gridWidth = gridWidth;
   }
 
@@ -125,6 +126,22 @@ public class UGridIndex extends GridIndex {
     for (long x = minX; x <= maxX; ++x) {
       for (long y = minY; y <= maxY; ++y) {
         indexes.add(combineXY(x, y));
+      }
+    }
+    return indexes;
+  }
+
+  @Override
+  public List<Long> getContainsIndex(Geometry geom) {
+    Envelope envelope = geom.getEnvelopeInternal();
+    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
+    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
+    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
+    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
+    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
+    for (long x = minX; x <= maxX; ++x) {
+      for (long y = minY; y <= maxY; ++y) {
+        long index = combineXY(x, y);
       }
     }
     return indexes;

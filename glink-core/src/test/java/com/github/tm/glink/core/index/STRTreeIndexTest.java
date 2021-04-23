@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * @author Yu Liebing
  * */
-public class TRTreeIndexTest {
+public class STRTreeIndexTest {
 
   private final GeometryFactory factory = new GeometryFactory();
   private final WKTReader reader = new WKTReader();
@@ -33,7 +33,7 @@ public class TRTreeIndexTest {
     Point p4 = factory.createPoint(new Coordinate(90, 10));
     p4.setUserData(new Tuple2<>(4, "D"));
     Point p5 = factory.createPoint(new Coordinate(90, 10));
-    p5.setUserData(new Tuple2<>(5, "E"));
+    p5.setUserData(new Tuple2<>(4, "D"));
     points.add(p1);
     points.add(p2);
     points.add(p3);
@@ -107,5 +107,4 @@ public class TRTreeIndexTest {
     List<Polygon> r2 = polygonTreeIndex.query(new Envelope(5, 10, 0, 10));
     assertEquals(2, r2.size());
   }
-
 }

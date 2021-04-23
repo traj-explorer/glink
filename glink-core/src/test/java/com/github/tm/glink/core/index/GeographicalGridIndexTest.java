@@ -6,9 +6,9 @@ import org.locationtech.jts.geom.*;
 
 import java.util.List;
 
-public class UGridIndexTest {
+public class GeographicalGridIndexTest {
 
-  private final UGridIndex gridIndex = new UGridIndex(17);
+  private final GeographicalGridIndex gridIndex = new GeographicalGridIndex(17);
 
   @Test
   public void getIndexTest() {

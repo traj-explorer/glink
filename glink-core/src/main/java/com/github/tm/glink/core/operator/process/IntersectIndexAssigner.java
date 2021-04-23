@@ -1,7 +1,7 @@
 package com.github.tm.glink.core.operator.process;
 
 import com.github.tm.glink.core.index.GridIndex;
-import com.github.tm.glink.core.index.UGridIndex;
+import com.github.tm.glink.core.index.GeographicalGridIndex;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
@@ -24,7 +24,7 @@ public class IntersectIndexAssigner<T extends Geometry> extends RichFlatMapFunct
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    gridIndex = new UGridIndex(gridWidth);
+    gridIndex = new GeographicalGridIndex(gridWidth);
   }
 
   @Override

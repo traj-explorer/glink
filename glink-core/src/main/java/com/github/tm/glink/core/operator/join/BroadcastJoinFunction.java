@@ -1,32 +1,36 @@
 package com.github.tm.glink.core.operator.join;
 
 import com.github.tm.glink.core.enums.TopologyType;
+import com.github.tm.glink.core.geom.MultiPolygonWithIndex;
+import com.github.tm.glink.core.geom.PolygonWithIndex;
 import com.github.tm.glink.core.index.TRTreeIndex;
 import com.github.tm.glink.core.index.TreeIndex;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
 import org.apache.flink.util.Collector;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.List;
 
+/**
+ * @author Yu Liebing
+ * */
 public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
-        extends BroadcastProcessFunction<T, T2, OUT> {
+        extends BroadcastProcessFunction<T, Tuple2<Boolean, T2>, OUT> {
 
-  private TopologyType joinType;
-  private JoinFunction<T, T2, OUT> joinFunction;
-  private double distance;
+  private final TopologyType joinType;
+  private final JoinFunction<T, T2, OUT> joinFunction;
   private MapStateDescriptor<Integer, TreeIndex<T2>> broadcastDesc;
 
-  public BroadcastJoinFunction(TopologyType joinType, JoinFunction<T, T2, OUT> joinFunction, double... distance) {
+  public BroadcastJoinFunction(TopologyType joinType, JoinFunction<T, T2, OUT> joinFunction) {
     this.joinType = joinType;
     this.joinFunction = joinFunction;
-    if (distance.length > 0) {
-      this.distance = distance[0];
-    }
   }
 
   public void setBroadcastDesc(MapStateDescriptor<Integer, TreeIndex<T2>> broadcastDesc) {
@@ -40,7 +44,7 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
 //      System.out.println("stream1: " + t);
       TreeIndex<T2> treeIndex = state.get(0);
       if (joinType == TopologyType.WITHIN_DISTANCE) {
-        List<T2> result = treeIndex.query(t, distance);
+        List<T2> result = treeIndex.query(t, joinType.getDistance());
         for (T2 t2 : result) {
           collector.collect(joinFunction.join(t, t2));
         }
@@ -60,13 +64,23 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
   }
 
   @Override
-  public void processBroadcastElement(T2 t2, Context context, Collector<OUT> collector) throws Exception {
+  public void processBroadcastElement(Tuple2<Boolean, T2> t2, Context context, Collector<OUT> collector) throws Exception {
     BroadcastState<Integer, TreeIndex<T2>> state = context.getBroadcastState(broadcastDesc);
     if (!state.contains(0)) {
       state.put(0, new TRTreeIndex<>());
     }
 //    System.out.println("stream2: " + t2);
     TreeIndex<T2> treeIndex = state.get(0);
-    treeIndex.insert(t2);
+    if (t2.f0) {
+      if (t2.f1 instanceof Polygon) {
+        treeIndex.insert((T2) PolygonWithIndex.fromPolygon((Polygon) t2.f1));
+      } else if (t2.f1 instanceof MultiPolygon) {
+        treeIndex.insert((T2) MultiPolygonWithIndex.fromMultiPolygon((MultiPolygon) t2.f1));
+      } else {
+        treeIndex.insert(t2.f1);
+      }
+    } else {
+      treeIndex.remove(t2.f1);
+    }
   }
 }
