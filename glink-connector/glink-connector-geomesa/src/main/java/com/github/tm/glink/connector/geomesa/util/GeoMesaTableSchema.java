@@ -28,6 +28,7 @@ public final class GeoMesaTableSchema implements Serializable {
   private int primaryKeyIndex;
   private String defaultGeometry;
   private String defaultDate;
+  private String indicesInfo;
   // join parameters, when do temporal table join with geomesa
   private double joinDistance = 0.d;
   private TemporalJoinPredict temporalJoinPredict = DEFAULT_TEMPORAL_JOIN_PREDICT;
@@ -70,6 +71,9 @@ public final class GeoMesaTableSchema implements Serializable {
         case STRING:
           builder.addString(ft.f0);
           break;
+        case BYTES:
+          builder.addBytes(ft.f0);
+          break;
         case BOOLEAN:
           builder.addBoolean(ft.f0);
           break;
@@ -108,6 +112,8 @@ public final class GeoMesaTableSchema implements Serializable {
     return sft;
   }
 
+  public String getIndicesInfo () { return indicesInfo;}
+
   public GeoMesaFieldEncoder getFieldEncoder(int pos) {
     return fieldEncoders.get(pos);
   }
@@ -141,6 +147,8 @@ public final class GeoMesaTableSchema implements Serializable {
     // spatial fields
     Map<String, GeoMesaType> spatialFields = getSpatialFields(
             readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
+    // indices;
+    geomesaTableSchema.indicesInfo = readableConfig.get(GeoMesaConfigOption.GEOMESA_INDICES_ENABLED);
     // all fields and field encoders
     String[] fieldNames = tableSchema.getFieldNames();
     DataType[] fieldTypes = tableSchema.getFieldDataTypes();

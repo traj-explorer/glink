@@ -28,4 +28,13 @@ public class PixelResult<V> {
   public void setResult(V result) {
     this.result = result;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    PixelResult pixelResult = (PixelResult) o;
+    return pixel.equals(pixelResult.pixel) && result.equals(pixelResult.result);
+  }
+
 }
