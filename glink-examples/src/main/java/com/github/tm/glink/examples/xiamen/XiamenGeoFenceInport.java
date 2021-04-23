@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.sql.geomesa;
+package com.github.tm.glink.examples.xiamen;
 
 import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import com.github.tm.glink.sql.GlinkSQLRegister;
@@ -12,23 +12,29 @@ import java.util.Objects;
  * @date 2021/3/11 - 7:38 下午
  */
 public class XiamenGeoFenceInport {
+
+    public static final String ZOOKEEPERS = "localhost:2181";
+    public static final String CATALOG_NAME = "Xiamen";
+    public static final String GEOFENCE_SCHEMA_NAME = "Geofence";
+    public static final String FILEPATH = Objects.requireNonNull(XiamenGeoFenceInport.class.getClassLoader().getResource("XiamenPolygonData.txt")).getPath();
+
     @SuppressWarnings("checkstyle:OperatorWrap")
     public static void main(String[] args) {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        GlinkSerializerRegister.registerSerializer(env);
         final StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
+        GlinkSerializerRegister.registerSerializer(env);
         GlinkSQLRegister.registerUDF(tEnv);
-        String path = Objects.requireNonNull(XiamenGeoFenceInport.class.getClassLoader().getResource("XiamenPolygonData.txt")).getPath();
 
         // create a source table from csv
         tEnv.executeSql(
                 "CREATE TABLE CSV_Area (\n" +
                         "id STRING,\n" +
                         "dtg TIMESTAMP(0),\n" +
-                        "geom STRING)\n" +
+                        "geom STRING,\n" +
+                        "name STRING)\n" +
                         "WITH (\n" +
                         "  'connector' = 'filesystem',\n" +
-                        "  'path' = '" +path + "',\n" +
+                        "  'path' = '" +FILEPATH + "',\n" +
                         "  'format' = 'csv',\n" +
                         "  'csv.field-delimiter' = ';'\n" +
                         ")");
@@ -39,17 +45,18 @@ public class XiamenGeoFenceInport {
                         "id STRING,\n" +
                         "dtg TIMESTAMP(0),\n" +
                         "geom STRING,\n" +
+                        "name STRING,\n" +
 //                        "WATERMARK FOR dtg AS dtg,\n"+
                         "PRIMARY KEY (id) NOT ENFORCED)\n" +
                         "WITH (\n" +
                         "  'connector' = 'geomesa',\n" +
                         "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = 'GeoFence',\n" +
+                        "  'geomesa.schema.name' = '" + GEOFENCE_SCHEMA_NAME +  "',\n" +
                         "  'geomesa.spatial.fields' = 'geom:Polygon',\n" +
-                        "  'hbase.zookeepers' = 'localhost:2181',\n" +
-                        "  'hbase.catalog' = 'Xiamen_GeoFence'\n" +
+                        "  'hbase.zookeepers' = '" + ZOOKEEPERS + "',\n" +
+                        "  'hbase.catalog' = '" + CATALOG_NAME + "'\n" +
                         ")");
         // define a dynamic aggregating query
-        tEnv.executeSql("INSERT INTO XiamenGeoFence SELECT id, dtg, geom FROM CSV_Area");
+        tEnv.executeSql("INSERT INTO XiamenGeoFence SELECT id, dtg, geom,name FROM CSV_Area");
     }
 }

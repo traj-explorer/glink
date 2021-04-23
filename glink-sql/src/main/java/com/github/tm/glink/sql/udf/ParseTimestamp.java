@@ -10,8 +10,7 @@ import java.sql.Timestamp;
  * @date 2021/3/10 - 10:20 下午
  */
 public class ParseTimestamp extends ScalarFunction{
-    public Timestamp eval(String s) {
-        Long l = Long.parseLong(s);
-        return new Timestamp(l);
+    public Timestamp eval(Long s) {
+        return new Timestamp(s);
     }
 }

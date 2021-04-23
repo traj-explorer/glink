@@ -6,6 +6,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -73,9 +76,16 @@ public class Point extends GeoObject implements TemporalObject {
   }
 
   @Override
-  public long setTimestamp(long timestamp) {
-    return this.timestamp;
+  public void setTimestamp(long timestamp) {
+     this.timestamp = timestamp;
   }
+
+  @Override
+  public LocalDateTime getLocalDateTime() {
+    Instant instant = Instant.ofEpochMilli(timestamp);
+    return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+  }
+
   public long getIndex() {
     return index;
   }

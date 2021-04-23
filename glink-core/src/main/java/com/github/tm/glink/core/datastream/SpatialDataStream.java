@@ -132,6 +132,36 @@ public class SpatialDataStream<T extends Geometry> {
   }
 
   /**
+   * 用于从SourceFunction中获取带属性的SpatialDataStream
+   * @param env
+   * @param sourceFunction
+   * @param geometryStartOffset
+   * @param geometryEndOffset
+   * @param splitter
+   * @param geometryType
+   * @param carryAttributes
+   * @param types
+   */
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final SourceFunction<String> sourceFunction,
+                           final int geometryStartOffset,
+                           final int geometryEndOffset,
+                           final TextFileSplitter splitter,
+                           final GeometryType geometryType,
+                           final boolean carryAttributes,
+                           final Class<?>[] types) {
+    GlinkSerializerRegister.registerSerializer(env);
+    this.env = env;
+    this.geometryType = geometryType;
+    TextFormatMap<T> textFormatMap = new TextFormatMap<>(
+            geometryStartOffset, geometryEndOffset, splitter, geometryType, carryAttributes, types);
+    spatialDataStream = env
+            .addSource(sourceFunction)
+            .flatMap(textFormatMap)
+            .returns(geometryType.getTypeInformation());
+        ;
+  }
+  /**
    * Init a {@link SpatialDataStream} from socket.
    * */
   public SpatialDataStream(final StreamExecutionEnvironment env,

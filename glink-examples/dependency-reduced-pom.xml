@@ -44,7 +44,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.github.tm.glink.examples.geomesa.GeoMesaHeatMap.Main</mainClass>
+              <mainClass>com.github.tm.glink.examples.xiamen.XiamenHeatMap.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

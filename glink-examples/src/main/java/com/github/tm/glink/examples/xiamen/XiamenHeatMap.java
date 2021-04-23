@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.geomesa;
+package com.github.tm.glink.examples.xiamen;
 
 import com.github.tm.glink.core.operator.HeatMap;
 import com.github.tm.glink.core.tile.Pixel;
@@ -11,14 +11,11 @@ import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.sql.Timestamp;
@@ -27,7 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class GeoMesaHeatMap {
+public class XiamenHeatMap {
 
     public static final String ZOOKEEPERS = "localhost:2181";
     public static final String CATALOG_NAME = "Xiamen";
@@ -40,9 +37,9 @@ public class GeoMesaHeatMap {
     public static final int PARALLELSIM = 20;
 
     public static void main(String[] args) throws Exception {
-        Time windowLength = Time.minutes(GeoMesaHeatMap.WIN_LEN); // 时间窗口长度
+        Time windowLength = Time.minutes(XiamenHeatMap.WIN_LEN); // 时间窗口长度
         // Drop Heatmap tables in HBase
-        HBaseCatalogCleaner.clean(GeoMesaHeatMap.CATALOG_NAME);
+        new HBaseCatalogCleaner(ZOOKEEPERS).deleteTable(CATALOG_NAME, SCHEMA_NAME);
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().setAutoWatermarkInterval(1000L);
