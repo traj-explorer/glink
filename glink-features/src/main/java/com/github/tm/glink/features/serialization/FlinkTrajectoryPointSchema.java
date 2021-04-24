@@ -12,6 +12,7 @@ import java.io.IOException;
 /**
  * @author Yu Liebing
  * */
+@Deprecated
 public class FlinkTrajectoryPointSchema
         implements SerializationSchema<TrajectoryPoint>, DeserializationSchema<TrajectoryPoint> {
 

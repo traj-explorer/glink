@@ -17,6 +17,7 @@ import java.util.Properties;
  * @author Yu Liebing
  * */
 @SuppressWarnings("checkstyle:VisibilityModifier")
+@Deprecated
 public abstract class AvroGeoObject<T extends GeoObject> implements Serializable {
 
     protected List<String> attributesName = new ArrayList<>();

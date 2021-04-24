@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class GeoUtil {
 
   public static double computeGeoDistance(Coordinate p1, Coordinate p2) {

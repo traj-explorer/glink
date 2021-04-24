@@ -1,5 +1,6 @@
 package com.github.tm.glink.core.index;
 
+import com.github.tm.glink.core.distance.DistanceCalculator;
 import com.github.tm.glink.core.util.GeoUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -45,11 +46,11 @@ public class STRTreeIndex<T extends Geometry> implements TreeIndex<T> {
   }
 
   @Override
-  public List<T> query(Geometry geometry, double distance) {
+  public List<T> query(Geometry geometry, double distance, DistanceCalculator calculator) {
     Point point = geometry instanceof Point ? (Point) geometry : geometry.getCentroid();
-    Envelope envelope = GeoUtils.calcBoxByDist(point, distance);
+    Envelope envelope = calculator.calcBoxByDist(point, distance);
     List<T> result = stRtree.query(envelope);
-    result.removeIf(geom -> GeoUtils.calcDistance(point, geom) > distance);
+    result.removeIf(geom -> calculator.calcDistance(point, geom) > distance);
     return result;
   }
 

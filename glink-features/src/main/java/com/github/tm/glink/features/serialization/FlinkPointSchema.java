@@ -12,6 +12,7 @@ import java.io.IOException;
 /**
  * @author Yu Liebing
  * */
+@Deprecated
 public class FlinkPointSchema implements SerializationSchema<Point>, DeserializationSchema<Point> {
 
   private String attributesSchema;

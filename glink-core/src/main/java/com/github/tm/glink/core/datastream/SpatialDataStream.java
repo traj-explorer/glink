@@ -10,7 +10,6 @@ import com.github.tm.glink.core.format.TextFormatMap;
 import com.github.tm.glink.core.index.*;
 import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
 import com.github.tm.glink.core.operator.join.JoinWithTopologyType;
-import com.github.tm.glink.core.serialize.GlinkSerializerRegister;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.common.state.MapStateDescriptor;
@@ -218,7 +217,9 @@ public class SpatialDataStream<T extends Geometry> {
 
   /**
    * Spatial dimension join with a broadcast stream.
-   * @param joinStream another {@link SpatialDataStream} to join with, will be treated as broadcast stream
+   * @param joinStream a {@link BroadcastSpatialDataStream} to join with
+   * @param joinType join type
+   * @param joinFunction the join function
    * @param returnType the return type of join
    * */
   public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin(
@@ -241,6 +242,9 @@ public class SpatialDataStream<T extends Geometry> {
             .returns(returnType);
   }
 
+  /**
+   * Spatial window join of two {@link SpatialDataStream}
+   * */
   public <T2 extends Geometry, W extends Window, OUT> DataStream<OUT> spatialWindowJoin(
           SpatialDataStream<T2> joinStream,
           TopologyType joinType,
@@ -261,12 +265,23 @@ public class SpatialDataStream<T extends Geometry> {
               public void coGroup(Iterable<Tuple2<Long, T>> stream1,
                                   Iterable<Tuple2<Long, T2>> stream2,
                                   Collector<Object> collector) throws Exception {
-                TreeIndex<T2> treeIndex = new STRTreeIndex<>(2);
+                TreeIndex<T2> treeIndex = new STRTreeIndex<>();
                 stream2.forEach(t2 -> treeIndex.insert(t2.f1));
-                for (Tuple2<Long, T> t1 : stream1) {
-                  List<T2> result = treeIndex.query(t1.f1, joinType.getDistance());
-                  for (T2 r : result) {
-                    collector.collect(joinFunction.join(t1.f1, r));
+                if (joinType == TopologyType.WITHIN_DISTANCE) {
+                  for (Tuple2<Long, T> t1 : stream1) {
+                    List<T2> result = treeIndex.query(t1.f1, joinType.getDistance(), distanceCalculator);
+                    for (T2 r : result) {
+                      collector.collect(joinFunction.join(t1.f1, r));
+                    }
+                  }
+                } else {
+                  for (Tuple2<Long, T> t1 :stream1) {
+                    List<T2> result = treeIndex.query(t1.f1);
+                    for (T2 r : result) {
+                      JoinWithTopologyType
+                              .join(t1.f1, r, joinType, joinFunction, distanceCalculator)
+                              .ifPresent(collector::collect);
+                    }
                   }
                 }
               }
@@ -358,7 +373,7 @@ public class SpatialDataStream<T extends Geometry> {
                 } else {
                   indices = gridIndex.getIndex(geom);
                 }
-                System.out.println("Distribute grids: " + indices.size());
+//                System.out.println("Distribute grids: " + indices.size());
                 indices.forEach(index -> collector.collect(new Tuple2<>(index, geom)));
               }
             });

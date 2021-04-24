@@ -8,6 +8,7 @@ import java.util.Comparator;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class GeoDistanceComparator implements Comparator<Point> {
 
   private Coordinate queryPoint;

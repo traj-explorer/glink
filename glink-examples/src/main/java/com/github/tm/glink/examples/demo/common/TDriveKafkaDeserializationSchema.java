@@ -35,6 +35,8 @@ public class TDriveKafkaDeserializationSchema implements DeserializationSchema<P
       LocalDateTime dateTime = LocalDateTime.parse(list[1], dateTimeFormatter);
       double lng = Double.parseDouble(list[2]);
       double lat = Double.parseDouble(list[3]);
+      if (lng < -180 || lng > 180) return null;
+      if (lat < -90 || lat > 90) return null;
       Point point = factory.createPoint(new Coordinate(lng, lat));
       Tuple2<Integer, Long> attr = new Tuple2<>(id, dateTime.toInstant(ZoneOffset.of("+8")).toEpochMilli());
       point.setUserData(attr);

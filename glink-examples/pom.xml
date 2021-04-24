@@ -17,22 +17,6 @@
         </dependency>
         <dependency>
             <groupId>com.github.tm</groupId>
-            <artifactId>glink-kafka</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-hbase</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-mapmatching</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
-            <artifactId>glink-traffic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.tm</groupId>
             <artifactId>glink-sql</artifactId>
         </dependency>
         <dependency>

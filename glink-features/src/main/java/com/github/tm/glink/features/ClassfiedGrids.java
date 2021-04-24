@@ -2,6 +2,7 @@ package com.github.tm.glink.features;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Deprecated
 public  class ClassfiedGrids {
   private ConcurrentLinkedQueue<Long> confirmedIndexes;
   private ConcurrentLinkedQueue<Long> toCheckIndexes;

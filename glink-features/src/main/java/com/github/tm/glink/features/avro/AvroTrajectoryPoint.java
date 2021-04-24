@@ -9,6 +9,7 @@ import java.util.Properties;
 /**
  * @author Yu Liebing
  * */
+@Deprecated
 public class AvroTrajectoryPoint extends AvroGeoObject<TrajectoryPoint> {
 
   @SuppressWarnings("checkstyle:OperatorWrap")

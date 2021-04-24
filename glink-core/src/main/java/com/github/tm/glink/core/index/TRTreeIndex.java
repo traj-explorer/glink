@@ -3,6 +3,7 @@ package com.github.tm.glink.core.index;
 import com.github.davidmoten.rtree.RTree;
 import com.github.davidmoten.rtree.geometry.Geometries;
 import com.github.davidmoten.rtree.geometry.Rectangle;
+import com.github.tm.glink.core.distance.DistanceCalculator;
 import com.github.tm.glink.core.util.GeoUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -59,15 +60,15 @@ public class TRTreeIndex<T extends Geometry> implements TreeIndex<T> {
   }
 
   @Override
-  public List<T> query(Geometry geom, double distance) {
-    Point point = geom.getCentroid();
-    Envelope box = GeoUtils.calcBoxByDist(point, distance);
+  public List<T> query(Geometry geom, double distance, DistanceCalculator calculator) {
+    Point point = geom instanceof Point ? (Point) geom : geom.getCentroid();
+    Envelope box = calculator.calcBoxByDist(point, distance);
     List<T> result = new ArrayList<>();
     rTree.search(envelopeToRect(box))
             .toBlocking()
             .toIterable()
             .forEach(item -> {
-              if (GeoUtils.calcDistance(geom, item.value().geom) <= distance)
+              if (calculator.calcDistance(geom, item.value().geom) <= distance)
                 result.add(item.value().geom);
             });
     return result;

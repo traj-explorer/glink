@@ -1,5 +1,6 @@
 package com.github.tm.glink.core.operator.join;
 
+import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
 import com.github.tm.glink.core.geom.MultiPolygonWithIndex;
 import com.github.tm.glink.core.geom.PolygonWithIndex;
@@ -44,7 +45,7 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
 //      System.out.println("stream1: " + t);
       TreeIndex<T2> treeIndex = state.get(0);
       if (joinType == TopologyType.WITHIN_DISTANCE) {
-        List<T2> result = treeIndex.query(t, joinType.getDistance());
+        List<T2> result = treeIndex.query(t, joinType.getDistance(), SpatialDataStream.distanceCalculator);
         for (T2 t2 : result) {
           collector.collect(joinFunction.join(t, t2));
         }

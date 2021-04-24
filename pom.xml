@@ -9,14 +9,9 @@
 
     <modules>
         <module>glink-core</module>
-        <module>glink-kafka</module>
         <module>glink-features</module>
         <module>glink-examples</module>
-        <module>glink-mapmatching</module>
-        <module>glink-hbase</module>
-        <module>glink-utils</module>
         <module>glink-visualization</module>
-        <module>glink-traffic</module>
         <module>glink-sql</module>
         <module>glink-connector</module>
         <module>glink-dist</module>

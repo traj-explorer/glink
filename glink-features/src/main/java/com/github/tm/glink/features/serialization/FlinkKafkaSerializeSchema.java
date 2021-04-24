@@ -5,6 +5,7 @@ import com.github.tm.glink.features.avro.AvroTrajectoryPoint;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+@Deprecated
 public class FlinkKafkaSerializeSchema implements KafkaSerializationSchema<TrajectoryPoint> {
 
   private String topic;

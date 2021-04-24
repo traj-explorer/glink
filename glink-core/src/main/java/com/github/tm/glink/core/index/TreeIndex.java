@@ -1,5 +1,6 @@
 package com.github.tm.glink.core.index;
 
+import com.github.tm.glink.core.distance.DistanceCalculator;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -72,7 +73,7 @@ public interface TreeIndex<T extends Geometry> {
    * @param distance the query distance
    * @return all geometries in the tree which within the distance will be return.
    * */
-  List<T> query(Geometry geom, double distance);
+  List<T> query(Geometry geom, double distance, DistanceCalculator calculator);
 
   void remove(T geom);
 

@@ -1,12 +1,10 @@
-package com.github.tm.glink.utils;
+package com.github.tm.glink.benchmark.tdrive;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.BytesDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ import java.util.Properties;
 /**
  * @author Yu Liebing
  */
-public class ThroughputPerformance {
+public class KafkaThroughputPerformance {
 
   public static void main(String[] args) {
     String brokerList = args[0];
@@ -28,9 +26,6 @@ public class ThroughputPerformance {
     Properties props = new Properties();
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
     props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-    props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
-    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -53,7 +48,6 @@ public class ThroughputPerformance {
           startTime = record.timestamp();
           endTime = startTime + timeWindow;
         }
-        System.out.println(Double.parseDouble(record.value().split(",")[0]));
         if (record.timestamp() >= endTime) {
           startTime = record.timestamp();
           endTime = startTime + timeWindow;
@@ -68,7 +62,7 @@ public class ThroughputPerformance {
         ++totalNum;
       }
 
-      if (num == 0) {
+      if (num < 0) {
 //        double timeInterval = ((double) (realEndTime - startTime)) / 1000;
 //        double throughput = windowNum / timeInterval;
 //        System.out.println("final time interval: " + timeInterval);

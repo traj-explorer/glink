@@ -1,5 +1,10 @@
 package com.github.tm.glink.core.enums;
 
+/**
+ * Enumeration of topology type.
+ *
+ * @author Yu Liebing
+ * */
 public enum TopologyType {
   INTERSECTS,
   P_CONTAINS,

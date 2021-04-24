@@ -8,6 +8,7 @@ import java.util.Properties;
 /**
  * @author Yu Liebing
  * */
+@Deprecated
 public class AvroPoint extends AvroGeoObject<Point> {
 
   @SuppressWarnings("checkstyle:OperatorWrap")
