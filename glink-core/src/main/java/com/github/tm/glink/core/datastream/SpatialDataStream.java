@@ -129,6 +129,23 @@ public class SpatialDataStream<T extends Geometry> {
             .addSource(sourceFunction);
   }
 
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final SourceFunction<String> sourceFunction,
+                           final int geometryStartOffset,
+                           final int geometryEndOffset,
+                           final TextFileSplitter splitter,
+                           final GeometryType geometryType,
+                           final boolean carryAttributes,
+                           final Class<?>[] types) {
+    this.env = env;
+    this.geometryType = geometryType;
+    TextFormatMap<T> textFormatMap = new TextFormatMap<>(
+            geometryStartOffset, geometryEndOffset, splitter, geometryType, carryAttributes, types);
+    spatialDataStream = env
+            .addSource(sourceFunction)
+            .flatMap(textFormatMap)
+            .returns(geometryType.getTypeInformation());
+  }
   /**
    * Init a {@link SpatialDataStream} from a text file.
    * */
@@ -217,9 +234,14 @@ public class SpatialDataStream<T extends Geometry> {
 
   /**
    * Spatial dimension join with a broadcast stream.
+<<<<<<< HEAD
    * @param joinStream a {@link BroadcastSpatialDataStream} to join with
    * @param joinType join type
    * @param joinFunction the join function
+=======
+   * @param joinStream another {@link SpatialDataStream} to join with, will be treated as broadcast stream
+   * @param broadcastJoinFunction function to perform broadcast join
+>>>>>>> c6aeaf5c4f5418450a57b56608c6596e1d72a7a3
    * @param returnType the return type of join
    * */
   public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin(

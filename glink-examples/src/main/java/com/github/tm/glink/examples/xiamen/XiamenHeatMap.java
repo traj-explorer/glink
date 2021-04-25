@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.geomesa;
+package com.github.tm.glink.examples.xiamen;
 
 import com.github.tm.glink.core.operator.HeatMap;
 import com.github.tm.glink.core.tile.Pixel;
@@ -11,14 +11,11 @@ import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.table.api.Table;
-import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.sql.Timestamp;
@@ -27,7 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-public class GeoMesaHeatMap {
+public class XiamenHeatMap {
 
     public static final String ZOOKEEPERS = "localhost:2181";
     public static final String CATALOG_NAME = "Xiamen";
@@ -40,9 +37,9 @@ public class GeoMesaHeatMap {
     public static final int PARALLELSIM = 20;
 
     public static void main(String[] args) throws Exception {
-        Time windowLength = Time.minutes(GeoMesaHeatMap.WIN_LEN); // 时间窗口长度
+        Time windowLength = Time.minutes(XiamenHeatMap.WIN_LEN); // 时间窗口长度
         // Drop Heatmap tables in HBase
-        HBaseCatalogCleaner.clean(GeoMesaHeatMap.CATALOG_NAME);
+        new HBaseCatalogCleaner(ZOOKEEPERS).deleteTable(CATALOG_NAME, SCHEMA_NAME);
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().setAutoWatermarkInterval(1000L);
@@ -53,7 +50,7 @@ public class GeoMesaHeatMap {
                 .assignTimestampsAndWatermarks(WatermarkStrategy
                         .<TrajectoryPoint>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner((event, timestamp) -> event.getTimestamp())).setParallelism(1).rebalance();
-        HeatMap.GetHeatMap(env, CATALOG_NAME, SCHEMA_NAME, ZOOKEEPERS,trajDataStream, H_LEVEL, L_LEVEL, windowLength, new CountAggregator(), new AddTimeInfoProcess());
+        HeatMap.GetHeatMap(env, CATALOG_NAME, SCHEMA_NAME, ZOOKEEPERS, trajDataStream, H_LEVEL, L_LEVEL, windowLength, new CountAggregator(), new AddTimeInfoProcess());
     }
 
     private static class CountAggregator implements AggregateFunction<Tuple2<PixelResult<Integer>, TrajectoryPoint>, Map<Pixel, Tuple2<Integer, HashSet<String>>>, TileResult<Integer>> {
@@ -72,9 +69,8 @@ public class GeoMesaHeatMap {
                 if (!pixelIntegerMap.containsKey(pixel)) {
                     HashSet<String> carNos = new HashSet<>();
                     carNos.add(carNo);
-                    pixelIntegerMap.put(pixel, new Tuple2<>(1,carNos));
-                } // 该像素第一次出现，进行像素中信息的初始化
-                else if(!pixelIntegerMap.get(pixel).f1.contains(carNo)) {
+                    pixelIntegerMap.put(pixel, new Tuple2<>(1, carNos));
+                } else if (!pixelIntegerMap.get(pixel).f1.contains(carNo)) {
                     pixelIntegerMap.get(pixel).f1.add(carNo);
                     pixelIntegerMap.get(pixel).f0 = pixelIntegerMap.get(pixel).f0  + 1;
                 } // 该像素已经出现过，但是车辆尚未在其中出现过。
@@ -88,7 +84,7 @@ public class GeoMesaHeatMap {
         public TileResult<Integer> getResult(Map<Pixel, Tuple2<Integer, HashSet<String>>> pixelIntegerMap) {
             TileResult<Integer> ret = new TileResult<>();
             ret.setTile(pixelIntegerMap.keySet().iterator().next().getTile());
-            for (Map.Entry<Pixel,Tuple2<Integer, HashSet<String>>> entry : pixelIntegerMap.entrySet()) {
+            for (Map.Entry<Pixel, Tuple2<Integer, HashSet<String>>> entry : pixelIntegerMap.entrySet()) {
                 ret.addPixelResult(new PixelResult<>(entry.getKey(), entry.getValue().f0));
             }
             return ret;
@@ -97,11 +93,11 @@ public class GeoMesaHeatMap {
         @Override
         public Map<Pixel, Tuple2<Integer, HashSet<String>>> merge(Map<Pixel, Tuple2<Integer, HashSet<String>>> acc0, Map<Pixel, Tuple2<Integer, HashSet<String>>> acc1) {
             Map<Pixel, Tuple2<Integer, HashSet<String>>> acc2 = new HashMap<>(acc0);
-            acc1.forEach((key, value) -> acc2.merge(key, value, (v1,v2) -> new Tuple2<>(v1.f0+v1.f0, combineSets(v1.f1,v2.f1))));
+            acc1.forEach((key, value) -> acc2.merge(key, value, (v1, v2) -> new Tuple2<>(v1.f0 + v1.f0, combineSets(v1.f1, v2.f1))));
             return acc1;
         }
 
-        private HashSet<String> combineSets (HashSet<String> v1, HashSet<String> v2) {
+        private HashSet<String> combineSets(HashSet<String> v1, HashSet<String> v2) {
             v1.addAll(v2);
             return v1;
         }

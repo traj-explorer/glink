@@ -21,7 +21,7 @@ public class Adapter implements Serializable {
   public static <T extends Geometry> Table toTable(
           final StreamTableEnvironment tEnv,
           final SpatialDataStream<T> spatialDataStream,
-          final Expression[] filesName,
+          final Expression[] filedsName,
           final Class<?>[] fieldsType) {
     DataStream<Row> rowDataStream = spatialDataStream.getDataStream().map(r -> {
       Tuple attributes = (Tuple) r.getUserData();
@@ -32,6 +32,6 @@ public class Adapter implements Serializable {
       }
       return Row.of(rowItems);
     }).returns(new RowTypeInfo(Schema.toFlinkTypes(fieldsType)));
-    return tEnv.fromDataStream(rowDataStream, filesName);
+    return tEnv.fromDataStream(rowDataStream, filedsName);
   }
 }

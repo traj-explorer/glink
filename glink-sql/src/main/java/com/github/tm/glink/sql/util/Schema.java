@@ -5,12 +5,34 @@ import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.table.expressions.Expression;
 import org.locationtech.jts.geom.Geometry;
 
+import static org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo.TIMESTAMP;
 import static org.apache.flink.table.api.Expressions.$;
 
 public class Schema {
+  static boolean setProcTime;
 
   public static Expression[] names(String... names) {
     Expression[] expressions = new Expression[names.length];
+    for (int i = 0; i < names.length; ++i) {
+      expressions[i] = $(names[i]);
+    }
+    return expressions;
+  }
+
+  /**
+   *
+   * @param setProcTime 如果是True，会比fields多一项，最后一项用来存proctime
+   * @param names
+   * @return
+   */
+  public static Expression[] names(boolean setProcTime, String... names) {
+    Expression[] expressions;
+    if(setProcTime == true) {
+      expressions = new Expression[names.length + 1];
+      expressions[names.length] = $("pt").proctime();
+    } else {
+      expressions = new Expression[names.length];
+    }
     for (int i = 0; i < names.length; ++i) {
       expressions[i] = $(names[i]);
     }
@@ -34,7 +56,12 @@ public class Schema {
     return null;
   }
 
+  // 如果需要设置处理时间，返回的TypeInformation[]最后一项为TIMESTAMP类型。
   public static TypeInformation<?>[] toFlinkTypes(Class<?>[] types) {
+    if(setProcTime == true){
+      TypeInformation<?>[] flinkTypes = new TypeInformation<?>[types.length+1];
+      flinkTypes[types.length] = TIMESTAMP;
+    }
     TypeInformation<?>[] flinkTypes = new TypeInformation<?>[types.length];
     for (int i =  0; i < types.length; ++i) {
       flinkTypes[i] = getFlinkTypeInformation(types[i]);

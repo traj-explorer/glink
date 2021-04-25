@@ -1,5 +1,7 @@
 package com.github.tm.glink.features;
 
+import java.time.LocalDateTime;
+
 /**
  * 提供对事件信息获取的能力。
  * @author Wang Haocheng
@@ -8,5 +10,6 @@ package com.github.tm.glink.features;
 @Deprecated
 public interface TemporalObject {
     public long getTimestamp();
-    public long setTimestamp(long timestamp);
+    public void setTimestamp(long timestamp);
+    public LocalDateTime getLocalDateTime();
 }
