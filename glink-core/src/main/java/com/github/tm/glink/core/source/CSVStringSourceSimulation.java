@@ -34,7 +34,7 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     private int timeFieldIndex;
     private TextFileSplitter splitter;
     private boolean withPid; // 如果没有pid，我们需要自行在后面附加。
-    private transient ValueState<Integer> pid;
+    private int pid;
 
 
 
@@ -83,9 +83,6 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     public void open(Configuration parameters) throws Exception {
         FileReader fileReader = new FileReader(filePath);
         bufferedReader = new BufferedReader(fileReader);
-        ValueStateDescriptor<Integer> descriptor =
-                new ValueStateDescriptor<Integer>("pid", Integer.class,0);
-        pid = getRuntimeContext().getState(descriptor);
     }
 
     @Override
@@ -96,7 +93,7 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
                 checkTimeAndWait(line);
             if(!withPid){
                 sourceContext.collect(line + "," + pid);
-                pid.update(pid.value() + 1);
+                pid ++;
             } else {
                 sourceContext.collect(line);
             }

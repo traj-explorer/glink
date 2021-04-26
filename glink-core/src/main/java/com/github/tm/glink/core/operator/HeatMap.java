@@ -92,7 +92,7 @@ public class HeatMap {
                     @Override
                     public Tuple4<String, Long, Timestamp, byte[]> map(Tuple2<TileResult<Integer>, Timestamp> value) throws Exception {
                         return new Tuple4<String, Long, Timestamp, byte[]>(
-                                GetPrimaryKey(value), value.f0.getTile().toLong(), value.f1, new AvroTileResult(value.f0).serialize());
+                                GetPrimaryKey(value), value.f0.getTile().toLong(), value.f1, AvroTileResult.serialize(value.f0));
                     }});
 
         // 创建GeoMesa中用于存储HeatMap的表

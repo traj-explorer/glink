@@ -44,6 +44,7 @@ public class XiamenHeatMap {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().setAutoWatermarkInterval(1000L);
         env.setParallelism(PARALLELSIM);
+        env.disableOperatorChaining();
 
         // 模拟流
         DataStream<TrajectoryPoint> trajDataStream = env.addSource(new CSVXiamenTrajectorySource(FILEPATH, SPEED_UP))

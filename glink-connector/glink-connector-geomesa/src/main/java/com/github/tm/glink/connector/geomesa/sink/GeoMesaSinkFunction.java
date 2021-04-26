@@ -86,10 +86,7 @@ public class GeoMesaSinkFunction<T>
     ((FeatureIdImpl) toWrite.getIdentifier()).setID(sf.getID());
     toWrite.getUserData().put(Hints.USE_PROVIDED_FID, Boolean.TRUE);
     toWrite.getUserData().putAll(sf.getUserData());
-    Long start = System.currentTimeMillis();
     featureWriter.write();
-    Long end = System.currentTimeMillis();
-
   }
 
   @Override
