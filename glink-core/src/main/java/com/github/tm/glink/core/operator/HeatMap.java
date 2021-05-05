@@ -1,8 +1,10 @@
 package com.github.tm.glink.core.operator;
 
-import com.github.tm.glink.core.tile.*;
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.core.tile.AvroTileResult;
+import com.github.tm.glink.core.tile.PixelResult;
+import com.github.tm.glink.core.tile.TileGrid;
+import com.github.tm.glink.core.tile.TileResult;
+import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
@@ -19,7 +21,8 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.util.Collector;
 
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.util.Base64;
 
 /**
  * @author Wang Haocheng
@@ -62,37 +65,37 @@ public class HeatMap {
         // Get a data stream mixed by pixels in different levels.
         DataStream<Tuple2<PixelResult<Integer>, TrajectoryPoint>> pixelResultDataStream =
                 geoDataStream.flatMap(new RichFlatMapFunction<TrajectoryPoint, Tuple2<PixelResult<Integer>, TrajectoryPoint>>() {
-            private transient TileGrid[] tileGrids;
-            @Override
-            public void open(Configuration conf) {
-                int length = finalH_Level-finalL_Level+1;
-                tileGrids = new TileGrid[length];
-                int i = length;
-                int j = finalH_Level;
-                while (i > 0) {
-                    tileGrids[i-1] = new TileGrid(j);
-                    i--;
-                    j--;
-                }
-            }
-            @Override
-            public void flatMap(TrajectoryPoint value, Collector<Tuple2<PixelResult<Integer>, TrajectoryPoint>> out) throws Exception {
-                int i = length;
-                while (i > 0) {
-                    out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getLat(), value.getLng()), 1), value));
-                    i = i - 1;
-                }
-            }
-        });
+                    private transient TileGrid[] tileGrids;
+                    @Override
+                    public void open(Configuration conf) {
+                        int length = finalH_Level-finalL_Level+1;
+                        tileGrids = new TileGrid[length];
+                        int i = length;
+                        int j = finalH_Level;
+                        while (i > 0) {
+                            tileGrids[i-1] = new TileGrid(j);
+                            i--;
+                            j--;
+                        }
+                    }
+                    @Override
+                    public void flatMap(TrajectoryPoint value, Collector<Tuple2<PixelResult<Integer>, TrajectoryPoint>> out) throws Exception {
+                        int i = length;
+                        while (i > 0) {
+                            out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getLat(), value.getLng()), 1), value));
+                            i = i - 1;
+                        }
+                    }
+                });
 
         DataStream<Tuple4<String, Long, Timestamp, byte[]>> tileStream =   pixelResultDataStream.keyBy(r -> r.f0.getPixel().getTile())
                 .window(SlidingEventTimeWindows.of(time_Len,Time.minutes(5)))
                 .aggregate(aggregateFunction, processFunction)
-                .map(new MapFunction<Tuple2<TileResult<Integer>, Timestamp>, Tuple4<String, Long, Timestamp, byte[]>>() {
+                .map(new MapFunction<Tuple2<TileResult<Integer>, Timestamp>, Tuple4<String, Long, Timestamp, String>>() {
                     @Override
-                    public Tuple4<String, Long, Timestamp, byte[]> map(Tuple2<TileResult<Integer>, Timestamp> value) throws Exception {
-                        return new Tuple4<String, Long, Timestamp, byte[]>(
-                                GetPrimaryKey(value), value.f0.getTile().toLong(), value.f1, AvroTileResult.serialize(value.f0));
+                    public Tuple4<String, Long, Timestamp, String> map(Tuple2<TileResult<Integer>, Timestamp> value) throws Exception {
+                        return new Tuple4<String, Long, Timestamp, String>(
+                                GetPrimaryKey(value), value.f0.getTile().toLong(), value.f1, Base64.getEncoder().encodeToString(AvroTileResult.serialize(value.f0)));
                     }});
 
         // 创建GeoMesa中用于存储HeatMap的表
@@ -103,7 +106,7 @@ public class HeatMap {
                         + "pk STRING,\n"
                         + "tile_id BIGINT,\n"
                         + "windowEndTime TIMESTAMP(0),\n"
-                        + "tile_result BYTES,\n"
+                        + "tile_result STRING,\n"
                         + "PRIMARY KEY (pk) NOT ENFORCED)\n"
                         // connector的配置设置
                         + "WITH (\n"
@@ -147,17 +150,6 @@ public class HeatMap {
         int hour_offset = ldt.getHour();
         int fiveMin_offset = ldt.getMinute()/5;
         return year_offset << 22 | month_offset<<17 | day_offset << 11 | hour_offset << 5 | fiveMin_offset;
-    }
-
-    public static void main(String[] args) {
-        LocalDateTime ldt = LocalDateTime.of(2019,6,6,15,20);
-        int year_offset = ldt.getYear()-2019;
-        int month_offset = ldt.getMonthValue();
-        int day_offset = ldt.getDayOfMonth();
-        int hour_offset = ldt.getHour();
-        int fiveMin_offset = ldt.getMinute()/5;
-        long val = year_offset << 22 | month_offset<<17 | day_offset << 11 | hour_offset << 5 | fiveMin_offset;
-        System.out.println(val);
     }
 
     /**

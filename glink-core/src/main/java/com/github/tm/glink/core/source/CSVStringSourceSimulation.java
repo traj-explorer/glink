@@ -42,6 +42,7 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     public CSVStringSourceSimulation(String filePath, int speed_factor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) {
         this.filePath = filePath;
         this.speed_factor = speed_factor;
+        this.timeFieldIndex = timeFieldIndex;
         this.startTime = Instant.now().toEpochMilli();
         this.splitter = splitter;
         this.withPid = withPid;
@@ -77,6 +78,7 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
                 syncCounter++;
             }
         }
+        preEventTime = thisEventTime;
     }
 
     @Override
