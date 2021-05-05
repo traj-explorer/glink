@@ -10,9 +10,13 @@ import org.locationtech.geomesa.utils.geotools.SchemaBuilder;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.*;
+import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.GeoMesaFieldDecoder;
+import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.GeoMesaFieldEncoder;
 
 /**
  * Helps to specify a Geomesa Table's schema.
@@ -25,7 +29,6 @@ public final class GeoMesaTableSchema implements Serializable {
   private static final TemporalJoinPredict DEFAULT_TEMPORAL_JOIN_PREDICT = TemporalJoinPredict.INTERSECTS;
 
   private String schemaName;
-  private int primaryKeyIndex;
   private String defaultGeometry;
   private String defaultDate;
   private String indicesInfo;
@@ -35,8 +38,12 @@ public final class GeoMesaTableSchema implements Serializable {
   private List<Tuple2<String, GeoMesaType>> fieldNameToType = new ArrayList<>();
   private List<GeoMesaFieldEncoder> fieldEncoders = new ArrayList<>();
   private List<GeoMesaFieldDecoder> fieldDecoders = new ArrayList<>();
-
   private Map<String, Serializable> indexedDateAttribute = new HashMap<>();
+  private Map<String, GeoMesaType> spatialFields;
+  private int defaultIndexedSpatialFieldIndex;  // 在table中的Index
+  private Map<String, GeoMesaType> primaryFields;
+  private int primaryKeyIndex; // 在table中的Index
+  private int primaryKeyIndexInUserData = Integer.MAX_VALUE; // 在作为属性的UserData中的Index
 
   private GeoMesaTableSchema() { }
 
@@ -126,6 +133,17 @@ public final class GeoMesaTableSchema implements Serializable {
     return (String) fieldEncoders.get(primaryKeyIndex).encode(record, primaryKeyIndex);
   }
 
+  public Integer getPrimaryKeyIndexInUserData() {
+    if (primaryKeyIndexInUserData == Integer.MAX_VALUE) {
+      if (primaryKeyIndexInUserData < defaultIndexedSpatialFieldIndex) {
+        primaryKeyIndexInUserData =  primaryKeyIndex;
+      } else {
+        primaryKeyIndexInUserData =  primaryKeyIndex - 1;
+      }
+    }
+    return primaryKeyIndexInUserData;
+  }
+
   public String getFieldName(int pos) {
     return fieldNameToType.get(pos).f0;
   }
@@ -143,10 +161,10 @@ public final class GeoMesaTableSchema implements Serializable {
     // schema name
     geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
     // primary key name
+    // only supports 1 field as primary key
     String primaryKey = tableSchema.getPrimaryKey().get().getColumns().get(0);
     // spatial fields
-    Map<String, GeoMesaType> spatialFields = getSpatialFields(
-            readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
+    geomesaTableSchema.spatialFields = getSpatialFields(readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
     // indices;
     geomesaTableSchema.indicesInfo = readableConfig.get(GeoMesaConfigOption.GEOMESA_INDICES_ENABLED);
     // all fields and field encoders
@@ -165,11 +183,11 @@ public final class GeoMesaTableSchema implements Serializable {
         }
         geomesaTableSchema.primaryKeyIndex = i;
       }
-      boolean isSpatialField = spatialFields.containsKey(fieldNames[i]);
+      boolean isSpatialField = geomesaTableSchema.spatialFields.containsKey(fieldNames[i]);
       Tuple2<String, GeoMesaType> ft = new Tuple2<>();
       ft.f0 = fieldNames[i];
       if (isSpatialField) {
-        ft.f1 = spatialFields.get(fieldNames[i]);
+        ft.f1 = geomesaTableSchema.spatialFields.get(fieldNames[i]);
       } else {
         ft.f1 = GeoMesaType.mapLogicalTypeToGeomesaType(fieldTypes[i].getLogicalType());
       }
@@ -185,6 +203,44 @@ public final class GeoMesaTableSchema implements Serializable {
     return geomesaTableSchema;
   }
 
+  public static GeoMesaTableSchema fromFieldNamesAndTypes(List<Tuple2<String, GeoMesaType>> fieldNamesToTypes, ReadableConfig readableConfig) {
+    GeoMesaTableSchema geomesaTableSchema = new GeoMesaTableSchema();
+    geomesaTableSchema.fieldNameToType = fieldNamesToTypes;
+    // set pk index and type check
+    String primaryFieldName = readableConfig.get(GeoMesaConfigOption.PRIMARY_FIELD_NAME);
+    int temp = 0;
+    String[] fieldNames = new String[fieldNamesToTypes.size()];
+    for (Tuple2 tup : fieldNamesToTypes) {
+      if (tup.f0 == primaryFieldName) {
+        if (tup.f1 != GeoMesaType.STRING) {
+          throw new IllegalArgumentException("Geomesa only supports STRING primary key.");
+        }
+        geomesaTableSchema.primaryKeyIndex = temp;
+      }
+      fieldNames[temp] = (String)tup.f0;
+      temp ++;
+    }
+    // schema name
+    geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
+    // spatial fields
+    geomesaTableSchema.spatialFields = getSpatialFields(readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
+    // TODO: 如果存在多个spatial fields...
+    geomesaTableSchema.setDefaultSpatialFieldIndex();
+    // indices
+    geomesaTableSchema.indicesInfo = readableConfig.get(GeoMesaConfigOption.GEOMESA_INDICES_ENABLED);
+    // default geometry and Data field
+    geomesaTableSchema.defaultGeometry = readableConfig.get(GeoMesaConfigOption.GEOMESA_DEFAULT_GEOMETRY);
+    geomesaTableSchema.defaultDate = readableConfig.get(GeoMesaConfigOption.GEOMESA_DEFAULT_DATE);
+    checkDefaultIndexFields(geomesaTableSchema.defaultGeometry, geomesaTableSchema.defaultDate, fieldNames);
+
+    // temporal table join parameters
+    String joinPredict = readableConfig.get(GeoMesaConfigOption.GEOMESA_TEMPORAL_JOIN_PREDICT);
+    geomesaTableSchema.validTemporalJoinParam(joinPredict);
+
+    return geomesaTableSchema;
+  }
+
+  // 可能有多个spatial fields
   private static Map<String, GeoMesaType> getSpatialFields(String spatialFields) {
     Map<String, GeoMesaType> nameToType = new HashMap<>();
     if (spatialFields == null) return nameToType;
@@ -196,6 +252,34 @@ public final class GeoMesaTableSchema implements Serializable {
       nameToType.put(name, type);
     }
     return nameToType;
+  }
+
+  // init the first spatial field index
+  private void setDefaultSpatialFieldIndex() {
+    for (int i = 0; i < fieldNameToType.size(); i++) {
+      if (getSpatialFieldNames()[0].equalsIgnoreCase(fieldNameToType.get(i).f0)) {
+        this.defaultIndexedSpatialFieldIndex = i;
+        return;
+      } else {
+        i++;
+      }
+    }
+    this.defaultIndexedSpatialFieldIndex = -1;
+  }
+
+
+  public String[] getSpatialFieldNames() {
+    String[] res = new String[spatialFields.size()];
+    int i = 0;
+    for (String key : spatialFields.keySet()){
+      res[i] = key;
+    }
+    return res;
+  }
+
+  // 获取默认的（第一个）几何字段的index
+  public int getDefaultIndexedSpatialFieldIndex() {
+    return defaultIndexedSpatialFieldIndex;
   }
 
   private static void checkDefaultIndexFields(String defaultGeometry, String defaultDate, String[] fieldNames) {
