@@ -1,10 +1,10 @@
-package com.github.tm.glink.examples.monitoring;
+package com.github.tm.glink.examples.aggregate;
 
 import com.github.tm.glink.core.datastream.BroadcastSpatialDataStream;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
-import com.github.tm.glink.examples.common.BroadcastFlatMapFunction;
-import com.github.tm.glink.examples.common.SpatialFlatMapFunction;
+import com.github.tm.glink.examples.utils.BroadcastFlatMapFunction;
+import com.github.tm.glink.examples.utils.SpatialFlatMapFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;

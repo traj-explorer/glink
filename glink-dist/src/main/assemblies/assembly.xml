@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly>
-	<!-- 最终打包文件的后缀，格式为 ${fileName}-bin -->
 	<id>bin</id>
-	<!-- 最终打包成一个用于发布的zip文件 -->
 	<formats>
 		<format>zip</format>
 	</formats>
@@ -22,7 +20,7 @@
 	</dependencySets>
 
 	<!-- 文件配置 -->
-<!--	<fileSets>-->
+	<fileSets>
 <!--		&lt;!&ndash; 把项目的配置文件，打包进zip包的config目录下    &ndash;&gt;-->
 <!--		<fileSet>-->
 <!--			&lt;!&ndash; 配置项目中需要被打包的文件的存储路径 &ndash;&gt;-->
@@ -46,13 +44,13 @@
 <!--		</fileSet>-->
 
 <!--		&lt;!&ndash; 把项目自己编译出来根目录下的jar文件，打包进zip文件的根目录 &ndash;&gt;-->
-<!--		<fileSet>-->
-<!--			<directory>${project.build.directory}</directory>-->
-<!--			<outputDirectory></outputDirectory>-->
-<!--			<includes>-->
-<!--				<include>*.jar</include>-->
-<!--			</includes>-->
-<!--		</fileSet>-->
+		<fileSet>
+			<directory>${project.build.directory}</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>*.jar</include>
+			</includes>
+		</fileSet>
 
 <!--		&lt;!&ndash; 把项目自己编译出来的jar文件夹下的jar文件，去除第三方jar，打包进zip文件的根目录 &ndash;&gt;-->
 <!--		<fileSet>-->
@@ -65,5 +63,20 @@
 <!--				<include>*.jar</include>-->
 <!--			</includes>-->
 <!--		</fileSet>-->
-<!--	</fileSets>-->
+	</fileSets>
+
+	<moduleSets>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+			<includes>
+				<include>com.github.tm:glink-core</include>
+				<include>com.github.tm:glink-sql</include>
+			</includes>
+			<binaries>
+				<outputDirectory>jar</outputDirectory>
+				<includeDependencies>false</includeDependencies>
+				<unpack>false</unpack>
+            </binaries>
+		</moduleSet>
+	</moduleSets>
 </assembly>
