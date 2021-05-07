@@ -1,68 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<assembly>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
 	<id>bin</id>
 	<formats>
-		<format>zip</format>
+		<format>tar.gz</format>
 	</formats>
 
-	<!-- 把依赖的jar包打包进zip的lib目录下-->
-	<dependencySets>
-		<dependencySet>
-			<!-- 不使用项目的artifact -->
-			<useProjectArtifact>false</useProjectArtifact>
-			<!-- 打包进zip文件下的lib目录中  -->
-			<outputDirectory>lib</outputDirectory>
-			<!-- 第三方jar不要解压 -->
-			<useTransitiveDependencies>true</useTransitiveDependencies>
-			<useTransitiveFiltering>true</useTransitiveFiltering>
-			<unpack>false</unpack>
-		</dependencySet>
-	</dependencySets>
+	<files>
+		<file>
+			<source>../README.md</source>
+			<outputDirectory>.</outputDirectory>
+		</file>
+	</files>
 
-	<!-- 文件配置 -->
 	<fileSets>
-<!--		&lt;!&ndash; 把项目的配置文件，打包进zip包的config目录下    &ndash;&gt;-->
-<!--		<fileSet>-->
-<!--			&lt;!&ndash; 配置项目中需要被打包的文件的存储路径 &ndash;&gt;-->
-<!--			<directory>${project.basedir}/src/main/resources/${env}</directory>-->
-<!--			<outputDirectory>/config</outputDirectory>-->
-<!--			<includes>-->
-<!--				&lt;!&ndash; 可以指定单个文件 &ndash;&gt;-->
-<!--				&lt;!&ndash;<include>project.config</include>&ndash;&gt;-->
-<!--				&lt;!&ndash; 可以直接指定所有文件 &ndash;&gt;-->
-<!--				<include>*.*</include>-->
-<!--			</includes>-->
-<!--		</fileSet>-->
-
-<!--		&lt;!&ndash; 把项目的配置文件，打包进zip包的根目录下    &ndash;&gt;-->
-<!--		<fileSet>-->
-<!--			<directory>${project.basedir}/src/main/resources/${env}</directory>-->
-<!--			<outputDirectory></outputDirectory>-->
-<!--			<includes>-->
-<!--				<include>scf*.xml</include>-->
-<!--			</includes>-->
-<!--		</fileSet>-->
-
-<!--		&lt;!&ndash; 把项目自己编译出来根目录下的jar文件，打包进zip文件的根目录 &ndash;&gt;-->
 		<fileSet>
-			<directory>${project.build.directory}</directory>
-			<outputDirectory></outputDirectory>
+			<directory>../glink-examples/src/main/zepplin</directory>
 			<includes>
-				<include>*.jar</include>
+				<include>*.zpln</include>
 			</includes>
+			<outputDirectory>examples/zepplin</outputDirectory>
 		</fileSet>
-
-<!--		&lt;!&ndash; 把项目自己编译出来的jar文件夹下的jar文件，去除第三方jar，打包进zip文件的根目录 &ndash;&gt;-->
-<!--		<fileSet>-->
-<!--			<directory>${project.build.directory}/jar</directory>-->
-<!--			<outputDirectory></outputDirectory>-->
-<!--			<excludes>-->
-<!--				<exclude>lib/*.jar</exclude>-->
-<!--			</excludes>-->
-<!--			<includes>-->
-<!--				<include>*.jar</include>-->
-<!--			</includes>-->
-<!--		</fileSet>-->
 	</fileSets>
 
 	<moduleSets>
@@ -77,6 +35,17 @@
 				<includeDependencies>false</includeDependencies>
 				<unpack>false</unpack>
             </binaries>
+		</moduleSet>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+			<includes>
+				<include>com.github.tm:glink-examples</include>
+			</includes>
+			<binaries>
+				<outputDirectory>examples</outputDirectory>
+				<includeDependencies>false</includeDependencies>
+				<unpack>false</unpack>
+			</binaries>
 		</moduleSet>
 	</moduleSets>
 </assembly>

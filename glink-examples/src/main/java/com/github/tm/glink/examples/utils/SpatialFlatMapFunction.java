@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.common;
+package com.github.tm.glink.examples.utils;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;

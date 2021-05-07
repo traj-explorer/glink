@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <artifactId>glink</artifactId>
+    <artifactId>glink-parent</artifactId>
     <groupId>com.github.tm</groupId>
     <version>0.2-SNAPSHOT</version>
   </parent>
@@ -55,55 +55,55 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-core</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-java_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-streaming-scala_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-clients_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-connector-kafka_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-sql-connector-hbase-1.4_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-avro</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-csv</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-table-api-java-bridge_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -115,19 +115,19 @@
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-table-api-scala-bridge_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-table-planner_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-table-planner-blink_2.11</artifactId>
-      <version>1.12.2</version>
+      <version>1.12.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

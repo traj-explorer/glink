@@ -62,8 +62,8 @@ public class ContainsCorrectTests {
   }
 
   public static void main(String[] args) {
-    List<Geometry> districts = BeijingDistrictReader.read("/media/liebing/p/data/beijing_district/beijing_district.csv");
-    List<Point> points = TrajectoryReader.read("/media/liebing/p/data/T-drive/release/taxi_log_2008_by_id/1.txt");
+    List<Geometry> districts = Utils.readDistrict("/media/liebing/p/data/beijing_district/beijing_district.csv");
+    List<Point> points = Utils.readTrajectory("/media/liebing/p/data/T-drive/release/taxi_log_2008_by_id/1.txt");
     ContainsCorrectTests tests = new ContainsCorrectTests(districts);
 
     for (Point p : points) {

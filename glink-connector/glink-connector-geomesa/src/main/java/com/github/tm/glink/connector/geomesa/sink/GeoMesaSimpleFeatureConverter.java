@@ -1,6 +1,6 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
-import org.apache.flink.annotation.Internal;
+import org.apache.flink.annotation.PublicEvolving;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author Yu Liebing
  */
-@Internal
+@PublicEvolving
 public interface GeoMesaSimpleFeatureConverter<T> extends Serializable {
 
   /**

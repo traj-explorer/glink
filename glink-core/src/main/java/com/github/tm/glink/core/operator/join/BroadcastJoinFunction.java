@@ -42,7 +42,6 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
   public void processElement(T t, ReadOnlyContext readOnlyContext, Collector<OUT> collector) throws Exception {
     ReadOnlyBroadcastState<Integer, TreeIndex<T2>> state = readOnlyContext.getBroadcastState(broadcastDesc);
     if (state.contains(0)) {
-//      System.out.println("stream1: " + t);
       TreeIndex<T2> treeIndex = state.get(0);
       if (joinType == TopologyType.WITHIN_DISTANCE) {
         List<T2> result = treeIndex.query(t, joinType.getDistance(), SpatialDataStream.distanceCalculator);
@@ -70,7 +69,6 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
     if (!state.contains(0)) {
       state.put(0, new TRTreeIndex<>());
     }
-//    System.out.println("stream2: " + t2);
     TreeIndex<T2> treeIndex = state.get(0);
     if (t2.f0) {
       if (t2.f1 instanceof Polygon) {
