@@ -117,6 +117,12 @@ public class GeoMesaConfigOption {
           .noDefaultValue()
           .withDescription("The default time field to create temporal index");
 
+  public static final ConfigOption<String> PRIMARY_FIELD_NAME = ConfigOptions
+          .key("geomesa.primary.field.name")
+          .stringType()
+          .noDefaultValue()
+          .withDescription("The field to be treated as primary field.");
+
   /**
    * Used to index configuration
    * */

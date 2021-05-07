@@ -29,6 +29,7 @@
 			<includes>
 				<include>com.github.tm:glink-core</include>
 				<include>com.github.tm:glink-sql</include>
+				<include>com.github.tm:glink-connector-geomesa</include>
 			</includes>
 			<binaries>
 				<outputDirectory>jar</outputDirectory>

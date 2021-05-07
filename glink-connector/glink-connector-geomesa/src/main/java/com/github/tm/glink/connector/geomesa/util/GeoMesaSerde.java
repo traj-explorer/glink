@@ -50,7 +50,7 @@ public class GeoMesaSerde {
     switch (fieldType.getTypeRoot()) {
       case CHAR:
       case VARCHAR:
-        return ((rowData, pos) -> rowData.getString(pos).toString());
+        return ((rowData, pos) -> (rowData.getString(pos) == null ? null : rowData.getString(pos).toString()));
       case BOOLEAN:
         return (RowData::getBoolean);
       case BINARY:

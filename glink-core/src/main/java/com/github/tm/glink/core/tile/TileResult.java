@@ -56,7 +56,7 @@ public class TileResult<V> {
   }
 
   public byte[] toBytes() throws IOException {
-    return new AvroTileResult<V>(this).serialize();
+    return AvroTileResult.serialize(this);
   }
 
   public boolean equals(TileResult compare) {

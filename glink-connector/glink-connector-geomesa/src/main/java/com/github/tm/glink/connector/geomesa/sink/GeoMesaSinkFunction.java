@@ -54,7 +54,8 @@ public class GeoMesaSinkFunction<T>
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
     SimpleFeatureType tableSft = schema.getSchema();
-    SimpleFeatureType sft = dataStore.getSchema(tableSft.getTypeName());
+    String name = tableSft.getTypeName();
+    SimpleFeatureType sft = dataStore.getSchema(name);
     if (sft == null) {
       LOG.info("Creating schema: " + DataUtilities.encodeType(tableSft));
       tableSft.getUserData().put("override.reserved.words", true);
@@ -83,7 +84,6 @@ public class GeoMesaSinkFunction<T>
     toWrite.getUserData().put(Hints.USE_PROVIDED_FID, Boolean.TRUE);
     toWrite.getUserData().putAll(sf.getUserData());
     featureWriter.write();
-
   }
 
   @Override

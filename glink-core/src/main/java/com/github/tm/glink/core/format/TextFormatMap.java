@@ -111,7 +111,7 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
           // TODO
           break;
         default:
-          geometry = createGeometry(readCoordinates(line), geometryType);
+          geometry = createGeometry(readCoordinatesAndAttr(line), geometryType);
           break;
       }
     } catch (Exception e) {
@@ -150,7 +150,7 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
     return geometry;
   }
 
-  private Coordinate[] readCoordinates(String line) {
+  private Coordinate[] readCoordinatesAndAttr(String line) {
     final String[] columns = line.split(splitter.getDelimiter());
     final int actualEndOffset = this.endOffset >= 0
             ? this.endOffset : (this.geometryType == GeometryType.POINT ? startOffset + 1 : columns.length - 1);

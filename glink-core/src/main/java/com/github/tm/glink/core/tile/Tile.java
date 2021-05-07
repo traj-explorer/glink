@@ -74,9 +74,9 @@ public class Tile implements Serializable {
       // even for x, odd for y
       int ind = i/2;
       if (i%2 ==0) {
-        res |= ((x >> ind & 1) << i);
+        res |= ((long)(x >>> ind & 1) << i);
       } else {
-        res |= ((y >> ind & 1) << i);
+        res |= ((long)(y >>> ind & 1) << i);
       }
     }
     return res;

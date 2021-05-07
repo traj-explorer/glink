@@ -10,17 +10,18 @@ import com.github.tm.glink.sql.Adapter;
 import com.github.tm.glink.sql.GlinkSQLRegister;
 import com.github.tm.glink.sql.util.Schema;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.TemporalTableFunction;
+import org.apache.flink.types.Row;
 import org.locationtech.jts.geom.Point;
 
 import java.time.Duration;
 
-import static org.apache.flink.table.api.Expressions.$;
-import static org.apache.flink.table.api.Expressions.call;
+import static org.apache.flink.table.api.Expressions.*;
 
 /**
  * @author Wang Haocheng
@@ -67,6 +68,7 @@ public class XiamenGeoFenceJoin {
                 + "FROM " + rawDataTable + " AS A "
                 + "LEFT JOIN GeoFence FOR SYSTEM_TIME AS OF A.pt  AS B "
                 + "ON ST_AsText(A.point) = B.geom");
+        tEnv.toAppendStream(res, Row.class).print();
         tEnv.executeSql("INSERT INTO PointAfterJoin "
                 + "SELECT ST_AsText(point), status, speed, azimuth, ParseTimestamp(rawtime), tid, pid, pt, id "
                 + "FROM " + res);

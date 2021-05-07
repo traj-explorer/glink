@@ -26,69 +26,45 @@ public class AvroTileResult<V> implements Serializable {
             "    {\"name\": \"values\", \"type\": { \"type\": \"array\", \"items\": \"int\"}}\n" +
             "]}";
 
-    private Schema schema;
-    private GenericRecord genericRecord;
-    private TileResult<V> tileResult;
-    protected Injection<GenericRecord, byte[]> injection;
+    private static Schema schema = new Schema.Parser().parse(SCHEMA);
+    protected static Injection<GenericRecord, byte[]> injection = GenericAvroCodecs.toBinary(schema);
 
+    private Tile tile;
 
-
-    public AvroTileResult(TileResult<V> tileResult) {
-        this.tileResult = tileResult;
-        this.schema = new Schema.Parser().parse(SCHEMA);
-        genericRecord = new GenericData.Record(schema);
-        injection = GenericAvroCodecs.toBinary(this.schema);
+    public AvroTileResult(Tile tile) {
+        this.tile = tile;
     }
 
-    public byte[] serialize() throws IOException {
+    public static byte[] serialize(TileResult tileResult) throws IOException {
         ArrayList<Integer> pixNos = new ArrayList<>();
         ArrayList<Integer> values = new ArrayList<>();
         int i =0;
-        for (PixelResult<V> pixelResult : tileResult.getGridResult()) {
-            pixNos.add(pixelResult.getPixel().getPixelNo());
-            values.add((Integer) pixelResult.getResult());
+        for (Object pixelResult : tileResult.getGridResult()) {
+            pixNos.add(((PixelResult)pixelResult).getPixel().getPixelNo());
+            values.add((Integer) ((PixelResult)pixelResult).getResult());
         }
+        GenericRecord genericRecord = new GenericData.Record(schema);
         genericRecord.put("pixNos", pixNos);
         genericRecord.put("values", values);
-        ArrayList<Integer> pixNos2 = (ArrayList<Integer>) genericRecord.get("pixNos");
         return injection.apply(genericRecord);
     }
 
-    public TileResult deserialize(byte[] data) {
+    public TileResult<V> deserialize(byte[] data) {
         GenericRecord record = injection.invert(data).get();
         return genericToTileResult(record);
     }
 
-    public TileResult<V> genericToTileResult(GenericRecord record) {
+    private TileResult<V> genericToTileResult(GenericRecord record) {
         GenericData.Array<Integer> pixNos = (GenericData.Array<Integer>) record.get("pixNos");
         GenericData.Array<Integer> values = (GenericData.Array<Integer>)  record.get("values");
         List<PixelResult<Integer>> list = new ArrayList<>();
-        Iterator pixNosIter = pixNos.iterator();
-        Iterator valuesIter = values.iterator();
+        Iterator<Integer> pixNosIter = pixNos.iterator();
+        Iterator<Integer> valuesIter = values.iterator();
         while (pixNosIter.hasNext()) {
-           list.add((PixelResult<Integer>) new PixelResult<>(new Pixel(tileResult.getTile(), (Integer) pixNosIter.next()), (int)valuesIter.next()));
+           list.add((PixelResult<Integer>) new PixelResult<>(new Pixel(tile, (Integer) pixNosIter.next()), (int)valuesIter.next()));
         }
-        TileResult ret = new TileResult(tileResult.getTile());
+        TileResult ret = new TileResult(tile);
         ret.setGridResult(list);
         return ret;
-    }
-
-    public static void main(String[] args) throws IOException {
-        ArrayList<Integer> pixNos = new ArrayList<>();
-        ArrayList<Integer> values = new ArrayList<>();
-        for ( int i = 0; i < 256 * 256; i++) {
-            pixNos.add(i);
-            values.add(i);
-        }
-        TileResult<java.lang.Integer> tileResult = new TileResult<>(new Tile(1,4,5));
-        List<PixelResult<Integer>> list = new ArrayList<>();
-        for( int i = 0; i < pixNos.size(); i++) {
-            list.add((PixelResult<Integer>) new PixelResult<>(new Pixel(tileResult.getTile(), pixNos.get(i)), values.get(i)));
-        }
-        TileResult ret = new TileResult(tileResult.getTile());
-        ret.setGridResult(list);
-//        System.out.println(ret.toString());
-        AvroTileResult avroTileResult = new AvroTileResult(ret);
-        System.out.println(avroTileResult.serialize().length);
     }
 }

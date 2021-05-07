@@ -96,6 +96,10 @@
             <artifactId>flink-table-api-java-bridge_2.11</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-connector-geomesa</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
