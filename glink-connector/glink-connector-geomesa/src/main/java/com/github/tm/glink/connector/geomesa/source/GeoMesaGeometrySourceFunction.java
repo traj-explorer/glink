@@ -84,7 +84,7 @@ public class GeoMesaGeometrySourceFunction<T extends Geometry> extends RichSourc
         isCanceled = true;
     }
 
-    private T convertToGeom (SimpleFeature sf) {
+    private T convertToGeom(SimpleFeature sf) {
         T geom = null;
         Tuple userData = null;
         // 需要跳过几何属性
@@ -101,7 +101,7 @@ public class GeoMesaGeometrySourceFunction<T extends Geometry> extends RichSourc
                 continue;
             } else {
                 userData.setField(sf.getAttribute(i), ind);
-                ind ++;
+                ind++;
             }
         }
         geom.setUserData(userData);

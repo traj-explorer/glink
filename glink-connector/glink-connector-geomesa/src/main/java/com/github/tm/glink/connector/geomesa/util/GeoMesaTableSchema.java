@@ -23,6 +23,7 @@ import static com.github.tm.glink.connector.geomesa.util.GeoMesaSerde.GeoMesaFie
  *
  * @author Yu Liebing
  * */
+@Deprecated
 public final class GeoMesaTableSchema implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -119,7 +120,9 @@ public final class GeoMesaTableSchema implements Serializable {
     return sft;
   }
 
-  public String getIndicesInfo () { return indicesInfo;}
+  public String getIndicesInfo() {
+    return indicesInfo;
+  }
 
   public GeoMesaFieldEncoder getFieldEncoder(int pos) {
     return fieldEncoders.get(pos);
@@ -156,7 +159,13 @@ public final class GeoMesaTableSchema implements Serializable {
     return joinDistance;
   }
 
-  public static GeoMesaTableSchema fromTableSchemaAndOptions(TableSchema tableSchema, ReadableConfig readableConfig) {
+  /**
+   * 两个构造函数，分别为了从Flink Table获取，和从Types and Names获取。
+   * @param tableSchema
+   * @param readableConfig
+   * @return
+   */
+  public static GeoMesaTableSchema fromFlinkTableSchemaAndOptions(TableSchema tableSchema, ReadableConfig readableConfig) {
     GeoMesaTableSchema geomesaTableSchema = new GeoMesaTableSchema();
     // schema name
     geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
@@ -217,14 +226,13 @@ public final class GeoMesaTableSchema implements Serializable {
         }
         geomesaTableSchema.primaryKeyIndex = temp;
       }
-      fieldNames[temp] = (String)tup.f0;
-      temp ++;
+      fieldNames[temp] = (String) tup.f0;
+      temp++;
     }
     // schema name
     geomesaTableSchema.schemaName = readableConfig.get(GeoMesaConfigOption.GEOMESA_SCHEMA_NAME);
     // spatial fields
     geomesaTableSchema.spatialFields = getSpatialFields(readableConfig.get(GeoMesaConfigOption.GEOMESA_SPATIAL_FIELDS));
-    // TODO: 如果存在多个spatial fields...
     geomesaTableSchema.setDefaultSpatialFieldIndex();
     // indices
     geomesaTableSchema.indicesInfo = readableConfig.get(GeoMesaConfigOption.GEOMESA_INDICES_ENABLED);
@@ -271,7 +279,7 @@ public final class GeoMesaTableSchema implements Serializable {
   public String[] getSpatialFieldNames() {
     String[] res = new String[spatialFields.size()];
     int i = 0;
-    for (String key : spatialFields.keySet()){
+    for (String key : spatialFields.keySet()) {
       res[i] = key;
     }
     return res;

@@ -1,7 +1,7 @@
 package com.github.tm.glink.connector.geomesa.source;
 
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.AbstractGeoMesaTableSchema;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
@@ -19,21 +19,22 @@ import org.opengis.filter.Filter;
  * */
 public class GeoMesaSourceFunction<T> extends RichSourceFunction<T> implements CheckpointedFunction {
 
+  private static final long serialVersionUID = -1686280757030652887L;
   private boolean isCanceled;
 
   private GeoMesaDataStoreParam geoMesaDataStoreParam;
-  private GeoMesaTableSchema geoMesaTableSchema;
-  private GeoMesaRowConverter<T> geoMesaRowConverter;
+  private AbstractGeoMesaTableSchema geoMesaTableSchema;
+  private GeoMesaGlinkObjectConverter<T> geoMesaGlinkObjectConverter;
 
   private transient DataStore dataStore;
   private transient FeatureReader<SimpleFeatureType, SimpleFeature> featureReader;
 
   public GeoMesaSourceFunction(GeoMesaDataStoreParam param,
-                               GeoMesaTableSchema schema,
-                               GeoMesaRowConverter<T> geoMesaRowConverter) {
+                               AbstractGeoMesaTableSchema schema,
+                               GeoMesaGlinkObjectConverter<T> geoMesaGlinkObjectConverter) {
     this.geoMesaDataStoreParam = param;
     this.geoMesaTableSchema = schema;
-    this.geoMesaRowConverter = geoMesaRowConverter;
+    this.geoMesaGlinkObjectConverter = geoMesaGlinkObjectConverter;
   }
 
   @Override
@@ -50,13 +51,13 @@ public class GeoMesaSourceFunction<T> extends RichSourceFunction<T> implements C
   @Override
   public void open(Configuration parameters) throws Exception {
     dataStore = DataStoreFinder.getDataStore(geoMesaDataStoreParam.getParams());
-    if (dataStore == null) {
+    if (null == dataStore) {
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    SimpleFeatureType providedSft = geoMesaTableSchema.getSchema();
+    SimpleFeatureType providedSft = geoMesaTableSchema.getSimpleFeatureType();
     String typeName = providedSft.getTypeName();
     SimpleFeatureType sft = dataStore.getSchema(typeName);
-    if (sft == null) {
+    if (null == sft) {
       throw new RuntimeException("GeoMesa schema doesn't exist, create it first.");
     } else {
       String providedSchema = DataUtilities.encodeType(providedSft);
@@ -75,7 +76,7 @@ public class GeoMesaSourceFunction<T> extends RichSourceFunction<T> implements C
     while (!isCanceled) {
       while (featureReader.hasNext()) {
         SimpleFeature sf = featureReader.next();
-        T rowData = geoMesaRowConverter.convertToRow(sf);
+        T rowData = geoMesaGlinkObjectConverter.convertToFlinkObj(sf);
         sourceContext.collect(rowData);
       }
     }

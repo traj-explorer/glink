@@ -1,7 +1,7 @@
 package com.github.tm.glink.connector.geomesa.source;
 
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.GeoMesaSQLTableSchema;
 import com.github.tm.glink.connector.geomesa.util.TemporalJoinPredict;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.table.data.RowData;
@@ -44,8 +44,8 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
   private transient FilterFactory2 filterFactory2;
 
   private GeoMesaDataStoreParam geoMesaDataStoreParam;
-  private GeoMesaTableSchema geoMesaTableSchema;
-  private GeoMesaRowConverter<RowData> geoMesaRowConverter;
+  private GeoMesaSQLTableSchema geoMesaTableSchema;
+  private GeoMesaGlinkObjectConverter<RowData> geoMesaGlinkObjectConverter;
   private String queryField;
 
   private transient DataStore dataStore;
@@ -55,12 +55,12 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
   private transient SimpleFeatureType sft;
 
   public GeoMesaRowDataLookupFunction(GeoMesaDataStoreParam geoMesaDataStoreParam,
-                                      GeoMesaTableSchema geoMesaTableSchema,
-                                      GeoMesaRowConverter<RowData> geoMesaRowConverter,
+                                      GeoMesaSQLTableSchema geoMesaTableSchema,
+                                      GeoMesaGlinkObjectConverter<RowData> geoMesaGlinkObjectConverter,
                                       String queryField) {
     this.geoMesaDataStoreParam = geoMesaDataStoreParam;
     this.geoMesaTableSchema = geoMesaTableSchema;
-    this.geoMesaRowConverter = geoMesaRowConverter;
+    this.geoMesaGlinkObjectConverter = geoMesaGlinkObjectConverter;
     this.queryField = queryField;
   }
 
@@ -73,14 +73,14 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
       Geometry resultGeometry = (Geometry) sf.getDefaultGeometry();
       if (geoMesaTableSchema.getTemporalJoinPredict() == TemporalJoinPredict.P_CONTAINS) {
         if (geometry.contains(resultGeometry)) {
-          collect(geoMesaRowConverter.convertToRow(sf));
+          collect(geoMesaGlinkObjectConverter.convertToFlinkObj(sf));
         }
       } else if (geoMesaTableSchema.getTemporalJoinPredict() == TemporalJoinPredict.N_CONTAINS) {
         if (resultGeometry.contains(geometry)) {
-          collect(geoMesaRowConverter.convertToRow(sf));
+          collect(geoMesaGlinkObjectConverter.convertToFlinkObj(sf));
         }
       } else {
-        collect(geoMesaRowConverter.convertToRow(sf));
+        collect(geoMesaGlinkObjectConverter.convertToFlinkObj(sf));
       }
     }
   }
@@ -92,7 +92,7 @@ public class GeoMesaRowDataLookupFunction extends TableFunction<RowData> {
     if (dataStore == null) {
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    SimpleFeatureType providedSft = geoMesaTableSchema.getSchema();
+    SimpleFeatureType providedSft = geoMesaTableSchema.getSimpleFeatureType();
     typeName = providedSft.getTypeName();
     sft = dataStore.getSchema(typeName);
     if (sft == null) {

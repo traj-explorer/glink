@@ -1,10 +1,9 @@
 package com.github.tm.glink.connector.geomesa.sink;
 
 import com.github.tm.glink.connector.geomesa.options.param.GeoMesaDataStoreParam;
-import com.github.tm.glink.connector.geomesa.util.GeoMesaTableSchema;
+import com.github.tm.glink.connector.geomesa.util.AbstractGeoMesaTableSchema;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.metrics.Meter;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
@@ -29,19 +28,14 @@ public class GeoMesaSinkFunction<T>
 
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = LoggerFactory.getLogger(GeoMesaSinkFunction.class);
-
-  private int count = 0;
   private GeoMesaDataStoreParam params;
-  private GeoMesaTableSchema schema;
+  private AbstractGeoMesaTableSchema schema;
   private GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter;
-
-  private transient Meter meter;
-
   private transient DataStore dataStore;
   private transient FeatureWriter<SimpleFeatureType, SimpleFeature> featureWriter;
 
   public GeoMesaSinkFunction(GeoMesaDataStoreParam params,
-                             GeoMesaTableSchema schema,
+                             AbstractGeoMesaTableSchema schema,
                              GeoMesaSimpleFeatureConverter<T> geomesaSimpleFeatureConverter) {
     this.params = params;
     this.schema = schema;
@@ -57,7 +51,7 @@ public class GeoMesaSinkFunction<T>
       LOG.error("Could not create data store with provided parameters");
       throw new RuntimeException("Could not create data store with provided parameters.");
     }
-    SimpleFeatureType tableSft = schema.getSchema();
+    SimpleFeatureType tableSft = schema.getSimpleFeatureType();
     String name = tableSft.getTypeName();
     SimpleFeatureType sft = dataStore.getSchema(name);
     if (sft == null) {
@@ -74,7 +68,7 @@ public class GeoMesaSinkFunction<T>
                 ", exists: " + existSchema);
       }
     }
-    featureWriter = dataStore.getFeatureWriterAppend(schema.getSchema().getTypeName(), Transaction.AUTO_COMMIT);
+    featureWriter = dataStore.getFeatureWriterAppend(schema.getSimpleFeatureType().getTypeName(), Transaction.AUTO_COMMIT);
     geomesaSimpleFeatureConverter.open();
     LOG.info("end open.");
   }

@@ -116,6 +116,10 @@ public class GeoMesaSerde {
       case TINYINT:
       case SMALLINT:
       case INTEGER:
+      case BIGINT:
+      case INTERVAL_DAY_TIME:
+      case FLOAT:
+      case DOUBLE:
         return SimpleFeature::getAttribute;
       case DATE:
         throw new UnsupportedOperationException("Currently not supported DATE, will be fix in the future");
@@ -127,11 +131,6 @@ public class GeoMesaSerde {
                           + "HBase connector", timePrecision, MIN_TIME_PRECISION, MAX_TIME_PRECISION));
         }
         throw new UnsupportedOperationException("Currently not supported TIME, will be fix in the future");
-      case BIGINT:
-      case INTERVAL_DAY_TIME:
-      case FLOAT:
-      case DOUBLE:
-        return SimpleFeature::getAttribute;
       case TIMESTAMP_WITHOUT_TIME_ZONE:
       case TIMESTAMP_WITH_LOCAL_TIME_ZONE:
         final int timestampPrecision = getPrecision(fieldType);

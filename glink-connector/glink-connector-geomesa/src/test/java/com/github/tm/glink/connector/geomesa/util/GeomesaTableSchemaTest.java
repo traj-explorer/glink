@@ -1,14 +1,10 @@
 package com.github.tm.glink.connector.geomesa.util;
 
-import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import org.locationtech.jts.io.WKTWriter;
 import org.locationtech.spatial4j.context.SpatialContext;
 import org.locationtech.spatial4j.context.SpatialContextFactory;
 import org.locationtech.spatial4j.distance.DistanceUtils;
 import org.locationtech.spatial4j.shape.Point;
-import org.locationtech.spatial4j.shape.ShapeFactory;
 
 public class GeomesaTableSchemaTest {
   public static void main(String[] args) throws ParseException {
