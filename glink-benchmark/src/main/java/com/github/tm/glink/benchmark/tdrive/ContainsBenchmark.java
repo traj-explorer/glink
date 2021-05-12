@@ -25,10 +25,6 @@ public class ContainsBenchmark {
 
   @State(Scope.Thread)
   public static class BenchmarkState {
-    @Param("aa")
-    private String tDrivePath;
-    @Param("bb")
-    private String bejingDistrictPath;
 
     private List<Point> points;
     private List<Geometry> districts;
@@ -38,11 +34,8 @@ public class ContainsBenchmark {
 
     @Setup
     public void setUp() {
-      System.out.println("----");
-      System.out.println(tDrivePath);
-      System.out.println(bejingDistrictPath);
       // /media/liebing/p/data/beijing_district/beijing_district.csv
-      districts = BeijingDistrictReader.read("/media/liebing/p/data/beijing_district/beijing_district.csv");
+      districts = Utils.readDistrict("/media/liebing/p/data/beijing_district/beijing_district.csv");
 
       treeIndex = new TRTreeIndex<>();
       treeIndex.insert(districts);
@@ -58,7 +51,7 @@ public class ContainsBenchmark {
         }
       });
 
-      points = TrajectoryReader.read("/media/liebing/p/data/T-drive/release/tdrive_merge.txt");
+      points = Utils.readTrajectory("/media/liebing/p/data/T-drive/release/tdrive_merge.txt");
       count = 100000;
     }
   }

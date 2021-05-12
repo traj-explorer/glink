@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>glink</artifactId>
+        <artifactId>glink-parent</artifactId>
         <groupId>com.github.tm</groupId>
         <version>0.2-SNAPSHOT</version>
     </parent>
@@ -36,11 +36,6 @@
         <dependency>
             <groupId>com.github.tm</groupId>
             <artifactId>glink-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

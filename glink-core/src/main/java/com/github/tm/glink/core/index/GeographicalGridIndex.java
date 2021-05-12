@@ -52,7 +52,7 @@ public class GeographicalGridIndex extends GridIndex {
     if (geom instanceof Point) {
       Point p = (Point) geom;
       long index = getIndex(p.getY(), p.getX());
-      return new ArrayList<Long>() {{ add(index); }};
+      return new ArrayList<Long>(1) {{ add(index); }};
     } else {
       return getIntersectIndex(geom);
     }

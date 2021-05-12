@@ -3,7 +3,7 @@ package com.github.tm.glink.examples.join;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.distance.GeographicalDistanceCalculator;
 import com.github.tm.glink.core.enums.TopologyType;
-import com.github.tm.glink.examples.common.SpatialFlatMapFunction;
+import com.github.tm.glink.examples.utils.SpatialFlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -12,6 +12,11 @@ import org.locationtech.jts.geom.Geometry;
 
 import java.time.Duration;
 
+/**
+ * A simple example of how to use glink to perform spatial window join.
+ *
+ * @author Yu Liebing
+ * */
 public class SpatialIntervalJoin {
 
   public static void main(String[] args) throws Exception {

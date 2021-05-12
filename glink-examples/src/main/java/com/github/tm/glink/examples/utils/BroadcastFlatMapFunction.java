@@ -1,4 +1,4 @@
-package com.github.tm.glink.examples.common;
+package com.github.tm.glink.examples.utils;
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -24,7 +24,7 @@ public class BroadcastFlatMapFunction extends RichFlatMapFunction<String, Tuple2
   @Override
   public void flatMap(String text, Collector<Tuple2<Boolean, Geometry>> collector) throws Exception {
     try {
-      String[] list = text.split(",");
+      String[] list = text.split(";");
       Geometry geometry = wktReader.read(list[1]);
       Date date = sdf.parse(list[2]);
       Tuple2<String, Long> t = new Tuple2<>(list[0], date.getTime());

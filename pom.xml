@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.tm</groupId>
-    <artifactId>glink</artifactId>
+    <artifactId>glink-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.2-SNAPSHOT</version>
 
@@ -14,17 +14,18 @@
         <module>glink-visualization</module>
         <module>glink-sql</module>
         <module>glink-connector</module>
-        <module>glink-dist</module>
         <module>glink-benchmark</module>
+        <module>glink-dist</module>
     </modules>
 
     <properties>
-        <flink.version>1.12.2</flink.version>
+        <flink.version>1.12.0</flink.version>
         <kafka.version>2.4.1</kafka.version>
         <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.7</scala.version>
+        <slf4j.version>1.7.15</slf4j.version>
         <log4j.version>2.12.1</log4j.version>
         <junit.version>4.13.1</junit.version>
         <jackson.version>2.10.1</jackson.version>
@@ -56,37 +57,25 @@
             </dependency>
             <dependency>
                 <groupId>com.github.tm</groupId>
-                <artifactId>glink-features</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-kafka</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-hbase</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-mapmatching</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tm</groupId>
-                <artifactId>glink-traffic</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.tm</groupId>
                 <artifactId>glink-sql</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tm</groupId>
                 <artifactId>glink-connector-geomesa</artifactId>
+                <version>${project.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Deprecated -->
+            <dependency>
+                <groupId>com.github.tm</groupId>
+                <artifactId>glink-features</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -365,12 +354,31 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- Add a logging Framework, to make the examples produce -->
-            <!--             logs when executing in the IDE            -->
+            <!-- log system -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
-                <scope>compile</scope>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <!-- API bridge between log4j 1 and 2 -->
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-1.2-api</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
         </dependencies>
@@ -381,6 +389,33 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+
+        <!-- tests will have log4j as the default logging framework available -->
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <!-- API bridge between log4j 1 and 2 -->
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
