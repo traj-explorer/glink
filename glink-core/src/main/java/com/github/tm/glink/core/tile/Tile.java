@@ -1,7 +1,5 @@
 package com.github.tm.glink.core.tile;
 
-import scala.concurrent.java8.FuturesConvertersImpl;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -48,9 +46,7 @@ public class Tile implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Tile tile = (Tile) o;
-    return level == tile.level &&
-            x == tile.x &&
-            y == tile.y;
+    return level == tile.level && x == tile.x && y == tile.y;
   }
 
   @Override
@@ -65,37 +61,38 @@ public class Tile implements Serializable {
 
   /**
    * Get id of the tile.
+   *
    * @return
    */
   public long toLong() {
     long res = 0L;
     res |= ((long) level) << 38;
-    for(int i = 0; i < 38; i++) {
+    for (int i = 0; i < 38; i++) {
       // even for x, odd for y
-      int ind = i/2;
-      if (i%2 ==0) {
-        res |= ((long)(x >>> ind & 1) << i);
+      int ind = i / 2;
+      if (i % 2 == 0) {
+        res |= ((long) (x >>> ind & 1) << i);
       } else {
-        res |= ((long)(y >>> ind & 1) << i);
+        res |= ((long) (y >>> ind & 1) << i);
       }
     }
     return res;
   }
 
   public Tile fromLong(long tileId) {
-    int level  = (int) (tileId >> 38);
+    int level = (int) (tileId >> 38);
     long x = 0L;
     long y = 0L;
-    for (int i = 0; i<38;i++){
+    for (int i = 0; i < 38; i++) {
       // even for x, odd for y
-      int ind = i/2;
-      if ( i % 2 == 0 ) {
-        x |= (tileId>>i & 1) << ind;
+      int ind = i / 2;
+      if (i % 2 == 0) {
+        x |= (tileId >> i & 1) << ind;
       } else {
-        y |= (tileId>>i & 1) << ind;
+        y |= (tileId >> i & 1) << ind;
       }
     }
-    return new Tile(level, (int)x, (int)y);
+    return new Tile(level, (int) x, (int) y);
   }
 
 }

@@ -29,13 +29,13 @@ public class Pixel {
   public void setPixelNo(int pixelNo) {
     this.pixelNo = pixelNo;
   }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Pixel pixel = (Pixel) o;
-    return pixelNo == pixel.pixelNo &&
-            Objects.equals(tile, pixel.tile);
+    return pixelNo == pixel.pixelNo && Objects.equals(tile, pixel.tile);
   }
 
   @Override
@@ -45,9 +45,9 @@ public class Pixel {
 
   @Override
   public String toString() {
-    return "Pixel{" +
-            "tile=" + tile +
-            ", pixelNo=" + pixelNo +
-            '}';
+    return "Pixel{"
+             + "tile=" + tile
+             + ", pixelNo=" + pixelNo
+             + '}';
   }
 }

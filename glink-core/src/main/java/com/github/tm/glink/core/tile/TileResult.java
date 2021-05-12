@@ -1,6 +1,6 @@
 package com.github.tm.glink.core.tile;
 
-import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,15 +10,18 @@ import java.util.List;
  */
 public class TileResult<V> {
   private Tile tile;
-  private List<PixelResult<V>> result;
+  private List<PixelResult<V>> resultList;
+  private Timestamp timeStart;
+  private Timestamp timeEnd;
+  private Object data;
 
   public TileResult() {
-    this.result = new ArrayList<>();
+    resultList = new ArrayList<>();
   }
 
   public TileResult(Tile tile) {
     this.tile = tile;
-    this.result = new ArrayList<>();
+    resultList = new ArrayList<>();
   }
 
   public Tile getTile() {
@@ -29,48 +32,60 @@ public class TileResult<V> {
     this.tile = tile;
   }
 
-  public List<PixelResult<V>> getGridResult() {
-    return result;
+  public List<PixelResult<V>> getGridResultList() {
+    return resultList;
   }
 
-  public void setGridResult(List<PixelResult<V>> result) {
-    this.result = result;
+  public void setGridResultList(List<PixelResult<V>> result) {
+    this.resultList = result;
   }
 
   public void addPixelResult(PixelResult<V> pixelResult) {
-    result.add(pixelResult);
+    resultList.add(pixelResult);
+  }
+
+  public Timestamp getTimeStart() {
+    return timeStart;
+  }
+
+  public void setTimeStart(Timestamp timeStart) {
+    this.timeStart = timeStart;
+  }
+
+  public Timestamp getTimeEnd() {
+    return timeEnd;
+  }
+
+  public void setTimeEnd(Timestamp timeEnd) {
+    this.timeEnd = timeEnd;
   }
 
   @Override
   public String toString() {
-    StringBuilder data = new StringBuilder();
-    for (PixelResult<V> pixelResult : result) {
-      data.append("\"").append(pixelResult.getPixel().getPixelNo()).append("\"")
+    StringBuilder pixels = new StringBuilder();
+    for (PixelResult<V> pixelResult : resultList) {
+      pixels.append("\"").append(pixelResult.getPixel().getPixelNo()).append("\"")
               .append(":")
               .append(pixelResult.getResult())
               .append(",");
     }
-    data.setLength(data.length() - 1);
-    return String.format("{\"zoom_level\": %d, \"x\": %d, \"y\": %d, \"data\": {%s}}",
-            tile.getLevel(), getTile().getX(), getTile().getY(), data);
-  }
-
-  public byte[] toBytes() throws IOException {
-    return AvroTileResult.serialize(this);
+    pixels.setLength(pixels.length() - 1);
+    return String.format("{\"level\": %d, \"x\": %d, \"y\": %d, \"start\": %tc, \"end\": %tc, \"data\": {%s}}",
+            getTile().getLevel(), getTile().getX(), getTile().getY(), timeStart, timeEnd, pixels);
   }
 
   public boolean equals(TileResult compare) {
-    boolean a = compare.tile.toLong() == this.tile.toLong();
+    boolean a = compare.getTile().toLong() == this.getTile().toLong();
     boolean b = true;
-    Iterator list1 = this.getGridResult().iterator();
-    Iterator list2 = compare.getGridResult().iterator();
+    Iterator list1 = this.getGridResultList().iterator();
+    Iterator list2 = compare.getGridResultList().iterator();
     while (list1.hasNext()) {
-      if (!list2.hasNext()){
+      if (!list2.hasNext()) {
         b = false;
         break;
       }
-      String val1 = ((PixelResult<V>)list1.next()).getResult().toString();
-      String val2 = ((PixelResult<V>)list2.next()).getResult().toString();
+      String val1 = ((PixelResult<V>) list1.next()).getResult().toString();
+      String val2 = ((PixelResult<V>) list2.next()).getResult().toString();
       if (!val1.equals(val2)) {
         b = false;
         break;

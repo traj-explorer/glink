@@ -36,5 +36,9 @@ public class PixelResult<V> {
     PixelResult pixelResult = (PixelResult) o;
     return pixel.equals(pixelResult.pixel) && result.equals(pixelResult.result);
   }
+  @Override
+  public int hashCode() {
+    return 0;
+  }
 
 }
