@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator.process;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.index.RTreeIndex;
 import com.github.tm.glink.core.index.SpatialTreeIndex;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;

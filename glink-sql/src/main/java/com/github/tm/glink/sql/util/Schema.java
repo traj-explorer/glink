@@ -27,7 +27,7 @@ public class Schema {
    */
   public static Expression[] names(boolean setProcTime, String... names) {
     Expression[] expressions;
-    if(setProcTime == true) {
+    if (setProcTime) {
       expressions = new Expression[names.length + 1];
       expressions[names.length] = $("pt").proctime();
     } else {
@@ -58,8 +58,8 @@ public class Schema {
 
   // 如果需要设置处理时间，返回的TypeInformation[]最后一项为TIMESTAMP类型。
   public static TypeInformation<?>[] toFlinkTypes(Class<?>[] types) {
-    if(setProcTime == true){
-      TypeInformation<?>[] flinkTypes = new TypeInformation<?>[types.length+1];
+    if (setProcTime) {
+      TypeInformation<?>[] flinkTypes = new TypeInformation<?>[types.length + 1];
       flinkTypes[types.length] = TIMESTAMP;
     }
     TypeInformation<?>[] flinkTypes = new TypeInformation<?>[types.length];

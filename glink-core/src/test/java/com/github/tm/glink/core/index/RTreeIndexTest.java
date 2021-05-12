@@ -2,7 +2,10 @@ package com.github.tm.glink.core.index;
 
 import com.github.tm.glink.features.Point;
 import org.junit.Test;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;

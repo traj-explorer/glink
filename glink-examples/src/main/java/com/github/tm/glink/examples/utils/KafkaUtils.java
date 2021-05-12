@@ -3,7 +3,10 @@ package com.github.tm.glink.examples.utils;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class KafkaUtils {
 

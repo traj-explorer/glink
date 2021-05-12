@@ -4,20 +4,28 @@ import com.github.tm.glink.core.distance.DistanceCalculator;
 import com.github.tm.glink.core.distance.GeographicalDistanceCalculator;
 import com.github.tm.glink.core.distance.GeometricDistanceCalculator;
 import com.github.tm.glink.core.enums.GeometryType;
-import com.github.tm.glink.core.enums.TopologyType;
 import com.github.tm.glink.core.enums.TextFileSplitter;
+import com.github.tm.glink.core.enums.TopologyType;
 import com.github.tm.glink.core.format.TextFormatMap;
-import com.github.tm.glink.core.index.*;
+import com.github.tm.glink.core.index.GeographicalGridIndex;
+import com.github.tm.glink.core.index.GridIndex;
+import com.github.tm.glink.core.index.STRTreeIndex;
+import com.github.tm.glink.core.index.TreeIndex;
 import com.github.tm.glink.core.operator.join.BroadcastJoinFunction;
 import com.github.tm.glink.core.operator.join.JoinWithTopologyType;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.*;
+import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.datastream.*;
+import org.apache.flink.streaming.api.datastream.BroadcastStream;
+import org.apache.flink.streaming.api.datastream.CoGroupedStreams;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
@@ -51,7 +59,7 @@ public class SpatialDataStream<T extends Geometry> {
   /**
    * The origin flink {@link DataStream}, be private so the subclasses will not see
    * and need to maintain their own {@link DataStream}.
-   *
+   * <p>
    * In the {@link SpatialDataStream}, generic type {@link T} is a subclass of {@link Geometry}.
    * If it has non-spatial attributes, it can be obtained through {@link Geometry#getUserData}.
    * It is a flink {@link org.apache.flink.api.java.tuple.Tuple} type.
@@ -127,6 +135,15 @@ public class SpatialDataStream<T extends Geometry> {
     this.env = env;
     spatialDataStream = env
             .addSource(sourceFunction);
+  }
+
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final SourceFunction<T> sourceFunction,
+                           GeometryType geometryType) {
+    this.env = env;
+    spatialDataStream = env
+            .addSource(sourceFunction)
+            .returns(geometryType.getTypeInformation());
   }
 
   public SpatialDataStream(final StreamExecutionEnvironment env,
@@ -346,10 +363,6 @@ public class SpatialDataStream<T extends Geometry> {
               }
             })
             .returns(returnType);
-  }
-
-  public DataStream<Object> spatialHeatmap() {
-    return null;
   }
 
   public DataStream<T> getDataStream() {

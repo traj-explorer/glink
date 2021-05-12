@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator.judgement;
 
+import com.github.tm.glink.core.index.GridIndex;
 import com.github.tm.glink.core.index.H3Index;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.index.GridIndex;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.RichAllWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.RichWindowFunction;
@@ -12,7 +12,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yu Liebing

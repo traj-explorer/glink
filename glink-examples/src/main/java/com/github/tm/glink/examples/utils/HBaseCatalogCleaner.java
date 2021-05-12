@@ -4,12 +4,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.ipc.Server;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HTable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * @author Wang Haocheng
@@ -44,7 +44,7 @@ public class HBaseCatalogCleaner {
             HBaseAdmin admin = (HBaseAdmin) connection.getAdmin();
             // 删除表前需要先禁用表
             TableName[] tableNames = admin.listTableNames(catalogName + "_" + schemaName + ".*");
-            for( TableName tableName : tableNames) {
+            for (TableName tableName : tableNames) {
                 HTable table =  new HTable(configuration, tableName);
                 HTableDescriptor td = admin.getTableDescriptor(tableName);
                 admin.disableTable(tableName);

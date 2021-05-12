@@ -10,7 +10,7 @@ import org.locationtech.jts.io.WKTReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Yu Liebing

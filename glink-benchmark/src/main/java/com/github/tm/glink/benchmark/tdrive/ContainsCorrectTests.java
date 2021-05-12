@@ -5,7 +5,10 @@ import com.github.tm.glink.core.geom.PolygonWithIndex;
 import com.github.tm.glink.core.index.TRTreeIndex;
 import com.github.tm.glink.core.index.TreeIndex;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;

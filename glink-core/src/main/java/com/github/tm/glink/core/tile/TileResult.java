@@ -60,6 +60,14 @@ public class TileResult<V> {
     this.timeEnd = timeEnd;
   }
 
+  public void setData(Object data) {
+    this.data = data;
+  }
+
+  public Object getData() {
+    return data;
+  }
+
   @Override
   public String toString() {
     StringBuilder pixels = new StringBuilder();

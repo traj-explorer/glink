@@ -1,20 +1,12 @@
 package com.github.tm.glink.core.source;
 
 import com.github.tm.glink.core.enums.TextFileSplitter;
-import com.github.tm.glink.features.TemporalObject;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 /**
  * @author Wang Haocheng

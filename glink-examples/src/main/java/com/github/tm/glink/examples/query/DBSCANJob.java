@@ -1,8 +1,8 @@
 package com.github.tm.glink.examples.query;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.operator.DBSCAN;
 import com.github.tm.glink.examples.source.CSVPointSource;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -24,7 +24,7 @@ public class DBSCANJob {
     DataStream<Point> pointDataStream = env.addSource(new CSVPointSource(path))
             .assignTimestampsAndWatermarks(WatermarkStrategy
                     .<Point>forBoundedOutOfOrderness(Duration.ofSeconds(3))
-                    .withTimestampAssigner((event, timestamp)->event.getTimestamp()));
+                    .withTimestampAssigner((event, timestamp) -> event.getTimestamp()));
 
     DataStream<Tuple2<Integer, Point>> clusterStream = DBSCAN.dbscan(
             pointDataStream, 1, 5000.d, 10, 0.5);

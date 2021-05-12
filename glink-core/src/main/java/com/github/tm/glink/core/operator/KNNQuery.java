@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.operator.judgement.IndexKNNJudgement;
 import com.github.tm.glink.core.operator.judgement.NativeKNNJudgement;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;

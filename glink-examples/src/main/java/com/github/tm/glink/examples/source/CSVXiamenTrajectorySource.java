@@ -1,12 +1,10 @@
 package com.github.tm.glink.examples.source;
 
-import com.github.tm.glink.features.Point;
-import com.github.tm.glink.features.TrajectoryPoint;
 import com.github.tm.glink.core.source.CSVGeoObjectSource;
+import com.github.tm.glink.features.TrajectoryPoint;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Properties;

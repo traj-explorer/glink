@@ -2,7 +2,6 @@ package com.github.tm.glink.sql.udf.standard.output;
 
 import org.apache.flink.table.functions.FunctionContext;
 import org.apache.flink.table.functions.ScalarFunction;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.WKTWriter;
 

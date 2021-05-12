@@ -54,15 +54,15 @@ public class HBaseTemporalTableJoin {
 
     /** Simple POJO. */
     public static class Order {
-        public long order_id;
+        public long orderId;
         public double price;
         public String currency;
         public long time;
 
-        public Order() {}
+        public Order() { }
 
-        public Order(long order_id, double price, String currency, long time) {
-            this.order_id = order_id;
+        public Order(long orderId, double price, String currency, long time) {
+            this.orderId = orderId;
             this.price = price;
             this.currency = currency;
             this.time = time;
@@ -72,7 +72,7 @@ public class HBaseTemporalTableJoin {
         public String toString() {
             return "Order{"
                     + "order_id="
-                    + order_id
+                    + orderId
                     + ", price='"
                     + price
                     + '\''

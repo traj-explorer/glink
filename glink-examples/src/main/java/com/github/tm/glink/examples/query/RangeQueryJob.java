@@ -1,18 +1,13 @@
 package com.github.tm.glink.examples.query;
 
+import com.github.tm.glink.core.operator.RangeQuery;
 import com.github.tm.glink.examples.source.CSVDiDiGPSPointSource;
 import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.operator.RangeQuery;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LinearRing;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.*;
 
 import java.time.Duration;
 
@@ -37,7 +32,7 @@ public class RangeQueryJob {
     DataStream<Point> pointDataStream = env.addSource(new CSVDiDiGPSPointSource(path))
             .assignTimestampsAndWatermarks(WatermarkStrategy
                     .<Point>forBoundedOutOfOrderness(Duration.ofSeconds(3))
-                    .withTimestampAssigner((event, timestamp)->event.getTimestamp()));
+                    .withTimestampAssigner((event, timestamp) -> event.getTimestamp()));
 
     Coordinate[] coorArray = new Coordinate[]{new Coordinate(30.5, 104),
         new Coordinate(30.8, 104),

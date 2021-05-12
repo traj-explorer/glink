@@ -1,10 +1,10 @@
 package com.github.tm.glink.examples.sql;
 
-import com.github.tm.glink.sql.util.Schema;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.GeometryType;
 import com.github.tm.glink.core.enums.TextFileSplitter;
 import com.github.tm.glink.sql.Adapter;
+import com.github.tm.glink.sql.util.Schema;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;

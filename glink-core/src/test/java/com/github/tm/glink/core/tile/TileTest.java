@@ -2,8 +2,6 @@ package com.github.tm.glink.core.tile;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class TileTest {
 
   @Test

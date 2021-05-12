@@ -1,7 +1,6 @@
 package com.github.tm.glink.core.index;
 
 import com.github.tm.glink.core.distance.DistanceCalculator;
-import com.github.tm.glink.core.util.GeoUtils;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;

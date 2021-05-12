@@ -9,8 +9,6 @@ import org.locationtech.jts.io.WKTReader;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
 public class GeoUtilsTest {
 
   private GeometryFactory factory = new GeometryFactory();

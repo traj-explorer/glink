@@ -1,7 +1,7 @@
 package com.github.tm.glink.sql;
 
-import com.github.tm.glink.sql.util.Schema;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
+import com.github.tm.glink.sql.util.Schema;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;

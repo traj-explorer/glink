@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.operator.process.AllIndexRangeJoinProcess;
 import com.github.tm.glink.core.operator.process.RangeJoinIndexAssigner;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;

@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator;
 
-import com.github.tm.glink.features.Point;
 import com.github.tm.glink.core.index.GeographicalGridIndex;
 import com.github.tm.glink.core.operator.cluster.WindowAllDBSCAN;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;

@@ -61,6 +61,16 @@ public class TextFormatMap<T extends Geometry> extends RichFlatMapFunction<Strin
    */
   protected boolean skipSyntacticallyInvalidGeometries;
 
+  /**
+   *
+   * @param startOffset Coordinate fields start index.
+   * @param endOffset Coordinate fields end index, if the coordinates form a point, then it should be "startOffset+1",
+   *                  else, it should be the last element index of the line.
+   * @param splitter
+   * @param geometryType
+   * @param carryInputData
+   * @param types
+   */
   public TextFormatMap(
           int startOffset,
           int endOffset,

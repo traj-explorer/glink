@@ -1,8 +1,8 @@
 package com.github.tm.glink.core.operator.process;
 
-import com.github.tm.glink.features.Point;
-import com.github.tm.glink.core.index.GridIndex;
 import com.github.tm.glink.core.index.GeographicalGridIndex;
+import com.github.tm.glink.core.index.GridIndex;
+import com.github.tm.glink.features.Point;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
