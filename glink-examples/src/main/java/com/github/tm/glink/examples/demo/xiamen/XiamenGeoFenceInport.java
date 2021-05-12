@@ -45,16 +45,16 @@ public class XiamenGeoFenceInport {
                     + "geom STRING,\n"
                     + "name STRING,\n"
 //                        "WATERMARK FOR dtg AS dtg,\n"+
-                        "PRIMARY KEY (id) NOT ENFORCED)\n" +
-                        "WITH (\n" +
-                        "  'connector' = 'geomesa',\n" +
-                        "  'geomesa.data.store' = 'hbase',\n" +
-                        "  'geomesa.schema.name' = '" + GEOFENCE_SCHEMA_NAME +  "',\n" +
-                        "  'geomesa.spatial.fields' = 'geom:Polygon',\n" +
-                        "  'hbase.zookeepers' = '" + ZOOKEEPERS + "',\n" +
-                        "  'hbase.catalog' = '" + CATALOG_NAME + "'\n" +
-                        ")");
-        // define a dynamic aggregating query
-        tEnv.executeSql("INSERT INTO XiamenGeoFence SELECT id, dtg, geom,name FROM CSV_Area");
-    }
+                    + "PRIMARY KEY (id) NOT ENFORCED)\n"
+                    + "WITH (\n"
+                    + "  'connector' = 'geomesa',\n"
+                    + "  'geomesa.data.store' = 'hbase',\n"
+                    + "  'geomesa.schema.name' = '" + GEOFENCE_SCHEMA_NAME + "',\n"
+                    + "  'geomesa.spatial.fields' = 'geom:Polygon',\n"
+                    + "  'hbase.zookeepers' = '" + ZOOKEEPERS + "',\n"
+                    + "  'hbase.catalog' = '" + CATALOG_NAME + "'\n"
+                    + ")");
+    // define a dynamic aggregating query
+    tEnv.executeSql("INSERT INTO XiamenGeoFence SELECT id, dtg, geom,name FROM CSV_Area");
+  }
 }
