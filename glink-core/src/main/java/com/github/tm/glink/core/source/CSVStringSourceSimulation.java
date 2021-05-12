@@ -12,13 +12,14 @@ import java.time.Instant;
  * @author Wang Haocheng
  * @date 2021/4/22 - 8:09 下午
  */
+@Deprecated
 public class CSVStringSourceSimulation extends RichSourceFunction<String> {
 
     protected String filePath;
     protected BufferedReader bufferedReader;
 
     // Variables for speed up the simulated stream.
-    private Integer speed_factor;
+    private Integer speedFactor;
     private long startTime;
     private long startEventTime = -1;
     private long preEventTime;
@@ -31,9 +32,9 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
 
 
 
-    public CSVStringSourceSimulation(String filePath, int speed_factor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) {
+    public CSVStringSourceSimulation(String filePath, int speedFactor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) {
         this.filePath = filePath;
-        this.speed_factor = speed_factor;
+        this.speedFactor = speedFactor;
         this.timeFieldIndex = timeFieldIndex;
         this.startTime = Instant.now().toEpochMilli();
         this.splitter = splitter;
@@ -49,16 +50,16 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
         String time = line.split(splitter.getDelimiter())[timeFieldIndex];
         long thisEventTime = Long.parseLong(time);
 
-        if(startEventTime<0) {
+        if (startEventTime < 0) {
             startEventTime = thisEventTime;
             preEventTime = thisEventTime;
         } else {
-            long gapTime = (thisEventTime - preEventTime)/speed_factor;
-            if(gapTime>0 || syncCounter > 1000) {
+            long gapTime = (thisEventTime - preEventTime) / speedFactor;
+            if (gapTime > 0 || syncCounter > 1000) {
                 long currentTime = System.currentTimeMillis();
-                long targetEmitTime = (long)((thisEventTime-startEventTime)/speed_factor) + startTime;
+                long targetEmitTime = (long) ((thisEventTime - startEventTime) / speedFactor) + startTime;
                 long waitTime = targetEmitTime - currentTime;
-                if (waitTime>0) {
+                if (waitTime > 0) {
                     try {
                         Thread.sleep(waitTime);
                     } catch (InterruptedException e) {
@@ -83,11 +84,11 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     public final void run(SourceContext<String> sourceContext) throws Exception {
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            if (speed_factor > 0)
+            if (speedFactor > 0)
                 checkTimeAndWait(line);
-            if(!withPid){
+            if (!withPid) {
                 sourceContext.collect(line + "," + pid);
-                pid ++;
+                pid++;
             } else {
                 sourceContext.collect(line);
             }

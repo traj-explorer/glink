@@ -1,62 +1,53 @@
 package com.github.tm.glink.core.source;
 
-import com.github.tm.glink.features.GeoObject;
-import com.github.tm.glink.features.TemporalObject;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
+import org.locationtech.jts.geom.Geometry;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
-/**
- * @author Yu Liebing
- */
-@Deprecated
-
-public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSourceFunction<T> {
+public abstract class CSVGeometrySource<T extends Geometry> extends RichSourceFunction<T> {
 
   protected String filePath;
   protected BufferedReader bufferedReader;
 
   // Variables for speed up the simulated stream.
-  private Integer speed_factor;
+  private Integer speedFactor;
   private long startTime;
   private long startEventTime = -1;
   private long preEventTime;
   private int syncCounter;
-  protected DateTimeFormatter formatter;
+  private int timestampOffsetInUserData;
+  private DateTimeFormatter formatter;
 
   public abstract T parseLine(String line);
 
-  public CSVGeoObjectSource(String filePath) {
-    this(filePath, 0);
-  }
-
-  public CSVGeoObjectSource(String filePath, int speed_factor) {
+  public CSVGeometrySource(String filePath, int speedFactor, int timestampOffsetInUserData, DateTimeFormatter formatter) {
     this.filePath = filePath;
-    this.speed_factor = speed_factor;
-    this.startTime = Instant.now().toEpochMilli();
+    this.speedFactor = speedFactor;
+    this.timestampOffsetInUserData = timestampOffsetInUserData;
+    this.formatter = formatter;
+    startTime = Instant.now().toEpochMilli();
   }
 
 
   protected void checkTimeAndWait(T geoObject) throws InterruptedException {
-    if (!(geoObject instanceof TemporalObject)) {
-      return;
-    }
-    TemporalObject temporalObject = (TemporalObject) geoObject;
-    long thisEventTime = temporalObject.getTimestamp();
-    if(startEventTime<0) {
+    Tuple userData = (Tuple) ((Geometry) geoObject).getUserData();
+    long thisEventTime = userData.getField(timestampOffsetInUserData);
+    if (startEventTime < 0) {
       startEventTime = thisEventTime;
       preEventTime = thisEventTime;
     } else {
-      long gapTime = (thisEventTime - preEventTime)/speed_factor;
-      if(gapTime>0 || syncCounter > 1000) {
+      long gapTime = (thisEventTime - preEventTime) / speedFactor;
+      if (gapTime > 0 || syncCounter > 1000) {
         long currentTime = System.currentTimeMillis();
-        long targetEmitTime = (long)((thisEventTime-startEventTime)/speed_factor) + startTime;
+        long targetEmitTime = (long) ((thisEventTime - startEventTime) / speedFactor) + startTime;
         long waitTime = targetEmitTime - currentTime;
-        if (waitTime>0) {
+        if (waitTime > 0) {
           try {
             Thread.sleep(waitTime);
           } catch (InterruptedException e) {
@@ -83,7 +74,7 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
       T geoObject = parseLine(line);
       if (geoObject == null)
         continue;
-      if (speed_factor > 0)
+      if (speedFactor > 0)
         checkTimeAndWait(geoObject);
       sourceContext.collect(geoObject);
     }

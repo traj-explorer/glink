@@ -21,6 +21,7 @@ import java.util.Properties;
  * @author Wang Haocheng
  *
  */
+@Deprecated
 public class CSVXiamenTrajectorySource extends CSVGeoObjectSource<TrajectoryPoint> {
   public CSVXiamenTrajectorySource(String path) {
     super(path);

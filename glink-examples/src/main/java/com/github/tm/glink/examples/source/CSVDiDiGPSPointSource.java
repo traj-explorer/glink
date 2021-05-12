@@ -6,6 +6,7 @@ import com.github.tm.glink.features.Point;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class CSVDiDiGPSPointSource extends CSVGeoObjectSource<Point> {
 
   public CSVDiDiGPSPointSource(String path) {
