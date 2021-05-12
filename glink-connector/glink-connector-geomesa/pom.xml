@@ -36,6 +36,10 @@
             <groupId>org.locationtech.spatial4j</groupId>
             <artifactId>spatial4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.tm</groupId>
+            <artifactId>glink-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

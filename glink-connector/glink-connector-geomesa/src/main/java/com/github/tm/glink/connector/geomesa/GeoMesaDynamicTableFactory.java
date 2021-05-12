@@ -36,7 +36,7 @@ public class GeoMesaDynamicTableFactory implements DynamicTableSourceFactory, Dy
     String dataStore = context.getCatalogTable().getOptions().get(GeoMesaConfigOption.GEOMESA_DATA_STORE.key());
     geomesaConfigOption = GeoMesaConfigOptionFactory.createGeomesaConfigOption(dataStore);
 
-    TableFactoryHelper helper = createTableFactoryHelper(this, context);
+    TableFactoryHelper helper = FactoryUtil.createTableFactoryHelper(this, context);
     helper.validate();
     TableSchema tableSchema = context.getCatalogTable().getSchema();
     validatePrimaryKey(tableSchema);
