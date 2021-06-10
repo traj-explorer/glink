@@ -8,8 +8,10 @@ import org.apache.flink.table.api.ValidationException;
 public class GeoMesaDataStoreParamFactory {
 
   public static GeoMesaDataStoreParam createGeomesaDataStoreParam(String dataStore) {
-    if (dataStore.equalsIgnoreCase("hbase")) {
+    if ("hbase".equalsIgnoreCase(dataStore)) {
       return new HBaseDataStoreParam();
+    } else if ("kafka".equalsIgnoreCase(dataStore)) {
+      return new KafkaDataStoreParam();
     } else {
       throw new ValidationException("Unsupported data store");
     }
