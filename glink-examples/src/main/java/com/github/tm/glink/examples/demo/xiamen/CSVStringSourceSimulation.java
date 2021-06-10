@@ -1,4 +1,4 @@
-package com.github.tm.glink.core.source;
+package com.github.tm.glink.examples.demo.xiamen;
 
 import com.github.tm.glink.core.enums.TextFileSplitter;
 import org.apache.flink.configuration.Configuration;
@@ -12,7 +12,6 @@ import java.time.Instant;
  * @author Wang Haocheng
  * @date 2021/4/22 - 8:09 下午
  */
-@Deprecated
 public class CSVStringSourceSimulation extends RichSourceFunction<String> {
 
     protected String filePath;
@@ -28,9 +27,6 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     private TextFileSplitter splitter;
     private boolean withPid; // 如果没有pid，我们需要自行在后面附加。
     private int pid;
-
-
-
 
     public CSVStringSourceSimulation(String filePath, int speedFactor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) {
         this.filePath = filePath;
