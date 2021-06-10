@@ -1,6 +1,6 @@
 package com.github.tm.glink.core.datastream;
 
-import com.github.tm.glink.core.enums.AggregateType;
+import com.github.tm.glink.core.enums.TileAggregateType;
 import com.github.tm.glink.core.tile.*;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
@@ -9,6 +9,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -27,9 +28,13 @@ public class TileDataStream<T1 extends Point, T2> {
 
   private DataStream<TileResult> tileResultDataStream;
 
+  /**
+   *
+   * @param aggFieldIndex The index of the field in the user data to be aggregated. If the aggregateType is COUNT, this parameter is useless.
+   */
   public TileDataStream(
           SpatialDataStream<T1> pointDataStream,
-          AggregateType aggregateType,
+          TileAggregateType aggregateType,
           WindowAssigner windowAssigner,
           int aggFieldIndex,
           int hLevel,
@@ -38,7 +43,7 @@ public class TileDataStream<T1 extends Point, T2> {
             .flatMap(new PixelGenerateFlatMap(hLevel, lLevel))
             .keyBy(new KeyByTile())
             .window(windowAssigner)
-            .aggregate(AggregateType.getAggregateFunction(aggregateType, aggFieldIndex), new AddWindowTimeInfo());
+            .aggregate(TileAggregateType.getAggregateFunction(aggregateType, aggFieldIndex), new AddWindowTimeInfo());
   }
 
   public TileDataStream(
@@ -86,7 +91,7 @@ public class TileDataStream<T1 extends Point, T2> {
     public void flatMap(T1 value, Collector<Tuple2<PixelResult<Integer>, T1>> out) throws Exception {
       int i = levelNum;
       while (0 < i) {
-        out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getX(), value.getY()), 1), value));
+        out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getY(), value.getX()), 1), value));
         i = i - 1;
       }
     }

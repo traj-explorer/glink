@@ -50,6 +50,9 @@ public class BroadcastJoinFunction<T extends Geometry, T2 extends Geometry, OUT>
         }
       } else {
         List<T2> result = treeIndex.query(t.getEnvelopeInternal());
+        if (result.size() == 0) {
+          collector.collect(joinFunction.join(t, null));
+        }
         for (T2 t2 : result) {
           if (joinType == TopologyType.INTERSECTS) {
             collector.collect(joinFunction.join(t, t2));

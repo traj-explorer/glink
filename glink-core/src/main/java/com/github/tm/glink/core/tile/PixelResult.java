@@ -2,6 +2,7 @@ package com.github.tm.glink.core.tile;
 
 /**
  * @author Yu Liebing
+ * @param <V> The type of value stored in this pixel, can be {@Integer} or {@Double}.
  */
 public class PixelResult<V> {
 
