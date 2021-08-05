@@ -1,13 +1,10 @@
-package com.github.tm.glink.examples.utils;
+package com.github.tm.glink.examples.demo.xiamen;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.*;
 
 import java.io.IOException;
 
@@ -47,11 +44,13 @@ public class HBaseCatalogCleaner {
             for (TableName tableName : tableNames) {
                 HTable table =  new HTable(configuration, tableName);
                 HTableDescriptor td = admin.getTableDescriptor(tableName);
-                admin.disableTable(tableName);
+                if (!admin.isTableDisabled(tableName)) {
+                    admin.disableTable(tableName);
+                }
                 admin.deleteTable(tableName);
                 System.out.println(tableName.toString() + " has been deleted;");
                 admin.createTable(td);
-                System.out.println("New " + tableName.toString() + " has created;");
+                System.out.println("New " + tableName + " has created;");
             }
         } catch (Exception e) {
             e.printStackTrace();

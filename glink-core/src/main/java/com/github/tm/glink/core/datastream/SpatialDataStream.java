@@ -167,6 +167,7 @@ public class SpatialDataStream<T extends Geometry> {
             geometryStartOffset, geometryEndOffset, splitter, geometryType, carryAttributes, types);
     spatialDataStream = env
             .addSource(sourceFunction)
+            .rebalance()
             .flatMap(textFormatMap)
             .returns(geometryType.getTypeInformation());
   }

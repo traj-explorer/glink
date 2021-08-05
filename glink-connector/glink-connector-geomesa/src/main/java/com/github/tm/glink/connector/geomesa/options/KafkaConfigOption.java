@@ -51,25 +51,25 @@ public class KafkaConfigOption extends GeoMesaConfigOption {
           .key("kafka.consumer.read-back")
           .stringType()
           .noDefaultValue()
-          .withDescription("On start up, read messages that were written within this time frame (vs ignore " +
-                  "old messages), e.g. ‘1 hour’. Use ‘Inf’ to read all messages. If enabled, features will not " +
-                  "be available for query until all existing messages are processed. However, feature listeners " +
-                  "will still be invoked as normal.");
+          .withDescription("On start up, read messages that were written within this time frame (vs ignore "
+                  + "old messages), e.g. ‘1 hour’. Use ‘Inf’ to read all messages. If enabled, features will not "
+                  + "be available for query until all existing messages are processed. However, feature listeners "
+                  + "will still be invoked as normal.");
 
   public static final ConfigOption<Integer> CONSUMER_COUNT = ConfigOptions
           .key("kafka.consumer.count")
           .intType()
           .noDefaultValue()
-          .withDescription("Number of kafka consumers used per feature type. " +
-                  "Set to 0 to disable consuming (i.e. producer only)");
+          .withDescription("Number of kafka consumers used per feature type. "
+                  + "Set to 0 to disable consuming (i.e. producer only)");
 
   public static final ConfigOption<Boolean> CONSUMER_START_ON_DEMAND = ConfigOptions
           .key("kafka.consumer.start-on-demand")
           .booleanType()
           .noDefaultValue()
-          .withDescription("The default behavior is to start consuming a topic only when that feature type is first requested. " +
-                  "This can reduce load if some layers are never queried. Note that care should be taken when setting this to false," +
-                  " as the store will immediately start consuming from Kafka for all known feature types, which may require significant memory overhead.");
+          .withDescription("The default behavior is to start consuming a topic only when that feature type is first requested. "
+                  + "This can reduce load if some layers are never queried. Note that care should be taken when setting this to false,"
+                  + " as the store will immediately start consuming from Kafka for all known feature types, which may require significant memory overhead.");
 
   public static final ConfigOption<Integer> TOPIC_PARTITIONS = ConfigOptions
           .key("kafka.topic.partitions")
@@ -105,8 +105,8 @@ public class KafkaConfigOption extends GeoMesaConfigOption {
           .key("kafka.cache.event-time")
           .stringType()
           .noDefaultValue()
-          .withDescription("Instead of message time, determine expiry based on feature data. " +
-                  "This can be an attribute name or a CQL expression, but it must evaluate to a date");
+          .withDescription("Instead of message time, determine expiry based on feature data. "
+                  + "This can be an attribute name or a CQL expression, but it must evaluate to a date");
 
   public static final ConfigOption<Boolean> EVENT_TIME_ORDERING = ConfigOptions
           .key("kafka.cache.event-time.ordering")
@@ -136,29 +136,29 @@ public class KafkaConfigOption extends GeoMesaConfigOption {
           .key("kafka.index.cqengine")
           .stringType()
           .noDefaultValue()
-          .withDescription("Use CQEngine for indexing individual attributes. Specify as `name:type`, delimited by commas, where name " +
-                  "is an attribute and type is one of `default`, `navigable`, `radix`, `unique`, `hash` or `geometry`");
+          .withDescription("Use CQEngine for indexing individual attributes. Specify as `name:type`, delimited by commas, where name "
+                  + "is an attribute and type is one of `default`, `navigable`, `radix`, `unique`, `hash` or `geometry`");
 
   public static final ConfigOption<Boolean> LAZY_LOAD = ConfigOptions
           .key("kafka.consumer.start-on-demand")
           .booleanType()
           .noDefaultValue()
-          .withDescription("The default behavior is to start consuming a topic only when that feature type is first requested. " +
-                  "This can reduce load if some layers are never queried. Note that care should be taken when " +
-                  "setting this to false, as the store will immediately start consuming from Kafka for all known " +
-                  "feature types, which may require significant memory overhead.");
+          .withDescription("The default behavior is to start consuming a topic only when that feature type is first requested. "
+                  + "This can reduce load if some layers are never queried. Note that care should be taken when "
+                  + "setting this to false, as the store will immediately start consuming from Kafka for all known "
+                  + "feature types, which may require significant memory overhead.");
 
   public static final ConfigOption<Boolean> LAZY_FEATURES = ConfigOptions
           .key("kafka.serialization.lazy")
           .booleanType()
           .noDefaultValue()
-          .withDescription("Use lazy deserialization of features. " +
-                  "This may improve processing load at the expense of slightly slower query times");
+          .withDescription("Use lazy deserialization of features. "
+                  + "This may improve processing load at the expense of slightly slower query times");
 
   public static final ConfigOption<String> METRICS_REPORTERS = ConfigOptions
           .key("kafka.metrics.reporters")
           .stringType()
           .noDefaultValue()
-          .withDescription("Reporters used to publish Kafka metrics, as TypeSafe config. To use multiple reporters, " +
-                  "nest them under the key 'reporters'");
+          .withDescription("Reporters used to publish Kafka metrics, as TypeSafe config. To use multiple reporters, "
+                  + "nest them under the key 'reporters'");
 }

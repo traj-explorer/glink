@@ -95,23 +95,23 @@ public class AvroStringTileResultToSimpleFeatureConverter implements TileResultT
   }
 
   /**
-   * 21 bit length:
-   * year - 5 bits - 16 year
-   * month- 5 bits - 12 months
-   * day  - 6 bits - 31 days
-   * hour - 6 bits - 24 hours
-   * min  - 5 bits - 12 bins
+   * 24  bit length:
+   * year - 4 bits - 15 year
+   * month- 4 bits - 12 months
+   * day  - 5 bits - 31 days
+   * hour - 5 bits - 24 hours
+   * min  - 6 bits - 60 minutes
    *
    * @param ts
    * @return
    */
   private int fromTimestampToLong(Timestamp ts) {
     LocalDateTime ldt = ts.toLocalDateTime();
-    int yearOffset = ldt.getYear() - 2019;
+    int yearOffset = ldt.getYear() - 2008;
     int monthOffset = ldt.getMonthValue();
     int dayOffset = ldt.getDayOfMonth();
     int hourOffset = ldt.getHour();
-    int fiveMinOffset = ldt.getMinute() / 5;
-    return yearOffset << 22 | monthOffset << 17 | dayOffset << 11 | hourOffset << 5 | fiveMinOffset;
+    int fiveMinOffset = ldt.getMinute();
+    return yearOffset << 20 | monthOffset << 16 | dayOffset << 11 | hourOffset << 6 | fiveMinOffset;
   }
 }

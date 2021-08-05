@@ -7,9 +7,9 @@ import java.util.Objects;
  * @author Yu Liebing
  */
 public class Tile implements Serializable {
-  private int level;
-  private int x;
-  private int y;
+  private final int level;
+  private final int x;
+  private final int y;
 
   public Tile(int level, int x, int y) {
     this.level = level;
@@ -21,24 +21,12 @@ public class Tile implements Serializable {
     return level;
   }
 
-  public void setLevel(int level) {
-    this.level = level;
-  }
-
   public int getX() {
     return x;
   }
 
-  public void setX(int x) {
-    this.x = x;
-  }
-
   public int getY() {
     return y;
-  }
-
-  public void setY(int y) {
-    this.y = y;
   }
 
   @Override

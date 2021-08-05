@@ -10,6 +10,8 @@ import org.locationtech.jts.geom.Point;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,8 +41,17 @@ public enum TileAggregateType implements Serializable {
         }
     }
 
-    private static class AvePixelAgg <V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, Tuple2<Integer, V>>, TileResult<V>>{
+    public static AggregateFunction getFinalAggregateFunction(TileAggregateType aggregateType) {
+        switch (aggregateType) {
+            case SUM:
+                return new SumFinalTileAggregate();
+            default:
+                return new SumFinalTileAggregate();
+        }
+    }
 
+
+    private static final class AvePixelAgg<V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, Tuple2<Integer, V>>, TileResult<V>> {
         private int aggFieldIndex;
 
         private AvePixelAgg(int aggFieldIndex) {
@@ -55,15 +66,15 @@ public enum TileAggregateType implements Serializable {
         @Override
         public Map<Pixel, Tuple2<Integer, V>> add(Tuple2<PixelResult<V>, Point> value, Map<Pixel, Tuple2<Integer, V>> accumulator) {
             Pixel pixel = value.f0.getPixel();
-            V val = ((Tuple)value.f1.getUserData()).getField(aggFieldIndex);
+            V val = ((Tuple) value.f1.getUserData()).getField(aggFieldIndex);
             if (!accumulator.containsKey(pixel)) {
                 accumulator.put(pixel, new Tuple2<>(1, val));
             } else {
                 Tuple2 tuple2 = accumulator.get(pixel);
                 Double ave = (Double) tuple2.f1 * (Integer) tuple2.f0 + (Double) val;
                 int count = (Integer) tuple2.f0 + 1;
-                ave = ave/count;
-                accumulator.put(pixel, new Tuple2<>(count,(V) ave));
+                ave = ave / count;
+                accumulator.put(pixel, new Tuple2<>(count, (V) ave));
             }
             return accumulator;
         }
@@ -86,7 +97,7 @@ public enum TileAggregateType implements Serializable {
         }
     }
 
-    private static class MaxPixelAgg <V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>>{
+    private static final class MaxPixelAgg<V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>> {
         private int aggFieldIndex;
 
         private MaxPixelAgg(int aggFieldIndex) {
@@ -101,19 +112,19 @@ public enum TileAggregateType implements Serializable {
         @Override
         public Map<Pixel, V> add(Tuple2<PixelResult<V>, Point> value, Map<Pixel, V> accumulator) {
             Pixel pixel = value.f0.getPixel();
-            V val = ((Tuple)value.f1.getUserData()).getField(aggFieldIndex);
+            V val = ((Tuple) value.f1.getUserData()).getField(aggFieldIndex);
             if (!(val instanceof Comparable)) {
                 throw new RuntimeException("The aggregate field does not support comparison");
-            } else if(!accumulator.containsKey(pixel)) {
+            } else if (!accumulator.containsKey(pixel)) {
                 accumulator.put(pixel, val);
-            } else if (((Comparable)val).compareTo(accumulator.get(pixel)) > 0) {
+            } else if (((Comparable) val).compareTo(accumulator.get(pixel)) > 0) {
                 accumulator.put(pixel, val);
             }
             return accumulator;
         }
 
         @Override
-        public TileResult<V> getResult(Map<Pixel,V> accumulator) {
+        public TileResult<V> getResult(Map<Pixel, V> accumulator) {
             TileResult<V> ret = new TileResult<>();
             ret.setTile(accumulator.keySet().iterator().next().getTile());
             for (Map.Entry<Pixel, V> entry : accumulator.entrySet()) {
@@ -138,7 +149,7 @@ public enum TileAggregateType implements Serializable {
         }
     }
 
-    private static class MinPixelAgg <V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>>{
+    private static final class MinPixelAgg<V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>> {
 
         private int aggFieldIndex;
 
@@ -154,17 +165,17 @@ public enum TileAggregateType implements Serializable {
         @Override
         public Map<Pixel, V> add(Tuple2<PixelResult<V>, Point> value, Map<Pixel, V> accumulator) {
             Pixel pixel = value.f0.getPixel();
-            V val = ((Tuple)value.f1.getUserData()).getField(aggFieldIndex);
-            if(!accumulator.containsKey(pixel)) {
+            V val = ((Tuple) value.f1.getUserData()).getField(aggFieldIndex);
+            if (!accumulator.containsKey(pixel)) {
                 accumulator.put(pixel, val);
-            } else if (((Comparable)val).compareTo(accumulator.get(pixel)) < 0) {
+            } else if (((Comparable) val).compareTo(accumulator.get(pixel)) < 0) {
                 accumulator.put(pixel, val);
             }
             return accumulator;
         }
 
         @Override
-        public TileResult<V> getResult(Map<Pixel,V> accumulator) {
+        public TileResult<V> getResult(Map<Pixel, V> accumulator) {
             TileResult<V> ret = new TileResult<>();
             ret.setTile(accumulator.keySet().iterator().next().getTile());
             for (Map.Entry<Pixel, V> entry : accumulator.entrySet()) {
@@ -189,7 +200,7 @@ public enum TileAggregateType implements Serializable {
         }
     }
 
-    private static class SumPixelAgg <V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>>{
+    private static final class SumPixelAgg<V> implements AggregateFunction<Tuple2<PixelResult<V>, Point>, Map<Pixel, V>, TileResult<V>> {
 
         private int aggFieldIndex;
 
@@ -205,7 +216,7 @@ public enum TileAggregateType implements Serializable {
         @Override
         public Map<Pixel, V> add(Tuple2<PixelResult<V>, Point> value, Map<Pixel, V> accumulator) {
             Pixel pixel = value.f0.getPixel();
-            V val = ((Tuple)value.f1.getUserData()).getField(aggFieldIndex);
+            V val = ((Tuple) value.f1.getUserData()).getField(aggFieldIndex);
             if (accumulator.containsKey(pixel)) {
                 Double newVal = (Double) val + (Double) accumulator.get(pixel);
                 accumulator.put(pixel, (V) newVal);
@@ -236,7 +247,7 @@ public enum TileAggregateType implements Serializable {
         }
     }
 
-    private static class CountPixelAgg implements AggregateFunction<Tuple2<PixelResult<Integer>, Point>, Map<Pixel, Integer>, TileResult<Integer>>{
+    private static class CountPixelAgg implements AggregateFunction<Tuple2<PixelResult<Integer>, Point>, Map<Pixel, Integer>, TileResult<Integer>> {
 
         @Override
         public Map<Pixel, Integer> createAccumulator() {
@@ -274,6 +285,55 @@ public enum TileAggregateType implements Serializable {
             }));
             return c;
         }
+    }
+
+    private static class SumFinalTileAggregate implements AggregateFunction<TileResult, TileResult, TileResult> {
+        @Override
+        public TileResult createAccumulator() {
+            return new TileResult();
+        }
+
+        @Override
+        public TileResult add(TileResult value, TileResult accumulator) {
+            if (accumulator.getTile() == null) {
+                accumulator.setTile(value.getTile());
+                accumulator.setGridResultList(value.getGridResultList());
+            } else {
+                List<PixelResult> lAcc = accumulator.getGridResultList();
+                List<Integer> pixelIdAcc = new LinkedList<>();
+                // 存储每个pixel的id。
+                for (PixelResult pixel : lAcc) {
+                    pixelIdAcc.add(pixel.getPixel().getPixelNo());
+                }
+                List<PixelResult> lVal = value.getGridResultList();
+                // 进行pixel的聚合，如果之前已经存在了acc中，则更新pixel的result，否则添加到acc中。
+                for (PixelResult pixel : lVal) {
+                    int pixelId = pixel.getPixel().getPixelNo();
+                    if (pixelIdAcc.contains(pixelId)) {
+                        int index = pixelIdAcc.indexOf(pixelId);
+                        int oldVal = (int) lAcc.get(index).getResult();
+                        int toAdd = (int) pixel.getResult();
+                        lAcc.get(index).setResult(oldVal + toAdd);
+                    } else {
+                        lAcc.add(pixel);
+                        pixelIdAcc.add(pixel.getPixel().getPixelNo());
+                    }
+                }
+                accumulator.setGridResultList(lAcc);
+            }
+            return accumulator;
+        }
+
+        @Override
+        public TileResult getResult(TileResult accumulator) {
+            return accumulator;
+        }
+        // 不会使用Session Window，暂不实现。
+        @Override
+        public TileResult merge(TileResult a, TileResult b) {
+            return null;
+        }
+
     }
 
 }

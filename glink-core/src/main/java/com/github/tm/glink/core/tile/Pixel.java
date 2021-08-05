@@ -6,8 +6,8 @@ import java.util.Objects;
  * @author Yu Liebing
  */
 public class Pixel {
-  private Tile tile;
-  private int pixelNo;
+  private final Tile tile;
+  private final int pixelNo;
 
   public Pixel(Tile tile, int pixelNo) {
     this.tile = tile;
@@ -18,16 +18,8 @@ public class Pixel {
     return tile;
   }
 
-  public void setTile(Tile tile) {
-    this.tile = tile;
-  }
-
   public int getPixelNo() {
     return pixelNo;
-  }
-
-  public void setPixelNo(int pixelNo) {
-    this.pixelNo = pixelNo;
   }
 
   @Override

@@ -10,12 +10,12 @@ import java.util.Objects;
 /**
  * @author Wang Haocheng
  */
-public class XiamenGeoFenceInport {
+public class GeoFenceInport {
 
-  public static final String ZOOKEEPERS = "localhost:2181";
+  public static final String ZOOKEEPERS = Heatmap.ZOOKEEPERS;
   public static final String CATALOG_NAME = "Xiamen";
   public static final String GEOFENCE_SCHEMA_NAME = "Geofence";
-  public static final String FILEPATH = Objects.requireNonNull(XiamenGeoFenceInport.class.getClassLoader().getResource("XiamenPolygonData.txt")).getPath();
+  public static final String FILEPATH = Objects.requireNonNull(GeoFenceInport.class.getClassLoader().getResource("XiamenPolygonData.txt")).getPath();
 
   public static void main(String[] args) {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

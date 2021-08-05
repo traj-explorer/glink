@@ -78,7 +78,6 @@ public class GeoMesaSinkFunction<T>
     SimpleFeature sf = geomesaSimpleFeatureConverter.convertToSimpleFeature(value);
     SimpleFeature toWrite = featureWriter.next();
     toWrite.setAttributes(sf.getAttributes());
-    toWrite.setDefaultGeometry(sf.getDefaultGeometry());
     ((FeatureIdImpl) toWrite.getIdentifier()).setID(sf.getID());
     toWrite.getUserData().put(Hints.USE_PROVIDED_FID, Boolean.TRUE);
     toWrite.getUserData().putAll(sf.getUserData());

@@ -1,18 +1,21 @@
 package com.github.tm.glink.examples.demo.xiamen;
 
 import com.github.tm.glink.core.enums.TextFileSplitter;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.Properties;
 
 /**
  * @author Wang Haocheng
  * @date 2021/4/22 - 8:09 下午
  */
-public class CSVStringSourceSimulation extends RichSourceFunction<String> {
+public class CSVStringSourceSimulation {
 
     protected String filePath;
     protected BufferedReader bufferedReader;
@@ -27,14 +30,20 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
     private TextFileSplitter splitter;
     private boolean withPid; // 如果没有pid，我们需要自行在后面附加。
     private int pid;
+    private KafkaProducer kafkaProducer;
+    private String topic;
 
-    public CSVStringSourceSimulation(String filePath, int speedFactor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) {
+    public CSVStringSourceSimulation(Properties props, String topicid, String filePath, int speedFactor, int timeFieldIndex, TextFileSplitter splitter, boolean withPid) throws FileNotFoundException {
+        topic = topicid;
+        kafkaProducer = new KafkaProducer(props);
         this.filePath = filePath;
         this.speedFactor = speedFactor;
         this.timeFieldIndex = timeFieldIndex;
-        this.startTime = Instant.now().toEpochMilli();
+        startTime = Instant.now().toEpochMilli();
         this.splitter = splitter;
         this.withPid = withPid;
+        FileReader fileReader = new FileReader(filePath);
+        bufferedReader = new BufferedReader(fileReader);
     }
 
 
@@ -70,34 +79,23 @@ public class CSVStringSourceSimulation extends RichSourceFunction<String> {
         preEventTime = thisEventTime;
     }
 
-    @Override
-    public void open(Configuration parameters) throws Exception {
-        FileReader fileReader = new FileReader(filePath);
-        bufferedReader = new BufferedReader(fileReader);
-    }
-
-    @Override
-    public final void run(SourceContext<String> sourceContext) throws Exception {
+    public void run() throws Exception {
         String line;
+        System.out.println("******** Start sinking data into Kafka. ********");
         while ((line = bufferedReader.readLine()) != null) {
             if (speedFactor > 0)
                 checkTimeAndWait(line);
             if (!withPid) {
-                sourceContext.collect(line + "," + pid);
+                kafkaProducer.send(new ProducerRecord(topic, line + "," + pid));
                 pid++;
             } else {
-                sourceContext.collect(line);
+                kafkaProducer.send(new ProducerRecord(topic, line));
             }
         }
     }
 
-    @Override
-    public final void cancel() {
-
-    }
-
-    @Override
-    public final void close() throws Exception {
+    public void close() throws IOException {
         bufferedReader.close();
+        kafkaProducer.close();
     }
 }

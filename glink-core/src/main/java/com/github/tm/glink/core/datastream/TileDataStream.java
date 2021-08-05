@@ -4,27 +4,27 @@ import com.github.tm.glink.core.enums.TileAggregateType;
 import com.github.tm.glink.core.tile.*;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 import org.locationtech.jts.geom.Point;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
- * @param <T1> Any class extends {@link Point}.
- * @param <T2> The ACC type of {@link AggregateFunction}.
+ * @param <T> The ACC type of {@link AggregateFunction}.
  */
-public class TileDataStream<T1 extends Point, T2> {
+public class TileDataStream<T> {
 
   private DataStream<TileResult> tileResultDataStream;
 
@@ -33,7 +33,7 @@ public class TileDataStream<T1 extends Point, T2> {
    * @param aggFieldIndex The index of the field in the user data to be aggregated. If the aggregateType is COUNT, this parameter is useless.
    */
   public TileDataStream(
-          SpatialDataStream<T1> pointDataStream,
+          SpatialDataStream<Point> pointDataStream,
           TileAggregateType aggregateType,
           WindowAssigner windowAssigner,
           int aggFieldIndex,
@@ -41,29 +41,48 @@ public class TileDataStream<T1 extends Point, T2> {
           int lLevel) {
     tileResultDataStream = pointDataStream.getDataStream()
             .flatMap(new PixelGenerateFlatMap(hLevel, lLevel))
-            .keyBy(new KeyByTile())
+            .keyBy(new DefaultKeyByTile())
             .window(windowAssigner)
             .aggregate(TileAggregateType.getAggregateFunction(aggregateType, aggFieldIndex), new AddWindowTimeInfo());
   }
 
   public TileDataStream(
-          SpatialDataStream<T1> pointDataStream,
-          AggregateFunction<Tuple2<PixelResult, T1>, Map<Pixel, T2>, TileResult> aggregateFunction,
+          SpatialDataStream<Point> pointDataStream,
+          AggregateFunction<Tuple2<Tuple2<PixelResult, Point>, String>, Map<Pixel, T>, TileResult> aggregateFunction,
           WindowAssigner windowAssigner,
           int hLevel,
-          int lLevel) {
-    tileResultDataStream = pointDataStream.getDataStream()
-            .flatMap(new PixelGenerateFlatMap(hLevel, lLevel))
-            .keyBy(new KeyByTile())
-            .window(windowAssigner)
-            .aggregate(aggregateFunction, new AddWindowTimeInfo());
+          int lLevel,
+          Boolean addSalt,
+          AggregateFunction<TileResult, TileResult, TileResult> finalTileAggregate) {
+    if (addSalt) {
+      tileResultDataStream = pointDataStream.getDataStream()
+              .flatMap(new PixelGenerateFlatMap(hLevel, lLevel))
+              .returns(TypeInformation.of(new TypeHint<Tuple2<PixelResult<Integer>, Point>>() { }))
+              // 预聚合
+              .map(r -> new Tuple2<Tuple2<PixelResult<Integer>, Point>, String>(r, r.f0.getPixel().getTile().toString() + ThreadLocalRandom.current().nextLong(1, 20)))
+              .returns(TypeInformation.of(new TypeHint<Tuple2<Tuple2<PixelResult<Integer>, Point>, String>>() { }))
+              .keyBy(r -> r.f1)
+              .window(windowAssigner)
+              .aggregate(aggregateFunction)
+              // final aggregate
+              .keyBy(new KeyByTileWithOutSalt())
+              .window(windowAssigner)
+              .aggregate(finalTileAggregate, new AddWindowTimeInfo());
+    } else {
+      tileResultDataStream = pointDataStream.getDataStream()
+              .flatMap(new PixelGenerateFlatMap(hLevel, lLevel))
+              .keyBy(new DefaultKeyByTile())
+              // 预聚合
+              .window(windowAssigner)
+              .aggregate(aggregateFunction, new AddWindowTimeInfo());
+    }
   }
 
   public DataStream<TileResult> getTileResultDataStream() {
     return tileResultDataStream;
   }
 
-  private class PixelGenerateFlatMap extends RichFlatMapFunction<T1, Tuple2<PixelResult<Integer>, T1>> {
+  private class PixelGenerateFlatMap extends RichFlatMapFunction<Point, Tuple2<PixelResult<Integer>, Point>> {
     private static final long serialVersionUID = 5235060756502253407L;
     private transient TileGrid[] tileGrids;
     int hLevel, lLevel, levelNum;
@@ -88,7 +107,7 @@ public class TileDataStream<T1 extends Point, T2> {
     }
 
     @Override
-    public void flatMap(T1 value, Collector<Tuple2<PixelResult<Integer>, T1>> out) throws Exception {
+    public void flatMap(Point value, Collector<Tuple2<PixelResult<Integer>, Point>> out) throws Exception {
       int i = levelNum;
       while (0 < i) {
         out.collect(new Tuple2<>(new PixelResult<>(tileGrids[i - 1].getPixel(value.getY(), value.getX()), 1), value));
@@ -97,13 +116,27 @@ public class TileDataStream<T1 extends Point, T2> {
     }
   }
 
-  private class KeyByTile implements KeySelector<Tuple2<PixelResult<Integer>, T1>, Tile> {
-
+  private class DefaultKeyByTile implements KeySelector<Tuple2<PixelResult<Integer>, Point>, Tile> {
     private static final long serialVersionUID = 406340347008662020L;
-
     @Override
-    public Tile getKey(Tuple2<PixelResult<Integer>, T1> value) throws Exception {
+    public Tile getKey(Tuple2<PixelResult<Integer>, Point> value) {
       return value.f0.getPixel().getTile();
+    }
+  }
+
+  private class KeyByTileWithOutSalt implements KeySelector<TileResult, Tile> {
+    private static final long serialVersionUID = 2776649793200324329L;
+    @Override
+    public Tile getKey(TileResult value) {
+      return value.getTile();
+    }
+  }
+
+  private class KeyByTileWithSalt implements KeySelector<Tuple2<Tuple2<PixelResult, Point>, String>, String> {
+    private static final long serialVersionUID = 2776649793200324329L;
+    @Override
+    public String getKey(Tuple2<Tuple2<PixelResult, Point>, String> tuple2StringTuple2) throws Exception {
+      return tuple2StringTuple2.f1;
     }
   }
 

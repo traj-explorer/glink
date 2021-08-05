@@ -21,7 +21,7 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
   protected BufferedReader bufferedReader;
 
   // Variables for speed up the simulated stream.
-  private Integer speed_factor;
+  private Integer speed;
   private long startTime;
   private long startEventTime = -1;
   private long preEventTime;
@@ -34,9 +34,9 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
     this(filePath, 0);
   }
 
-  public CSVGeoObjectSource(String filePath, int speed_factor) {
+  public CSVGeoObjectSource(String filePath, int speed) {
     this.filePath = filePath;
-    this.speed_factor = speed_factor;
+    this.speed = speed;
     this.startTime = Instant.now().toEpochMilli();
   }
 
@@ -47,16 +47,16 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
     }
     TemporalObject temporalObject = (TemporalObject) geoObject;
     long thisEventTime = temporalObject.getTimestamp();
-    if(startEventTime<0) {
+    if (startEventTime < 0) {
       startEventTime = thisEventTime;
       preEventTime = thisEventTime;
     } else {
-      long gapTime = (thisEventTime - preEventTime)/speed_factor;
-      if(gapTime>0 || syncCounter > 1000) {
+      long gapTime = (thisEventTime - preEventTime) / speed;
+      if (gapTime > 0 || syncCounter > 1000) {
         long currentTime = System.currentTimeMillis();
-        long targetEmitTime = (long)((thisEventTime-startEventTime)/speed_factor) + startTime;
+        long targetEmitTime = (long) ((thisEventTime - startEventTime) / speed) + startTime;
         long waitTime = targetEmitTime - currentTime;
-        if (waitTime>0) {
+        if (waitTime > 0) {
           try {
             Thread.sleep(waitTime);
           } catch (InterruptedException e) {
@@ -83,7 +83,7 @@ public abstract class CSVGeoObjectSource<T extends GeoObject> extends RichSource
       T geoObject = parseLine(line);
       if (geoObject == null)
         continue;
-      if (speed_factor > 0)
+      if (speed > 0)
         checkTimeAndWait(geoObject);
       sourceContext.collect(geoObject);
     }
