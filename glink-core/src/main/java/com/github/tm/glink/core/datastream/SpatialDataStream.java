@@ -14,10 +14,7 @@ import com.github.tm.glink.core.operator.join.BroadcastKNNJoinFunction;
 import com.github.tm.glink.core.operator.join.JoinWithTopologyType;
 import com.github.tm.glink.core.operator.aggregate.PVAggregateFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.*;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -30,8 +27,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -171,6 +166,7 @@ public class SpatialDataStream<T extends Geometry> {
             .flatMap(textFormatMap)
             .returns(geometryType.getTypeInformation());
   }
+
   /**
    * Init a {@link SpatialDataStream} from a text file.
    * */
@@ -244,40 +240,6 @@ public class SpatialDataStream<T extends Geometry> {
       e.printStackTrace();
     }
     return null;
-  }
-
-  /**
-   * Spatial dimension join with external storage systems, such as geomesa.
-   * */
-  public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin() {
-    return null;
-  }
-
-  /**
-   * Spatial dimension join with a broadcast stream.
-   * @param joinStream a {@link BroadcastSpatialDataStream} to join with
-   * @param joinType join type
-   * @param joinFunction the join function
-   * @param returnType the return type of join
-   * */
-  public <T2 extends Geometry, OUT> DataStream<OUT> spatialDimensionJoin(
-          BroadcastSpatialDataStream<T2> joinStream,
-          TopologyType joinType,
-          JoinFunction<T, T2, OUT> joinFunction,
-          TypeHint<OUT> returnType) {
-    DataStream<T> dataStream1 = spatialDataStream;
-    DataStream<Tuple2<Boolean, T2>> dataStream2 = joinStream.getDataStream();
-    final MapStateDescriptor<Integer, TreeIndex<T2>> broadcastDesc = new MapStateDescriptor<>(
-            "broadcast-state-for-dim-join",
-            TypeInformation.of(Integer.class),
-            TypeInformation.of(new TypeHint<TreeIndex<T2>>() { }));
-    BroadcastStream<Tuple2<Boolean, T2>> broadcastStream = dataStream2.broadcast(broadcastDesc);
-    BroadcastJoinFunction<T, T2, OUT> broadcastJoinFunction = new BroadcastJoinFunction<>(joinType, joinFunction);
-    broadcastJoinFunction.setBroadcastDesc(broadcastDesc);
-    return dataStream1
-            .connect(broadcastStream)
-            .process(broadcastJoinFunction)
-            .returns(returnType);
   }
 
   /**

@@ -1,6 +1,7 @@
 package com.github.tm.glink.core.index;
 
 import com.github.tm.glink.features.ClassfiedGrids;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
@@ -18,9 +19,18 @@ public abstract class GridIndex implements Serializable {
 
   public abstract int getRes();
 
-  public abstract long getIndex(double lat, double lng);
+  public abstract long getIndex(double lng, double lat);
+
+  public abstract List<Long> getIndex(Envelope envelope);
 
   public abstract List<Long> getIndex(Geometry geom);
+
+  public abstract List<Long> getIndex(double lng, double lat, double distance);
+
+  /**
+   * Use for pair range join for analysis applications like DBSCAN.
+   * */
+  public abstract List<Long> getIndex(double lng, double lat, double distance, boolean reduce);
 
   /**
    * Get a list of grid indexes that may generate neighbor pairs with the input point.
@@ -32,14 +42,15 @@ public abstract class GridIndex implements Serializable {
    */
   public abstract List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode);
 
+  @Deprecated
   public abstract List<Long> getRangeIndex(double minLat, double minLng, double maxLat, double maxLng);
 
   /**
    * Get the indexes intersecting with the boundary of the input geometry.
-   * @param geoObject The geometry to get a boundary.
+   * @param geom The geometry to get a boundary.
    * @return Intersected indexes.
    */
-  public abstract List<Long> getIntersectIndex(Geometry geoObject);
+  public abstract List<Long> getIntersectIndex(Geometry geom);
 
   public abstract List<Long> getContainsIndex(Geometry geom);
 

@@ -46,7 +46,8 @@ public class SpatialDimensionJoin {
     BroadcastSpatialDataStream<Geometry> spatialDataStream2 = new BroadcastSpatialDataStream<>(
             env, new FlinkKafkaConsumer<>(districtTopic, new BeijingKafkaDeserializationSchema(), props));
 
-    spatialDataStream1.spatialDimensionJoin(
+    com.github.tm.glink.core.process.SpatialDimensionJoin.join(
+            spatialDataStream1,
             spatialDataStream2,
             TopologyType.N_CONTAINS,  // district contains trajectory point
             ((point, geometry) -> {

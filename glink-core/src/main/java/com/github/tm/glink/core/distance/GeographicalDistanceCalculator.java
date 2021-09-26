@@ -16,6 +16,6 @@ public class GeographicalDistanceCalculator implements DistanceCalculator {
 
   @Override
   public Envelope calcBoxByDist(Geometry geom, double distance) {
-    return GeoUtils.calcBoxByDist(geom.getCentroid(), distance);
+    return GeoUtils.calcEnvelopeByDis(geom.getCentroid(), distance);
   }
 }

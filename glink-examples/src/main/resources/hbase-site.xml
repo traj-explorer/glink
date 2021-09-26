@@ -31,12 +31,16 @@
   </property>
   <property>
     <name>hbase.rootdir</name>
-    <value>hdfs://localhost:9000/hbase</value>
+    <value>hdfs://localhost:9000/hbase1</value>
   </property>
   <!--<property>-->
   <!--  <name>hbase.zookeeper.property.dataDir</name>-->
   <!--  <value>/usr/local/hbase-1.4.13/data/zookeeper</value>-->
   <!--</property>-->
+  <property>
+    <name>zookeeper.znode.parent</name>
+    <value>/hbase1</value>
+  </property>
 
   <property>
     <name>hbase.zookeeper.property.clientPort</name>

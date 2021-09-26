@@ -3,6 +3,7 @@ package com.github.tm.glink.examples.aggregate;
 import com.github.tm.glink.core.datastream.BroadcastSpatialDataStream;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
+import com.github.tm.glink.core.process.SpatialDimensionJoin;
 import com.github.tm.glink.examples.utils.BroadcastFlatMapFunction;
 import com.github.tm.glink.examples.utils.SpatialFlatMapFunction;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -35,7 +36,8 @@ public class SpatialWindowApply {
             env, "localhost", 9999, broadcastFlatMapFunction);
 
     // 1. do join
-    DataStream<Tuple2<Geometry, Geometry>> joinedStream = spatialDataStream1.spatialDimensionJoin(
+    DataStream<Tuple2<Geometry, Geometry>> joinedStream = SpatialDimensionJoin.join(
+            spatialDataStream1,
             spatialDataStream2,
             TopologyType.WITHIN_DISTANCE.distance(1),
             Tuple2::new,

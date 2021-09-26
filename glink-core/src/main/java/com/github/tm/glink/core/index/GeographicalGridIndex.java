@@ -1,5 +1,6 @@
 package com.github.tm.glink.core.index;
 
+import com.github.tm.glink.core.util.GeoUtils;
 import com.github.tm.glink.features.ClassfiedGrids;
 import com.github.tm.glink.features.utils.GeoUtil;
 import org.apache.flink.annotation.VisibleForTesting;
@@ -12,46 +13,100 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Grid division based on geographic coordinate system.
+ *
  * @author Yu Liebing
  */
 public class GeographicalGridIndex extends GridIndex {
 
   private static final int MAX_BITS = 30;
 
+  private double minLat = -90.0;
+  private double maxLat = 90.0;
+  private double minLng = -180.0;
+  private double maxLng = 180.0;
+
   private double latWidth;
   private double lngWidth;
-  private double gridWidth;
 
   public GeographicalGridIndex(int res) {
-    if (res < 0 || res > MAX_BITS)
-      throw new IllegalArgumentException("Resolution of GridIndex must between [0, 30]");
+    if (res <= 0 || res > 30) {
+      throw new IllegalArgumentException("Resolution of grid index must in [1, 30]");
+    }
     this.res = res;
-    double splits = Math.pow(2, res);
-    this.latWidth = 180.d / splits;
-    this.lngWidth = 360.d / splits;
+    int splits = (int) Math.pow(2, res);
+    lngWidth = (maxLng - minLng) / splits;
+    latWidth = (maxLat - minLat) / splits;
   }
 
-  public GeographicalGridIndex(double gridWidth) {
-    this.gridWidth = gridWidth;
+  public GeographicalGridIndex(Envelope envelope, double lngDistance, double latDistance) {
+    this.minLng = envelope.getMinX();
+    this.maxLng = envelope.getMaxX();
+    this.minLat = envelope.getMinY();
+    this.maxLat = envelope.getMaxY();
+    lngWidth = GeoUtils.distanceToDEG(lngDistance);
+    latWidth = GeoUtils.distanceToDEG(latDistance);
+  }
+
+  public GeographicalGridIndex(Envelope envelope, int lngSplits, int latSplits) {
+    this(
+            envelope.getMinX(),
+            envelope.getMaxX(),
+            envelope.getMinY(),
+            envelope.getMaxY(),
+            lngSplits,
+            latSplits);
+  }
+
+  public GeographicalGridIndex(double minLng, double maxLng,
+                               double minLat, double maxLat,
+                               int lngSplits, int latSplits) {
+    this.minLat = minLat;
+    this.maxLat = maxLat;
+    this.minLng = minLng;
+    this.maxLng = maxLng;
+    lngWidth = (maxLng - minLng) / lngSplits;
+    latWidth = (maxLat - minLat) / latSplits;
+  }
+
+  public GeographicalGridIndex(double gridDistance) {
+    double deg = GeoUtils.distanceToDEG(gridDistance);
+    lngWidth = deg;
+    latWidth = deg;
   }
 
   @Override
   public int getRes() {
-    return res;
+    return 0;
   }
 
   @Override
-  public long getIndex(double lat, double lng) {
-    long x = (long) ((lat + 90.d) / latWidth);
-    long y = (long) ((lng + 180.d) / lngWidth);
+  public long getIndex(double lng, double lat) {
+    long x = (long) ((lng - minLng) / lngWidth);
+    long y = (long) ((lat -minLat) / latWidth);
     return combineXY(x, y);
+  }
+
+  @Override
+  public List<Long> getIndex(Envelope envelope) {
+    long minX = (long) ((envelope.getMinX() - minLng) / lngWidth);
+    long maxX = (long) ((envelope.getMaxX() - minLng) / lngWidth);
+    long minY = (long) ((envelope.getMinY() - minLat) / latWidth);
+    long maxY = (long) ((envelope.getMaxY() - minLat) / latWidth);
+    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
+    for (long x = minX; x <= maxX; ++x) {
+      for (long y = minY; y <= maxY; ++y) {
+        indexes.add(combineXY(x, y));
+      }
+    }
+    return indexes;
   }
 
   @Override
   public List<Long> getIndex(Geometry geom) {
     if (geom instanceof Point) {
       Point p = (Point) geom;
-      long index = getIndex(p.getY(), p.getX());
+      long index = getIndex(p.getX(), p.getY());
       return new ArrayList<Long>(1) {{ add(index); }};
     } else {
       return getIntersectIndex(geom);
@@ -59,44 +114,92 @@ public class GeographicalGridIndex extends GridIndex {
   }
 
   @Override
-  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
-    Coordinate upper = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 0, distance);
-    Coordinate right = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 90, distance);
-    Coordinate bottom = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 180, distance);
-    Coordinate left = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 270, distance);
-    long minX = (long) ((bottom.getX() + 90.d) / gridWidth);
-    long maxX = (long) ((upper.getX() + 90.d) / gridWidth);
-    long minY = (long) ((left.getY() + 180.d) / gridWidth);
-    long maxY = (long) ((right.getY() + 180.d) / gridWidth);
-    List<Long> res = new ArrayList<>();
+  public List<Long> getIndex(double lng, double lat, double distance) {
+    Envelope envelope = GeoUtils.calcEnvelopeByDis(lng, lat, distance);
+    return getIndex(envelope);
+  }
+
+  @Override
+  public List<Long> getIndex(double lng, double lat, double distance, boolean reduce) {
+    if (!reduce) {
+      return getIndex(lng, lat, distance);
+    }
+    Envelope envelope = GeoUtils.calcEnvelopeByDis(lng, lat, distance);
+    long minX = (long) ((envelope.getMinX() - minLng) / lngWidth);
+    long maxX = (long) ((envelope.getMaxX() - minLng) / lngWidth);
+    long minY = (long) ((envelope.getMinY() - minLat) / latWidth);
+    long maxY = (long) ((envelope.getMaxY() - minLat) / latWidth);
+    List<Long> res = new ArrayList<>(3);
     if (minX == maxX && minY == maxY) {
-      res.add(combineXY(minX, minY));
       return res;
     } else if (minX == maxX && minY < maxY) {
-      res.add(combineXY(minX, minY));
+      res.add(combineXY(minX, maxY));
       return res;
     } else if (minX < maxX && minY == maxY) {
-      res.add(combineXY(maxX, minY));
+      res.add(combineXY(minX, minY));
       return res;
     } else {
-      long curX = (long) ((lat + 90.d) / gridWidth);
-      long curY = (long) ((lng + 180.d) / gridWidth);
+      long curX = (long) ((lng - minLng) / lngWidth);
+      long curY = (long) ((lat - minLat) / latWidth);
       if (curX == minX && curY == minY) {
-        res.add(combineXY(maxX, minY));
+        res.add(combineXY(minX, maxY));
         res.add(combineXY(maxX, maxY));
         return res;
-      } else if (curX == maxX && curY == minY) {
+      } else if (curX == minX && curY == maxY) {
         return res;
       } else if (curX == maxX && curY == maxY) {
-        res.add(combineXY(maxX, minY));
+        res.add(combineXY(minX, maxY));
         return res;
-      } else {
+      } else if (curX == maxX && curY == minY) {
         res.add(combineXY(minX, minY));
-        res.add(combineXY(maxX, minY));
+        res.add(combineXY(minX, maxY));
         res.add(combineXY(maxX, maxY));
         return res;
       }
     }
+    return res;
+  }
+
+  @Override
+  public List<Long> getRangeIndex(double lat, double lng, double distance, boolean fullMode) {
+//    Coordinate upper = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 0, distance);
+//    Coordinate right = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 90, distance);
+//    Coordinate bottom = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 180, distance);
+//    Coordinate left = GeoUtil.calculateEndingLatLng(new Coordinate(lat, lng), 270, distance);
+//    long minX = (long) ((bottom.getX() + 90.d) / gridWidth);
+//    long maxX = (long) ((upper.getX() + 90.d) / gridWidth);
+//    long minY = (long) ((left.getY() + 180.d) / gridWidth);
+//    long maxY = (long) ((right.getY() + 180.d) / gridWidth);
+//    List<Long> res = new ArrayList<>();
+//    if (minX == maxX && minY == maxY) {
+//      res.add(combineXY(minX, minY));
+//      return res;
+//    } else if (minX == maxX && minY < maxY) {
+//      res.add(combineXY(minX, minY));
+//      return res;
+//    } else if (minX < maxX && minY == maxY) {
+//      res.add(combineXY(maxX, minY));
+//      return res;
+//    } else {
+//      long curX = (long) ((lat + 90.d) / gridWidth);
+//      long curY = (long) ((lng + 180.d) / gridWidth);
+//      if (curX == minX && curY == minY) {
+//        res.add(combineXY(maxX, minY));
+//        res.add(combineXY(maxX, maxY));
+//        return res;
+//      } else if (curX == maxX && curY == minY) {
+//        return res;
+//      } else if (curX == maxX && curY == maxY) {
+//        res.add(combineXY(maxX, minY));
+//        return res;
+//      } else {
+//        res.add(combineXY(minX, minY));
+//        res.add(combineXY(maxX, minY));
+//        res.add(combineXY(maxX, maxY));
+//        return res;
+//      }
+//    }
+    return null;
   }
 
   @Override
@@ -116,35 +219,26 @@ public class GeographicalGridIndex extends GridIndex {
   }
 
   @Override
-  public List<Long> getIntersectIndex(Geometry geoObject) {
-    Envelope envelope = geoObject.getEnvelopeInternal();
-    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
-    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
-    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
-    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
-    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
-    for (long x = minX; x <= maxX; ++x) {
-      for (long y = minY; y <= maxY; ++y) {
-        indexes.add(combineXY(x, y));
-      }
-    }
-    return indexes;
+  public List<Long> getIntersectIndex(Geometry geom) {
+    // TODO: optimize this
+    return getIndex(geom.getEnvelopeInternal());
   }
 
   @Override
   public List<Long> getContainsIndex(Geometry geom) {
-    Envelope envelope = geom.getEnvelopeInternal();
-    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
-    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
-    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
-    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
-    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
-    for (long x = minX; x <= maxX; ++x) {
-      for (long y = minY; y <= maxY; ++y) {
-        long index = combineXY(x, y);
-      }
-    }
-    return indexes;
+//    Envelope envelope = geom.getEnvelopeInternal();
+//    long minX = (long) ((envelope.getMinX() + 90.d) / gridWidth);
+//    long maxX = (long) ((envelope.getMaxX() + 90.d) / gridWidth);
+//    long minY = (long) ((envelope.getMinY() + 180.d) / gridWidth);
+//    long maxY = (long) ((envelope.getMaxY() + 180.d) / gridWidth);
+//    List<Long> indexes = new ArrayList<>((int) ((maxX - minX + 1) * (maxY - minY + 1)));
+//    for (long x = minX; x <= maxX; ++x) {
+//      for (long y = minY; y <= maxY; ++y) {
+//        long index = combineXY(x, y);
+//      }
+//    }
+//    return indexes;
+    return null;
   }
 
   @Override

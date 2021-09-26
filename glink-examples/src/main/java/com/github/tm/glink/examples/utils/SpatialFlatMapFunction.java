@@ -10,6 +10,10 @@ import org.locationtech.jts.io.WKTReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Parse text line to geometry object.
+ * Text line format: id,WKT,HH:mm:ss
+ * */
 public class SpatialFlatMapFunction extends RichFlatMapFunction<String, Geometry> {
 
   private WKTReader wktReader;

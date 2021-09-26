@@ -2,11 +2,14 @@ package com.github.tm.glink.core.util;
 
 import com.github.tm.glink.core.distance.DistanceCalculator;
 import com.github.tm.glink.core.distance.GeographicalDistanceCalculator;
+import com.github.tm.glink.core.index.TRTreeIndex;
+import com.github.tm.glink.core.index.TreeIndex;
 import org.junit.Test;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 
+import java.util.List;
 import java.util.Random;
 
 public class GeoUtilsTest {
@@ -22,10 +25,69 @@ public class GeoUtilsTest {
   }
 
   @Test
-  public void calcBoxByDistTest() {
+  public void calcEnvelopeByDisTest() {
     Point p = factory.createPoint(new Coordinate(114, 34));
-    Envelope envelope = GeoUtils.calcBoxByDist(p, 0.1);
+    Envelope envelope = GeoUtils.calcEnvelopeByDis(p, 0.1);
     System.out.println(envelope);
+  }
+
+  @Test
+  public void calcPointOnBearingTest() {
+    calcEnvelopeByDisTest();
+
+    Coordinate c1 = GeoUtils.calcPointOnBearing(114, 34, 0, 0.1);
+    Coordinate c2 = GeoUtils.calcPointOnBearing(114, 34, 90, 0.1);
+    Coordinate c3 = GeoUtils.calcPointOnBearing(114, 34, 180, 0.1);
+    Coordinate c4 = GeoUtils.calcPointOnBearing(114, 34, 270, 0.1);
+    System.out.println(c1);
+    System.out.println(c2);
+    System.out.println(c3);
+    System.out.println(c4);
+  }
+
+  @Test
+  public void generateGraph() {
+    double stepDis = 0.05;
+    double startLng = 100., startLat = 30.;
+    int count = 1;
+    for (int i = 0; i < 4; ++i) {
+      Coordinate c = GeoUtils.calcPointOnBearing(startLng, startLat, 180, stepDis * i);
+      double curLat = c.getY();
+      for (int j = 0; j < 4; ++j) {
+        Coordinate cc = GeoUtils.calcPointOnBearing(startLng, curLat, 90, stepDis * j);
+        System.out.println(count + "," + cc.getX() + "," + cc.getY() + "," + "2021-09-24 20:00:00,1");
+        ++count;
+      }
+    }
+  }
+
+  @Test
+  public void tmp() {
+    Coordinate c1 = GeoUtils.calcPointOnBearing(100.00103843159746, 29.99865101537369, 0, 0.05);
+    System.out.println(c1);
+    Coordinate c2 = GeoUtils.calcPointOnBearing(100, 30, 270, 0.05);
+    System.out.println(c2);
+    Coordinate c3 = GeoUtils.calcPointOnBearing(100, 30, 90, 0.2);
+    System.out.println(c3);
+    Coordinate c4 = GeoUtils.calcPointOnBearing(100, 30, 180, 0.2);
+    System.out.println(c4);
+  }
+
+  @Test
+  public void tmp1() {
+    double lng1 = 100.0, lat1 = 29.998651019448356;
+    double lng2 = 100.00051921579875, lat2 = 29.998651018429687;
+    double dis = GeoUtils.calcDistance(
+            lng1, lat1,
+            lng2, lat2);
+    System.out.println(dis);
+
+    GeometryFactory factory = new GeometryFactory();
+
+    TreeIndex<Point> treeIndex = new TRTreeIndex<>();
+    treeIndex.insert(factory.createPoint(new Coordinate(lng1, lat1)));
+    List<Point> query = treeIndex.query(GeoUtils.calcEnvelopeByDis(lng2, lat2, 0.0505));
+    System.out.println(query);
   }
 
   @Test
@@ -37,7 +99,7 @@ public class GeoUtilsTest {
   @Test
   public void generateRandomDataForDistanceJoin() {
     Point p1 = factory.createPoint(new Coordinate(114, 34));
-    Envelope envelope = GeoUtils.calcBoxByDist(p1, 1);
+    Envelope envelope = GeoUtils.calcEnvelopeByDis(p1, 1);
     System.out.println(envelope);
     double lngStep = envelope.getMaxX() - envelope.getMinX();
     double latStep = envelope.getMaxY() - envelope.getMinY();

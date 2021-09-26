@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * @author Yu Liebing
  */
+@Deprecated
 public class H3Index extends GridIndex {
 
   private H3Core h3Core;
@@ -46,7 +47,22 @@ public class H3Index extends GridIndex {
   }
 
   @Override
+  public List<Long> getIndex(Envelope envelope) {
+    return null;
+  }
+
+  @Override
   public List<Long> getIndex(Geometry geom) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getIndex(double lng, double lat, double distance) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getIndex(double lng, double lat, double distance, boolean reduce) {
     return null;
   }
 

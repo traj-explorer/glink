@@ -19,7 +19,7 @@
     </modules>
 
     <properties>
-        <flink.version>1.12.0</flink.version>
+        <flink.version>1.13.2</flink.version>
         <kafka.version>2.4.1</kafka.version>
         <avro.version>1.8.2</avro.version>
         <bijection.version>0.9.7</bijection.version>
@@ -36,7 +36,7 @@
         <spatial4j.version>0.8</spatial4j.version>
         <geotools.version>23.3</geotools.version>
         <jts.version>1.16.1</jts.version>
-        <geomesa.version>3.1.0</geomesa.version>
+        <geomesa.version>3.2.1</geomesa.version>
     </properties>
 
     <scm>

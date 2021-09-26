@@ -1,8 +1,9 @@
-package com.github.tm.glink.examples.join;
+package com.github.tm.glink.examples.process;
 
 import com.github.tm.glink.core.datastream.BroadcastSpatialDataStream;
 import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.TopologyType;
+import com.github.tm.glink.core.process.SpatialDimensionJoin;
 import com.github.tm.glink.examples.utils.BroadcastFlatMapFunction;
 import com.github.tm.glink.examples.utils.SpatialFlatMapFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -16,7 +17,7 @@ import org.locationtech.jts.geom.Geometry;
  *
  * @author Yu Liebing
  * */
-public class SpatialDimensionJoin {
+public class SpatialDimensionJoinExample {
 
   public static void main(String[] args) throws Exception {
     final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -27,10 +28,13 @@ public class SpatialDimensionJoin {
     FlatMapFunction<String, Geometry> flatMapFunction = new SpatialFlatMapFunction();
     FlatMapFunction<String, Tuple2<Boolean, Geometry>> broadcastFlatMapFunction = new BroadcastFlatMapFunction();
 
-    SpatialDataStream<Geometry> spatialDataStream1 = new SpatialDataStream<>(env, "localhost", 8888, flatMapFunction);
-    BroadcastSpatialDataStream<Geometry> spatialDataStream2 = new BroadcastSpatialDataStream<>(env, "localhost", 9999, broadcastFlatMapFunction);
+    SpatialDataStream<Geometry> spatialDataStream1 = new SpatialDataStream<>(
+            env, "localhost", 8888, flatMapFunction);
+    BroadcastSpatialDataStream<Geometry> spatialDataStream2 = new BroadcastSpatialDataStream<>(
+            env, "localhost", 9999, broadcastFlatMapFunction);
 
-    spatialDataStream1.spatialDimensionJoin(
+    SpatialDimensionJoin.join(
+            spatialDataStream1,
             spatialDataStream2,
             TopologyType.WITHIN_DISTANCE.distance(1.0),
             Tuple2::new,

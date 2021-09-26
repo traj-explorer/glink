@@ -8,20 +8,43 @@ import java.util.List;
 
 public class GeographicalGridIndexTest {
 
-  private final GeographicalGridIndex gridIndex = new GeographicalGridIndex(17);
+  private final GeographicalGridIndex gridIndex = new GeographicalGridIndex(2);
+  private final GeographicalGridIndex gridIndex1 =
+          new GeographicalGridIndex(100, 110, 20, 40, 4, 8);
 
   @Test
-  public void getIndexTest() {
-    long index = gridIndex.getIndex(45, 90);
+  public void getPointIndexTest() {
+    long index = gridIndex.getIndex(100, 40);
     long[] xy = gridIndex.getXY(index);
     System.out.println("[" + xy[0] + ", " + xy[1] + "]");
+
+    long index1 = gridIndex1.getIndex(105, 30);
+    long[] xy1 = gridIndex1.getXY(index1);
+    System.out.println("[" + xy1[0] + ", " + xy1[1] + "]");
+  }
+
+  @Test
+  public void getEnvelopIndexTest() {
+    Envelope envelope = new Envelope(103, 107, 23, 34);
+
+    List<Long> indices = gridIndex.getIndex(envelope);
+    for (Long index : indices) {
+      long[] xy = gridIndex.getXY(index);
+      System.out.println("[" + xy[0] + ", " + xy[1] + "]");
+    }
+
+    List<Long> indices1 = gridIndex1.getIndex(envelope);
+    for (Long index : indices1) {
+      long[] xy1 = gridIndex1.getXY(index);
+      System.out.println("[" + xy1[0] + ", " + xy1[1] + "]");
+    }
   }
 
   @Test
   public void getRangeIndexTest() {
     GeometryFactory geometryFactory = new GeometryFactory();
     Point point = geometryFactory.createPoint(new Coordinate(114, 34));
-    Envelope envelope = GeoUtils.calcBoxByDist(point, 1);
+    Envelope envelope = GeoUtils.calcEnvelopeByDis(point, 1);
     List<Long> index = gridIndex.getIndex(point);
     System.out.println(index);
 

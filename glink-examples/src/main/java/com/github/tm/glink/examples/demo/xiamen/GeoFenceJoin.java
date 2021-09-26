@@ -13,6 +13,7 @@ import com.github.tm.glink.core.datastream.SpatialDataStream;
 import com.github.tm.glink.core.enums.GeometryType;
 import com.github.tm.glink.core.enums.TextFileSplitter;
 import com.github.tm.glink.core.enums.TopologyType;
+import com.github.tm.glink.core.process.SpatialDimensionJoin;
 import com.github.tm.glink.core.tile.Pixel;
 import com.github.tm.glink.core.tile.PixelResult;
 import com.github.tm.glink.core.tile.TileResult;
@@ -107,8 +108,7 @@ public class GeoFenceJoin {
                 Schema.types(Integer.class, Double.class, Integer.class, Long.class, String.class, String.class))
                 .assignTimestampsAndWatermarks((WatermarkStrategy.<Point>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner((event, timestamp) -> ((Tuple) event.getUserData()).getField(TIMEFIELDINDEX))));
-        originalDataStream
-                .spatialDimensionJoin(bsd, TopologyType.N_CONTAINS, new AddFenceId(), new TypeHint<Point>() { })
+        SpatialDimensionJoin.join(originalDataStream, bsd, TopologyType.N_CONTAINS, new AddFenceId(), new TypeHint<Point>() { })
                 .addSink(pointSink);
         env.execute();
 

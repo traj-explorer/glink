@@ -25,7 +25,6 @@ public class GeometricGridIndex extends GridIndex {
   public GeometricGridIndex(int res, Envelope box) {
     if (res < 0 || res > MAX_BITS)
       throw new IllegalArgumentException("Resolution of GridIndex must between [0, 30]");
-    this.res = res;
     minX = box.getMinX();
     maxX = box.getMaxX();
     minY = box.getMinY();
@@ -37,7 +36,7 @@ public class GeometricGridIndex extends GridIndex {
 
   @Override
   public int getRes() {
-    return res;
+    return 0;
   }
 
   @Override
@@ -48,7 +47,22 @@ public class GeometricGridIndex extends GridIndex {
   }
 
   @Override
+  public List<Long> getIndex(Envelope envelope) {
+    return null;
+  }
+
+  @Override
   public List<Long> getIndex(Geometry geom) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getIndex(double lng, double lat, double distance) {
+    return null;
+  }
+
+  @Override
+  public List<Long> getIndex(double lng, double lat, double distance, boolean reduce) {
     return null;
   }
 

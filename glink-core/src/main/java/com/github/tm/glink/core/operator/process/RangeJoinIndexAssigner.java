@@ -15,6 +15,7 @@ import java.util.List;
  * assigned with a index of the neighbor grid. As for exact data broadcast mechanism, see {@link GeographicalGridIndex}.
  * @author Yu Liebing
  */
+@Deprecated
 public class RangeJoinIndexAssigner extends RichFlatMapFunction<Point, Tuple3<Boolean, Long, Point>> {
 
   private double distance;
