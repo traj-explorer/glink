@@ -2,14 +2,12 @@ package com.github.tm.glink.core.index;
 
 import com.github.tm.glink.core.util.GeoUtils;
 import com.github.tm.glink.features.ClassfiedGrids;
-import com.github.tm.glink.features.utils.GeoUtil;
 import org.apache.flink.annotation.VisibleForTesting;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -83,7 +81,7 @@ public class GeographicalGridIndex extends GridIndex {
   @Override
   public long getIndex(double lng, double lat) {
     long x = (long) ((lng - minLng) / lngWidth);
-    long y = (long) ((lat -minLat) / latWidth);
+    long y = (long) ((lat - minLat) / latWidth);
     return combineXY(x, y);
   }
 
@@ -285,5 +283,56 @@ public class GeographicalGridIndex extends GridIndex {
     long y = index & 0x3fffffff;
     long x = index >> MAX_BITS;
     return new long[] {x, y};
+  }
+
+  /**
+   * 以四邻域或八邻域获取一个网格的邻居网格索引值。
+   * @param index 中心网格索引
+   * @param type 邻域类型
+   * @return
+   * @throws Exception
+   */
+  public List<Long> getNeighbors(long index, int type) {
+    if (type == 8) {
+      return this.kRing(index, 1);
+    } else if (type == 4) {
+      long[] coor = this.getXY(index);
+      long x = coor[0];
+      long y = coor[1];
+      List<Long> res = new LinkedList<>();
+      res.add(combineXY(x + 1, y));
+      res.add(combineXY(x - 1, y));
+      res.add(combineXY(x, y + 1));
+      res.add(combineXY(x, y - 1));
+      return res;
+    }
+    return null;
+  }
+
+  /**
+   * 获取一个网格所对应的四叉树分区ID
+   * @param index 网格索引值
+   * @param level 四叉树划分层级，对应分区数量为 4 ^ level;
+   * @return 分区ID，最多2*level位
+   */
+  public Long getPartition(long index, int level) {
+    long[] coor = this.getXY(index);
+    long partitionX = (long) (coor[0] / (((long) ((maxLat - minLat) / latWidth)) / Math.pow(2.0, level)));
+    long partitionY = (long) (coor[1] / (((long) ((maxLng - minLng) / lngWidth)) / Math.pow(2.0, level)));
+    return partitionX << level | partitionY;
+  }
+
+  public Polygon getGridPolygon(long index) {
+    long[] xy = getXY(index);
+    double cLng = xy[0] * lngWidth + minLng;
+    double cLat = xy[1] * latWidth + minLat;
+    Coordinate[] vertexs = new Coordinate[5];
+    vertexs[0] = new Coordinate(cLng - lngWidth / 2, cLat - latWidth / 2);
+    vertexs[1] = new Coordinate(cLng + lngWidth / 2, cLat - latWidth / 2);
+    vertexs[2] = new Coordinate(cLng + lngWidth / 2, cLat + latWidth / 2);
+    vertexs[3] = new Coordinate(cLng - lngWidth / 2, cLat + latWidth / 2);
+    vertexs[4] = new Coordinate(cLng - lngWidth / 2, cLat - latWidth / 2);
+    GeometryFactory factory = new GeometryFactory();
+    return new Polygon(new LinearRing(new CoordinateArraySequence(vertexs), factory), null, factory);
   }
 }

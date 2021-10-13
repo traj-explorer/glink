@@ -40,6 +40,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import javax.xml.crypto.Data;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -201,6 +202,12 @@ public class SpatialDataStream<T extends Geometry> {
                            final int port,
                            final FlatMapFunction<String, T> flatMapFunction) {
     this(env, host, port, "\n", flatMapFunction);
+  }
+
+  public SpatialDataStream(final StreamExecutionEnvironment env,
+                           final DataStream<T> spatialDataStream) {
+    this.env = env;
+    this.spatialDataStream = spatialDataStream;
   }
 
   public SpatialDataStream<T> assignTimestampsAndWatermarks(WatermarkStrategy<T> watermarkStrategy) {
