@@ -1,5 +1,3 @@
 # Glink
 
-Glink is a spatial stream processing framework based on Apache FLink.
-
-Learn more about Glink at [https://glink.gitbook.io/docs/](https://glink.gitbook.io/docs/)
+**Note: This repo is deprecated, please refer to https://github.com/glink-incubator/glink for lastest Glink code and documentation.**
